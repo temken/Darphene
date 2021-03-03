@@ -1,41 +1,29 @@
-# Option A: If a static library is built. (see src/CMakeLists.txt)
-add_executable(tests
-	test_module.cpp)
-
-target_link_libraries(tests 
+# 1. Unit tests: Graphene.xpp
+add_executable(test_Graphene
+	test_Graphene.cpp)
+target_link_libraries(test_Graphene 
 	PRIVATE
-		module_library
+		graphene_library
 		gtest_main ) #contains the main function
-
-target_include_directories(tests
+target_include_directories(test_Graphene
 	PRIVATE
 		${GENERATED_DIR} )
-
-target_compile_options(tests PUBLIC -Wall -pedantic)
-
-install(TARGETS tests DESTINATION ${TESTS_DIR})
-
-add_test(NAME all_tests COMMAND tests
+target_compile_options(test_Graphene PUBLIC -Wall -pedantic)
+# install(TARGETS tests DESTINATION ${TESTS_DIR})
+add_test(NAME test_Graphene COMMAND test_Graphene
 	WORKING_DIRECTORY ${TESTS_DIR} )
 
-#####################################################################
-# # Option B: If no static library is built.(see src/CMakeLists.txt)
-# add_executable(tests
-# 	test_module.cpp
-# 	${SRC_DIR}/module.cpp)
-
-# target_link_libraries(tests
-# 	PUBLIC
-# 		coverage_config 
-# 	PRIVATE
-# 		gtest_main	#contains the main function
-# 		libobscura )
-
-# target_include_directories(tests PRIVATE ${GENERATED_DIR} )
-
-# target_compile_options(tests PUBLIC -Wall -pedantic)
-
+# 2. Unit tests: Hydrogenic_Wavefunctions.xpp
+add_executable(test_Hydrogenic_Wavefunctions
+	test_Hydrogenic_Wavefunctions.cpp)
+target_link_libraries(test_Hydrogenic_Wavefunctions 
+	PRIVATE
+		graphene_library
+		gtest_main ) #contains the main function
+target_include_directories(test_Hydrogenic_Wavefunctions
+	PRIVATE
+		${GENERATED_DIR} )
+target_compile_options(test_Hydrogenic_Wavefunctions PUBLIC -Wall -pedantic)
 # install(TARGETS tests DESTINATION ${TESTS_DIR})
-
-# add_test(NAME all_tests COMMAND tests
-# 	WORKING_DIRECTORY ${TESTS_DIR})
+add_test(NAME test_Hydrogenic_Wavefunctions COMMAND test_Hydrogenic_Wavefunctions
+	WORKING_DIRECTORY ${TESTS_DIR} )
