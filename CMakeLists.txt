@@ -18,6 +18,8 @@ set(TESTS_DIR     ${PROJECT_SOURCE_DIR}/tests)
 set(EXTERNAL_DIR  ${PROJECT_SOURCE_DIR}/external)
 
 #External projects
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
 include(FetchContent)
 # obscura
 set(OBSCURA_DIR   ${EXTERNAL_DIR}/obscura)

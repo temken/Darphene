@@ -3,8 +3,6 @@
 
 namespace graphene
 {
-
-double func();
 }	// namespace graphene
 
 #endif

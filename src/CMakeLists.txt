@@ -28,6 +28,7 @@
 	target_link_libraries(graphene_library
 		PUBLIC
 			coverage_config
+			Eigen3::Eigen
 			libobscura
 			libphysica)
 

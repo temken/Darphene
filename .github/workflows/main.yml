@@ -36,6 +36,11 @@ jobs:
     - name: Install codecov
       shell: bash
       run: sudo pip install codecov
+      
+    # EIGEN
+    - name: Install eigen
+      shell: bash
+      run: sudo apt install libeigen3-dev
 
     # BUILD
     - name: Create Build Environment
