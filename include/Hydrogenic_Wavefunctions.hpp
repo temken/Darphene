@@ -7,16 +7,16 @@ namespace graphene
 {
 
 // Position space
-extern double Hydrogenic_Wavefunction_2s(Eigen::Vector3d& position, double Zeff);
-extern double Hydrogenic_Wavefunction_2px(Eigen::Vector3d& position, double Zeff);
-extern double Hydrogenic_Wavefunction_2py(Eigen::Vector3d& position, double Zeff);
-extern double Hydrogenic_Wavefunction_2pz(Eigen::Vector3d& position, double Zeff);
+extern double Hydrogenic_Wavefunction_2s(const Eigen::Vector3d& position, double Zeff);
+extern double Hydrogenic_Wavefunction_2px(const Eigen::Vector3d& position, double Zeff);
+extern double Hydrogenic_Wavefunction_2py(const Eigen::Vector3d& position, double Zeff);
+extern double Hydrogenic_Wavefunction_2pz(const Eigen::Vector3d& position, double Zeff);
 
 // Momentum space
-extern double Hydrogenic_Wavefunction_Momentum_2s(Eigen::Vector3d& momentum, double Zeff);
-extern double Hydrogenic_Wavefunction_Momentum_2px(Eigen::Vector3d& momentum, double Zeff);
-extern double Hydrogenic_Wavefunction_Momentum_2py(Eigen::Vector3d& momentum, double Zeff);
-extern double Hydrogenic_Wavefunction_Momentum_2pz(Eigen::Vector3d& momentum, double Zeff);
+extern double Hydrogenic_Wavefunction_Momentum_2s(const Eigen::Vector3d& momentum, double Zeff);
+extern double Hydrogenic_Wavefunction_Momentum_2px(const Eigen::Vector3d& momentum, double Zeff);
+extern double Hydrogenic_Wavefunction_Momentum_2py(const Eigen::Vector3d& momentum, double Zeff);
+extern double Hydrogenic_Wavefunction_Momentum_2pz(const Eigen::Vector3d& momentum, double Zeff);
 
 }	// namespace graphene
 
