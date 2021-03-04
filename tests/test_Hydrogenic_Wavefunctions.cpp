@@ -1,7 +1,10 @@
 #include "gtest/gtest.h"
 
+#include <functional>
+
 // Headers from libphysica
 #include "Natural_Units.hpp"
+#include "Numerics.hpp"
 
 #include "Hydrogenic_Wavefunctions.hpp"
 
@@ -24,12 +27,20 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionValues)
 	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_2pz(position, Zeff), phi_2pz);
 }
 
-// TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization)
-// {
-// 	//ARRANGE
-// 	//ACT & ASSERT
+TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2s)
+{
+	//ARRANGE
+	double Zeff								= 2.0;
+	std::function<double(double)> integrand = [Zeff](double r) {
+		Eigen::Vector3d position({r, 0, 0});
+		double phi = Hydrogenic_Wavefunction_2s(position, Zeff);
+		return 4.0 * M_PI * r * r * phi * phi;
+	};
+	double epsilon = 1.0e-8;
 
-// }
+	//ACT & ASSERT
+	EXPECT_FLOAT_EQ(libphysica::Integrate(integrand, 0.0, 15 * Bohr_Radius, epsilon), 1.0);
+}
 
 TEST(TestHydrogenicWavefunctions, TestMomentumWavefunctionValues)
 {
