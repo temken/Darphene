@@ -17,14 +17,15 @@ TEST(TestGraphene, TestEnergyDispersionPi)
 	Graphene graphene;
 	std::vector<std::vector<double>> results = {{-6.5602 * eV, 14.843393 * eV},
 												{-2.6864482 * eV, 3.4822043 * eV},
-												{-1.0648358e-15 * eV, 1.0648358e-15 * eV}};
+												{0.0 * eV, 0.0 * eV}};
+	double tolerance						 = 1.0e-5 * eV;
 	//ACT & ASSERT
 	int i = 0;
 	for(auto& lVec : high_symmetry_points)
 	{
 		std::vector<double> energy_analytic = graphene.Energy_Dispersion_Pi_Analytic(lVec);
-		EXPECT_FLOAT_EQ(energy_analytic[0], results[i][0]);
-		EXPECT_FLOAT_EQ(energy_analytic[1], results[i++][1]);
+		EXPECT_NEAR(energy_analytic[0], results[i][0], tolerance);
+		EXPECT_NEAR(energy_analytic[1], results[i++][1], tolerance);
 	}
 }
 
