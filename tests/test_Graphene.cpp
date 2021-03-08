@@ -45,3 +45,29 @@ TEST(TestGraphene, TestEnergyDispersionPiAnalytic)
 		EXPECT_FLOAT_EQ(energy_analytic[1], energy_numeric[1]);
 	}
 }
+
+TEST(TestGraphene, TestEnergyDispersionSigma)
+{
+	//ARRANGE
+	double aCC										  = 1.42 * Angstrom;
+	double a										  = aCC * sqrt(3.0);
+	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
+	Graphene graphene;
+	std::vector<std::vector<double>> results = {
+		{-17.833129584352082 * eV, -2.93125 * eV, -2.93125 * eV, 3.08466 * eV, 3.08466 * eV, 31.425824175824184 * eV},
+		{-14.802126408956223 * eV, -11.691743504673768 * eV, -7.06817 * eV, 10.476314847203604 * eV, 12.661549197487779 * eV, 20.1867 * eV},
+		{-13.064658876661905 * eV, -13.064658876661898 * eV, -8.56991 * eV, 12.119618979416404 * eV, 12.119618979416412 * eV, 20.604255319148937 * eV}};
+	double tolerance = 1.0e-5 * eV;
+	//ACT & ASSERT
+	int i = 0;
+	for(auto& lVec : high_symmetry_points)
+	{
+		std::vector<double> energy = graphene.Energy_Dispersion_Sigma(lVec);
+		EXPECT_NEAR(energy[0], results[i][0], tolerance);
+		EXPECT_NEAR(energy[1], results[i][1], tolerance);
+		EXPECT_NEAR(energy[2], results[i][2], tolerance);
+		EXPECT_NEAR(energy[3], results[i][3], tolerance);
+		EXPECT_NEAR(energy[4], results[i][4], tolerance);
+		EXPECT_NEAR(energy[5], results[i++][5], tolerance);
+	}
+}

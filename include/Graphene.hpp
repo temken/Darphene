@@ -19,7 +19,7 @@ class Graphene
 	std::vector<Eigen::Vector3d> lattice_vectors, reciprocal_lattice_vectors, nearest_neighbors;
 
 	// Overlap and transfer integrals
-	double s, Sss, Ssp, Ssigma, Spi, t, Hss, Hsp, Hsigma, Hpi, epsilon_2s, epsilon_2p;
+	double s, sPrime, Sss, Ssp, Ssigma, Spi, t, Hss, Hsp, Hsigma, Hpi, epsilon_2s, epsilon_2p;
 
 	double Zeff_2s, Zeff_2px_2py, Zeff_2pz;
 	std::complex<double> Bloch_Wavefunction_A(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, double Zeff) const;
@@ -27,14 +27,19 @@ class Graphene
 
 	std::complex<double> f_aux(const Eigen::Vector3d& lVec) const;
 
+  public:
 	Eigen::MatrixXcd S_Matrix_Pi(const Eigen::Vector3d& lVec) const;
 	Eigen::MatrixXcd H_Matrix_Pi(const Eigen::Vector3d& lVec) const;
 
-  public:
+	Eigen::MatrixXcd S_Matrix_Sigma(const Eigen::Vector3d& lVec) const;
+	Eigen::MatrixXcd H_Matrix_Sigma(const Eigen::Vector3d& lVec) const;
+
 	Graphene();
 
 	std::vector<double> Energy_Dispersion_Pi(const Eigen::Vector3d& lVec) const;
 	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& lVec) const;
+
+	std::vector<double> Energy_Dispersion_Sigma(const Eigen::Vector3d& lVec) const;
 
 	std::complex<double> Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const;
 	std::complex<double> Wavefunction_Pi_Analytic(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const;
