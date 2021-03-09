@@ -45,7 +45,7 @@ jobs:
   # BOOST
     - name: Install boost
       shell: bash
-      run: sudo apt-get install libboost-all-dev
+      run: sudo apt-get update && sudo apt-get install libboost-all-dev
 
     # BUILD
     - name: Create Build Environment
