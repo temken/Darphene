@@ -18,7 +18,8 @@ set(TESTS_DIR     ${PROJECT_SOURCE_DIR}/tests)
 set(EXTERNAL_DIR  ${PROJECT_SOURCE_DIR}/external)
 
 #External projects
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Boost 1.40 COMPONENTS program_options REQUIRED )
 
 include(FetchContent)
 # obscura
@@ -62,7 +63,8 @@ configure_file(
   ${GENERATED_DIR}/version.hpp )
 
 # Source and include directories
-include_directories( ${INCLUDE_DIR} )
+include_directories( ${INCLUDE_DIR}
+                      ${Boost_INCLUDE_DIR}  )
 add_subdirectory( ${SRC_DIR} )
 
 # Code Coverage Configuration

@@ -19,7 +19,8 @@
 	# Static library
 	add_library(graphene_library STATIC
 	    Graphene.cpp
-	    Hydrogenic_Wavefunctions.cpp)
+	    Hydrogenic_Wavefunctions.cpp
+		Multidimensional_Integration.cpp)
 
 	set_target_properties(graphene_library PROPERTIES PREFIX "")
 
@@ -27,6 +28,7 @@
 
 	target_link_libraries(graphene_library
 		PUBLIC
+			${Boost_LIBRARIES}
 			coverage_config
 			Eigen3::Eigen
 			libobscura
