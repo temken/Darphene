@@ -3,6 +3,9 @@
 #include <Eigen/Eigenvalues>
 #include <algorithm>
 
+// Headers from libphysica
+#include "Utilities.hpp"
+
 #include "Hydrogenic_Wavefunctions.hpp"
 
 namespace graphene
@@ -26,6 +29,21 @@ std::complex<double> Graphene::Bloch_Wavefunction_B(const Eigen::Vector3d& rVec,
 std::complex<double> Graphene::f_aux(const Eigen::Vector3d& lVec) const
 {
 	return exp(1i * lVec[0] * a / sqrt(3.0)) + 2.0 * exp(-1i * lVec[0] * a / 2.0 / sqrt(3.0)) * cos(a * lVec[1] / 2.0);
+}
+
+Eigen::Vector3d Graphene::Path_1BZ(double k) const
+{
+	if(k >= 0.0 && k < 4.0 * M_PI / 3.0 / a)
+		return {2.0 * M_PI / sqrt(3.0) / a - sqrt(3.0) / 2.0 * k, -k / 2.0 + 2.0 * M_PI / 3.0 / a, 0.0};
+	else if(k >= 4.0 * M_PI / 3.0 / a && k < 2.0 * M_PI / 3.0 / a * (2.0 + sqrt(3.0)))
+		return {k - 4.0 / 3.0 * M_PI / a, 0.0, 0.0};
+	else if(k >= 2.0 * M_PI / 3.0 / a * (2.0 + sqrt(3.0)) && k <= 2.0 * M_PI / 3.0 / a * (3.0 + sqrt(3.0)))
+		return {2.0 * M_PI / sqrt(3.0) / a, k - 2.0 / 3.0 * M_PI * (2.0 + sqrt(3.0)) / a, 0.0};
+	else
+	{
+		std::cerr << "Error in Graphene::Path_1BZ(): Momentum k = " << k << " out of bound." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 }
 
 Eigen::MatrixXcd Graphene::S_Matrix_Pi(const Eigen::Vector3d& lVec) const
@@ -100,6 +118,9 @@ Graphene::Graphene()
 		{aCC, 0.0, 0.0},
 		{-aCC / 2.0, a / 2.0, 0.0},
 		{-aCC / 2.0, -a / 2.0, 0.0}};
+	high_symmetry_point_G = {0.0, 0.0, 0.0};
+	high_symmetry_point_M = {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0};
+	high_symmetry_point_K = {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0};
 
 	// Overlap and transfer integrals
 	s		   = 0.129;
@@ -149,6 +170,25 @@ std::vector<double> Graphene::Energy_Dispersion_Sigma(const Eigen::Vector3d& lVe
 	// std::sort(eigenvalues.begin(), eigenvalues.end());
 
 	return eigenvalues;
+}
+
+std::vector<std::vector<double>> Graphene::Energy_Bands(unsigned int k_points)
+{
+	double kMin			   = 0.0;
+	double kMax			   = 2.0 * M_PI / 3.0 / a * (3.0 + sqrt(3.0));
+	std::vector<double> ks = libphysica::Linear_Space(kMin, kMax, k_points);
+	std::vector<std::vector<double>> energy_bands;
+	for(auto& k : ks)
+	{
+		std::cout << "\t" << k / kMax << std::endl;
+		Eigen::Vector3d kVec		= Path_1BZ(k);
+		std::vector<double> E_pi	= Energy_Dispersion_Pi_Analytic(kVec);
+		std::vector<double> E_sigma = Energy_Dispersion_Sigma(kVec);
+		std::vector<double> aux		= {k, E_pi[0], E_pi[1], E_sigma[0], E_sigma[1], E_sigma[2], E_sigma[3], E_sigma[4], E_sigma[5]};
+
+		energy_bands.push_back(aux);
+	}
+	return energy_bands;
 }
 
 std::complex<double> Graphene::Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const

@@ -71,3 +71,21 @@ TEST(TestGraphene, TestEnergyDispersionSigma)
 		EXPECT_NEAR(energy[5], results[i++][5], tolerance);
 	}
 }
+
+TEST(TestGraphene, TestEnergyBands)
+{
+	// ARRANGE
+	Graphene graphene;
+	int N			 = 100;
+	double tolerance = 1e-22;
+
+	// ACT
+	std::vector<std::vector<double>> energy_bands = graphene.Energy_Bands(N);
+
+	// ASSERT
+	EXPECT_EQ(energy_bands.size(), N);
+	for(auto& entry : energy_bands)
+		EXPECT_EQ(entry.size(), 9);
+	for(int i = 1; i < 9; i++)
+		EXPECT_NEAR(energy_bands[0][i], energy_bands[N - 1][i], tolerance);
+}
