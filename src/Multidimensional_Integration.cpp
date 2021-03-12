@@ -9,6 +9,11 @@ namespace graphene
 {
 using namespace boost::math::quadrature;
 
+Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi)
+{
+	return Eigen::Vector3d(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta));
+}
+
 // 1. Two-dimensional integrals
 double Trapezoidal_2D(std::function<double(double, double)>& integrand, double xMin, double xMax, double yMin, double yMax)
 {
@@ -123,6 +128,15 @@ double Integrate_3D(std::function<double(double, double, double)>& integrand, do
 		std::cerr << "Error in Integrate_3D(): Method " << method << " not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+}
+
+double Integrate_3D(std::function<double(Eigen::Vector3d)>& integrand, double rMin, double rMax, double cos_theta_min, double cos_theta_max, double phi_min, double phi_max, const std::string& method)
+{
+	std::function<double(double, double, double)> integrand_2 = [&integrand](double r, double cos_theta, double phi) {
+		Eigen::Vector3d rVec = Spherical_Coordinates(r, acos(cos_theta), phi);
+		return r * r * integrand(rVec);
+	};
+	return Integrate_3D(integrand_2, rMin, rMax, cos_theta_min, cos_theta_max, phi_min, phi_max, method);
 }
 
 }	// namespace graphene

@@ -122,3 +122,17 @@ TEST(TestMultidimensionalIntegration, TestGaussKronrod3D)
 	// ASSERT
 	ASSERT_NEAR(integral, result, tolerance);
 }
+
+TEST(TestMultidimensionalIntegration, TestIntegrate3DVectorial)
+{
+	// ARRANGE
+	std::function<double(Eigen::Vector3d)> integrand = [](Eigen::Vector3d rVec) {
+		double r = rVec.norm();
+		return exp(-r * r);
+	};
+	double integral_exact = pow(M_PI, 1.5);
+	// ACT
+	double integral = Integrate_3D(integrand, 0.0, 10.0);
+	// ASSERT
+	ASSERT_FLOAT_EQ(integral, integral_exact);
+}
