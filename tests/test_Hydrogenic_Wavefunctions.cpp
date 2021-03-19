@@ -1,12 +1,14 @@
 #include "gtest/gtest.h"
 
 #include <functional>
+#include <limits>
 
 // Headers from libphysica
 #include "Natural_Units.hpp"
 #include "Numerics.hpp"
 
 #include "Hydrogenic_Wavefunctions.hpp"
+#include "Multidimensional_Integration.hpp"
 
 using namespace libphysica::natural_units;
 using namespace graphene;
@@ -30,16 +32,53 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionValues)
 TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2s)
 {
 	//ARRANGE
-	double Zeff								= 2.0;
-	std::function<double(double)> integrand = [Zeff](double r) {
-		Eigen::Vector3d position({r, 0, 0});
-		double phi = Hydrogenic_Wavefunction_2s(position, Zeff);
-		return 4.0 * M_PI * r * r * phi * phi;
+	double Zeff										 = 2.0;
+	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
+		double phi = Hydrogenic_Wavefunction_2s(rVec, Zeff);
+		return phi * phi;
 	};
-	double epsilon = 1.0e-8;
 
 	//ACT & ASSERT
-	EXPECT_FLOAT_EQ(libphysica::Integrate(integrand, 0.0, 15 * Bohr_Radius, epsilon), 1.0);
+	ASSERT_FLOAT_EQ(Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI, "Gauss"), 1.0);
+}
+
+TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2px)
+{
+	//ARRANGE
+	double Zeff										 = 2.0;
+	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
+		double phi = Hydrogenic_Wavefunction_2px(rVec, Zeff);
+		return phi * phi;
+	};
+
+	//ACT & ASSERT
+	ASSERT_FLOAT_EQ(Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI, "Gauss"), 1.0);
+}
+
+TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2py)
+{
+	//ARRANGE
+	double Zeff										 = 2.0;
+	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
+		double phi = Hydrogenic_Wavefunction_2py(rVec, Zeff);
+		return phi * phi;
+	};
+
+	//ACT & ASSERT
+	ASSERT_FLOAT_EQ(Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI, "Gauss"), 1.0);
+}
+
+TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2pz)
+{
+	//ARRANGE
+	double Zeff										 = 2.0;
+	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
+		double phi = Hydrogenic_Wavefunction_2pz(rVec, Zeff);
+		return phi * phi;
+	};
+
+	//ACT & ASSERT
+	ASSERT_FLOAT_EQ(Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI, "Gauss"), 1.0);
 }
 
 TEST(TestHydrogenicWavefunctions, TestMomentumWavefunctionValues)
