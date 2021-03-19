@@ -2,21 +2,16 @@
 #define __Hydrogenic_Wavefunctions_hpp_
 
 #include <Eigen/Geometry>
+#include <string>
 
 namespace graphene
 {
 
 // Position space
-extern double Hydrogenic_Wavefunction_2s(const Eigen::Vector3d& position, double Zeff);
-extern double Hydrogenic_Wavefunction_2px(const Eigen::Vector3d& position, double Zeff);
-extern double Hydrogenic_Wavefunction_2py(const Eigen::Vector3d& position, double Zeff);
-extern double Hydrogenic_Wavefunction_2pz(const Eigen::Vector3d& position, double Zeff);
+extern double Hydrogenic_Wavefunction(const Eigen::Vector3d& position, const std::string& orbital, double Zeff);
 
 // Momentum space
-extern double Hydrogenic_Wavefunction_Momentum_2s(const Eigen::Vector3d& momentum, double Zeff);
-extern double Hydrogenic_Wavefunction_Momentum_2px(const Eigen::Vector3d& momentum, double Zeff);
-extern double Hydrogenic_Wavefunction_Momentum_2py(const Eigen::Vector3d& momentum, double Zeff);
-extern double Hydrogenic_Wavefunction_Momentum_2pz(const Eigen::Vector3d& momentum, double Zeff);
+extern double Hydrogenic_Wavefunction_Momentum(const Eigen::Vector3d& momentum, const std::string& orbital, double Zeff);
 
 }	// namespace graphene
 

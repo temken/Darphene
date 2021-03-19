@@ -23,10 +23,10 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionValues)
 	double phi_2py = 6.325520187706432e-10;
 	double phi_2pz = 4.2170134584709545e-10;
 	//ACT & ASSERT
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_2s(position, Zeff), phi_2s);
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_2px(position, Zeff), phi_2px);
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_2py(position, Zeff), phi_2py);
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_2pz(position, Zeff), phi_2pz);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction(position, "2s", Zeff), phi_2s);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction(position, "2px", Zeff), phi_2px);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction(position, "2py", Zeff), phi_2py);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction(position, "2pz", Zeff), phi_2pz);
 }
 
 TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2s)
@@ -34,7 +34,7 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2s)
 	//ARRANGE
 	double Zeff										 = 2.0;
 	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
-		double phi = Hydrogenic_Wavefunction_2s(rVec, Zeff);
+		double phi = Hydrogenic_Wavefunction(rVec, "2s", Zeff);
 		return phi * phi;
 	};
 
@@ -47,7 +47,7 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2px)
 	//ARRANGE
 	double Zeff										 = 2.0;
 	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
-		double phi = Hydrogenic_Wavefunction_2px(rVec, Zeff);
+		double phi = Hydrogenic_Wavefunction(rVec, "2px", Zeff);
 		return phi * phi;
 	};
 
@@ -60,7 +60,7 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2py)
 	//ARRANGE
 	double Zeff										 = 2.0;
 	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
-		double phi = Hydrogenic_Wavefunction_2py(rVec, Zeff);
+		double phi = Hydrogenic_Wavefunction(rVec, "2py", Zeff);
 		return phi * phi;
 	};
 
@@ -73,7 +73,7 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2pz)
 	//ARRANGE
 	double Zeff										 = 2.0;
 	std::function<double(Eigen::Vector3d)> integrand = [Zeff](Eigen::Vector3d rVec) {
-		double phi = Hydrogenic_Wavefunction_2pz(rVec, Zeff);
+		double phi = Hydrogenic_Wavefunction(rVec, "2pz", Zeff);
 		return phi * phi;
 	};
 
@@ -91,8 +91,8 @@ TEST(TestHydrogenicWavefunctions, TestMomentumWavefunctionValues)
 	double phi_2py = 4.6677e6;
 	double phi_2pz = 7.00155e6;
 	//ACT & ASSERT
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum_2s(momentum, Zeff), phi_2s);
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum_2px(momentum, Zeff), phi_2px);
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum_2py(momentum, Zeff), phi_2py);
-	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum_2pz(momentum, Zeff), phi_2pz);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum(momentum, "2s", Zeff), phi_2s);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum(momentum, "2px", Zeff), phi_2px);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum(momentum, "2py", Zeff), phi_2py);
+	EXPECT_FLOAT_EQ(Hydrogenic_Wavefunction_Momentum(momentum, "2pz", Zeff), phi_2pz);
 }

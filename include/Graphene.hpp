@@ -23,8 +23,8 @@ class Graphene
 	double s, sPrime, Sss, Ssp, Ssigma, Spi, t, Hss, Hsp, Hsigma, Hpi, epsilon_2s, epsilon_2p;
 
 	double Zeff_2s, Zeff_2px_2py, Zeff_2pz;
-	std::complex<double> Bloch_Wavefunction_A(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, double Zeff) const;
-	std::complex<double> Bloch_Wavefunction_B(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, double Zeff) const;
+	std::complex<double> Bloch_Wavefunction_A(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, const std::string& orbital, double Zeff) const;
+	std::complex<double> Bloch_Wavefunction_B(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, const std::string& orbital, double Zeff) const;
 
 	std::complex<double> f_aux(const Eigen::Vector3d& lVec) const;
 
@@ -48,6 +48,7 @@ class Graphene
 
 	std::complex<double> Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const;
 	std::complex<double> Wavefunction_Pi_Analytic(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const;
+	// std::complex<double> Wavefunction_Sigma(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const;
 };
 }	// namespace graphene
 
