@@ -190,14 +190,14 @@ std::vector<std::vector<double>> Graphene::Energy_Bands(unsigned int k_points)
 	return energy_bands;
 }
 
-std::complex<double> Graphene::Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const
+std::complex<double> Graphene::Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, int i) const
 {
 	Eigen::MatrixXcd S = S_Matrix_Pi(lVec);
 	Eigen::MatrixXcd H = H_Matrix_Pi(lVec);
 	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges(H, S);
-	std::complex<double> C1 = ges.eigenvectors().col(0)[0];
-	std::complex<double> C2 = ges.eigenvectors().col(0)[1];
-	double norm				= ges.eigenvectors().col(0).norm();
+	std::complex<double> C1 = ges.eigenvectors().col(i)[0];
+	std::complex<double> C2 = ges.eigenvectors().col(i)[1];
+	double norm				= ges.eigenvectors().col(i).norm();
 	double normalization	= 1.0 / norm;
 	return normalization * (C1 * Bloch_Wavefunction_A(rVec, lVec, "2pz", Zeff_2pz) + C2 * Bloch_Wavefunction_B(rVec, lVec, "2pz", Zeff_2pz));
 }
@@ -213,16 +213,20 @@ std::complex<double> Graphene::Wavefunction_Pi_Analytic(const Eigen::Vector3d& r
 	return pow(2.0 * norm, -0.5) * (Bloch_Wavefunction_A(rVec, lVec, "2pz", Zeff_2pz) + exp(1i * phi) * Bloch_Wavefunction_B(rVec, lVec, "2pz", Zeff_2pz));
 }
 
-// std::complex<double> Graphene::Wavefunction_Sigma(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const
-// {
-// 	Eigen::MatrixXcd S = S_Matrix_Sigma(lVec);
-// 	Eigen::MatrixXcd H = H_Matrix_Sigma(lVec);
-// 	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges(H, S);
-// 	std::complex<double> C1 = ges.eigenvectors().col(0)[0];
-// 	std::complex<double> C2 = ges.eigenvectors().col(0)[1];
-// 	double norm				= ges.eigenvectors().col(0).norm();
-// 	double normalization	= 1.0 / norm;
-// 	return normalization * (C1 * Bloch_Wavefunction_A(rVec, lVec, Zeff_2pz) + C2 * Bloch_Wavefunction_B(rVec, lVec, Zeff_2pz));
-// }
+std::complex<double> Graphene::Wavefunction_Sigma(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, int i) const
+{
+	Eigen::MatrixXcd S = S_Matrix_Sigma(lVec);
+	Eigen::MatrixXcd H = H_Matrix_Sigma(lVec);
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges(H, S);
+	std::complex<double> C1 = ges.eigenvectors().col(i)[0];
+	std::complex<double> C2 = ges.eigenvectors().col(i)[1];
+	std::complex<double> C3 = ges.eigenvectors().col(i)[2];
+	std::complex<double> C4 = ges.eigenvectors().col(i)[3];
+	std::complex<double> C5 = ges.eigenvectors().col(i)[4];
+	std::complex<double> C6 = ges.eigenvectors().col(i)[5];
+	double eigenvector_norm = ges.eigenvectors().col(i).norm();
+	double normalization	= 1.0 / eigenvector_norm;
+	return normalization * (C1 * Bloch_Wavefunction_A(rVec, lVec, "2s", Zeff_2s) + C2 * Bloch_Wavefunction_A(rVec, lVec, "2px", Zeff_2px_2py) + C3 * Bloch_Wavefunction_A(rVec, lVec, "2py", Zeff_2px_2py) + C4 * Bloch_Wavefunction_B(rVec, lVec, "2s", Zeff_2s) + C5 * Bloch_Wavefunction_B(rVec, lVec, "2px", Zeff_2px_2py) + C6 * Bloch_Wavefunction_B(rVec, lVec, "2py", Zeff_2px_2py));
+}
 
 }	// namespace graphene
