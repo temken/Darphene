@@ -39,8 +39,7 @@
 			${GENERATED_DIR}
 		PUBLIC
 			${CMAKE_CURRENT_SOURCE_DIR}
-			${INCLUDE_DIR}
-			${Boost_INCLUDE_DIR} )
+			${INCLUDE_DIR})
 
 	install(TARGETS graphene_library DESTINATION ${LIB_DIR})
 
