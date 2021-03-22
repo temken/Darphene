@@ -229,4 +229,56 @@ std::complex<double> Graphene::Wavefunction_Sigma(const Eigen::Vector3d& rVec, c
 	return normalization * (C1 * Bloch_Wavefunction_A(rVec, lVec, "2s", Zeff_2s) + C2 * Bloch_Wavefunction_A(rVec, lVec, "2px", Zeff_2px_2py) + C3 * Bloch_Wavefunction_A(rVec, lVec, "2py", Zeff_2px_2py) + C4 * Bloch_Wavefunction_B(rVec, lVec, "2s", Zeff_2s) + C5 * Bloch_Wavefunction_B(rVec, lVec, "2px", Zeff_2px_2py) + C6 * Bloch_Wavefunction_B(rVec, lVec, "2py", Zeff_2px_2py));
 }
 
+std::complex<double> Graphene::Wavefunction_Momentum_Pi(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i) const
+{
+	Eigen::MatrixXcd S = S_Matrix_Pi(lVec);
+	Eigen::MatrixXcd H = H_Matrix_Pi(lVec);
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges(H, S);
+	std::complex<double> C1 = ges.eigenvectors().col(i)[0];
+	std::complex<double> C2 = ges.eigenvectors().col(i)[1];
+	double norm				= ges.eigenvectors().col(i).norm();
+	double normalization	= 1.0 / norm;
+	std::complex<double> f	= f_aux(lVec + kVec);
+
+	return normalization * (C1 + C2 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
+}
+
+std::complex<double> Graphene::Wavefunction_Momentum_Pi_Analytic(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec) const
+{
+	std::complex<double> f = f_aux(lVec + kVec);
+	double phi			   = -atan2(f.imag(), f.real());
+	double norm			   = 1.0;
+	return pow(2.0 * norm, -0.5) * (1.0 + exp(1i * phi) * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
+}
+
+std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i) const
+{
+
+	Eigen::MatrixXcd S = S_Matrix_Sigma(lVec);
+	Eigen::MatrixXcd H = H_Matrix_Sigma(lVec);
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges(H, S);
+	std::complex<double> C1 = ges.eigenvectors().col(i)[0];
+	std::complex<double> C2 = ges.eigenvectors().col(i)[1];
+	std::complex<double> C3 = ges.eigenvectors().col(i)[2];
+	std::complex<double> C4 = ges.eigenvectors().col(i)[3];
+	std::complex<double> C5 = ges.eigenvectors().col(i)[4];
+	std::complex<double> C6 = ges.eigenvectors().col(i)[5];
+	double eigenvector_norm = ges.eigenvectors().col(i).norm();
+	double normalization	= 1.0 / eigenvector_norm;
+	std::complex<double> f	= f_aux(lVec + kVec);
+	return normalization * ((C1 + C4 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
+}
+
+double Graphene::DM_Response(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
+{
+	std::complex<double> psi;
+	if(band == 0)
+		psi = Wavefunction_Momentum_Pi_Analytic(kVec, lVec);
+	else
+	{
+		psi = Wavefunction_Momentum_Sigma(kVec, lVec, band);
+	}
+	return std::norm(psi);
+}
+
 }	// namespace graphene

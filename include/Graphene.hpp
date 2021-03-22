@@ -49,6 +49,12 @@ class Graphene
 	std::complex<double> Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, int i = 0) const;
 	std::complex<double> Wavefunction_Pi_Analytic(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const;
 	std::complex<double> Wavefunction_Sigma(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, int i = 0) const;
+
+	std::complex<double> Wavefunction_Momentum_Pi(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i = 0) const;
+	std::complex<double> Wavefunction_Momentum_Pi_Analytic(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec) const;
+	std::complex<double> Wavefunction_Momentum_Sigma(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i = 0) const;
+
+	double DM_Response(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec);
 };
 }	// namespace graphene
 
