@@ -1,6 +1,7 @@
 #ifndef __Graphene_hpp_
 #define __Graphene_hpp_
 
+#include <Eigen/Eigenvalues>
 #include <Eigen/Geometry>
 #include <cmath>
 #include <complex>
@@ -36,13 +37,16 @@ class Graphene
 	Eigen::MatrixXcd S_Matrix_Sigma(const Eigen::Vector3d& lVec) const;
 	Eigen::MatrixXcd H_Matrix_Sigma(const Eigen::Vector3d& lVec) const;
 
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Pi(const Eigen::Vector3d& lVec, bool compute_eigenvectors = true) const;
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Sigma(const Eigen::Vector3d& lVec, bool compute_eigenvectors = true) const;
+
   public:
 	Graphene();
 
 	std::vector<double> Energy_Dispersion_Pi(const Eigen::Vector3d& lVec) const;
 	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& lVec) const;
-
 	std::vector<double> Energy_Dispersion_Sigma(const Eigen::Vector3d& lVec) const;
+	double Valence_Band_Energies(const Eigen::Vector3d& lVec, unsigned int energy_band);
 
 	std::vector<std::vector<double>> Energy_Bands(unsigned int k_points);
 
