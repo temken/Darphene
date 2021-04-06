@@ -10,9 +10,15 @@
 #include "Statistics.hpp"
 #include "Utilities.hpp"
 
+// Headers from obscura
+#include "DM_Distribution.hpp"
+#include "DM_Particle_Standard.hpp"
+
+#include "Direct_Detection_Graphene.hpp"
 #include "Graphene.hpp"
 #include "Hydrogenic_Wavefunctions.hpp"
 #include "Multidimensional_Integration.hpp"
+#include "Vegas.hpp"
 #include "version.hpp"
 
 using namespace libphysica::natural_units;
@@ -32,27 +38,29 @@ int main(int argc, char* argv[])
 			  << std::endl;
 	////////////////////////////////////////////////////////////////////////
 
-	double aCC = 1.42 * Angstrom;
-	double a   = aCC * sqrt(3.0);
-	Eigen::Vector3d high_symmetry_point_G({0.0, 0.0, 0.0});
-	Eigen::Vector3d high_symmetry_point_M({2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0});
-	Eigen::Vector3d high_symmetry_point_K({2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0});
-
+	obscura::Standard_Halo_Model SHM(0.4 * GeV / cm / cm / cm, 220.0 * km / sec, 232.0 * km / sec, 550.0 * km / sec);
+	obscura::DM_Particle_SI DM(100 * MeV);
 	Graphene graphene;
 
-	Eigen::Vector3d rVec({Bohr_Radius, 2 * Bohr_Radius, 3 * Bohr_Radius});
-	Eigen::Vector3d lVec({1.0 / Bohr_Radius, 2 / Bohr_Radius, 3.0 / Bohr_Radius});
-	// for(auto entry : graphene.Energy_Dispersion_Sigma(high_symmetry_point_G))
-	// 	std::cout << entry / eV << std::endl;
+	// std::vector<double> energies = libphysica::Log_Space(0.2 * eV, 250 * eV, 50);
+	// for(int i = 0; i < 1; i++)
+	// {
+	// 	std::ofstream f;
+	// 	f.open("Graphene_Spectrum_" + std::to_string(i) + ".txt");
+	// 	for(auto& E : energies)
+	// 		f << E / eV << "\t" << kg * year * 2.0 * perform_integral_vegas(E, DM, SHM, graphene, i) << std::endl;
+	// 	f.close();
+	// }
 
-	std::complex<double> psi		  = graphene.Wavefunction_Pi(rVec, lVec);
-	std::complex<double> psi_analytic = graphene.Wavefunction_Pi_Analytic(rVec, lVec);
-	std::cout << psi << "\t" << psi_analytic << std::endl;
-	std::cout << std::abs(psi) << "\t" << std::abs(psi_analytic) << std::endl;
-
-	double energy		   = graphene.Energy_Dispersion_Pi(high_symmetry_point_M)[1];
-	double energy_analytic = graphene.Energy_Dispersion_Pi_Analytic(high_symmetry_point_M)[1];
-	std::cout << energy / eV << "\t" << energy_analytic / eV << std::endl;
+	double E_e = 100 * eV;
+	// for(int i = 0; i < 4; i++)
+	// 	std::cout << kg * year * perform_integral(E_e, DM, SHM, graphene, i) << std::endl;
+	for(int i = 0; i < 1; i++)
+	{
+		std::cout << perform_integral(E_e, DM, SHM, graphene, i) << std::endl;
+		std::cout << 2.0 * perform_integral_vegas(E_e, DM, SHM, graphene, i) << std::endl
+				  << std::endl;
+	}
 
 	////////////////////////////////////////////////////////////////////////
 	//Final terminal output

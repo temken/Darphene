@@ -18,9 +18,11 @@
 
 	# Static library
 	add_library(graphene_library STATIC
+	    Direct_Detection_Graphene.cpp
 	    Graphene.cpp
 	    Hydrogenic_Wavefunctions.cpp
-		Multidimensional_Integration.cpp)
+		Multidimensional_Integration.cpp
+		Vegas.cpp)
 
 	set_target_properties(graphene_library PROPERTIES PREFIX "")
 
@@ -42,23 +44,3 @@
 			${INCLUDE_DIR})
 
 	install(TARGETS graphene_library DESTINATION ${LIB_DIR})
-
-#####################################################################
-# # OPTION B: Build only an executable.
-# 	# Executable
-# 	add_executable(executable
-# 		main.cpp
-# 		module.cpp)
-
-# 	target_compile_options(executable PUBLIC -Wall -pedantic)
-
-# 	target_link_libraries(executable
-# 		PUBLIC
-# 			coverage_config
-# 			libobscura)
-
-# 	target_include_directories(executable
-# 		PRIVATE
-# 			${GENERATED_DIR} )
-
-# 	install(TARGETS executable DESTINATION ${BIN_DIR})
