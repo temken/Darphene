@@ -248,3 +248,30 @@ void vegas(std::vector<double>& regn, std::function<double(std::vector<double>&,
 		}
 	}
 }
+
+void brute_force(std::vector<double>& regn, std::function<double(std::vector<double>&, const double)> fxn, const int init, const int ncall, const int itmx, const int nprn, double& tgral, double& sd, double& chi2a)
+{
+	int dim = regn.size() / 2.0;
+	std::random_device rd;
+	std::mt19937 PRNG(rd());
+
+	double volume = 1.0;
+	for(int i = 0; i < dim; i++)
+		volume *= (regn[i + dim] - regn[i]);
+	std::cout << "Volume (bf) = " << volume << std::endl;
+
+	double sum	 = 0.0;
+	double sum_2 = 0.0;
+	for(int i = 0; i < ncall; i++)
+	{
+		std::vector<double> args(dim);
+		for(int j = 0; j < dim; j++)
+			args[j] = regn[j] + libphysica::Sample_Uniform(PRNG) * (regn[j + dim] - regn[j]);
+		double fct = fxn(args, 0.0);
+		sum += volume * fct;
+		sum_2 += volume * volume * fct * fct;
+	}
+	tgral = sum / ncall;
+	sd	  = sqrt((sum_2 / ncall - tgral * tgral) / (ncall - 1.0));
+	chi2a = 0.0;
+}
