@@ -2,8 +2,7 @@
 
 #include <algorithm>
 
-// Headers from libphysica
-#include "Utilities.hpp"
+#include "libphysica/Utilities.hpp"
 
 #include "Hydrogenic_Wavefunctions.hpp"
 
@@ -62,12 +61,12 @@ Eigen::MatrixXcd Graphene::H_Matrix_Pi(const Eigen::Vector3d& lVec) const
 Eigen::MatrixXcd Graphene::S_Matrix_Sigma(const Eigen::Vector3d& lVec) const
 {
 	Eigen::MatrixXcd S(6, 6);
-	std::complex<double> S11 = Sss * (exp(1i * lVec[0] * aCC) + 2.0 * exp(-1i * lVec[0] * aCC / 2.0) * cos(sqrt(3) / 2.0 * lVec[1] * aCC));
-	std::complex<double> S12 = Ssp * (-exp(1i * lVec[0] * aCC) + exp(-1i * lVec[0] * aCC / 2.0) * cos(sqrt(3) / 2.0 * lVec[1] * aCC));
-	std::complex<double> S13 = Ssp * (-1i * sqrt(3.0) * exp(-1i * lVec[0] * aCC / 2.0) * sin(sqrt(3) / 2.0 * lVec[1] * aCC));
+	std::complex<double> S11 = Sss * (exp(1i * lVec[0] * aCC) + 2.0 * exp(-1i * lVec[0] * aCC / 2.0) * cos(sqrt(3.0) / 2.0 * lVec[1] * aCC));
+	std::complex<double> S12 = Ssp * (-exp(1i * lVec[0] * aCC) + exp(-1i * lVec[0] * aCC / 2.0) * cos(sqrt(3.0) / 2.0 * lVec[1] * aCC));
+	std::complex<double> S13 = Ssp * (-1i * sqrt(3.0) * exp(-1i * lVec[0] * aCC / 2.0) * sin(sqrt(3.0) / 2.0 * lVec[1] * aCC));
 	std::complex<double> S21 = -S12;
-	std::complex<double> S22 = -Ssigma * exp(1i * lVec[0] * aCC) + (3.0 * Spi - Ssigma) / 2.0 * exp(-1i * lVec[0] * aCC / 2.0) * cos(sqrt(3) / 2.0 * lVec[1] * aCC);
-	std::complex<double> S23 = 1i * sqrt(3.0) / 2.0 * (Ssigma + Spi) * exp(-1i * lVec[0] * aCC / 2.0) * sin(sqrt(3) / 2.0 * lVec[1] * aCC);
+	std::complex<double> S22 = -Ssigma * exp(1i * lVec[0] * aCC) + (3.0 * Spi - Ssigma) / 2.0 * exp(-1i * lVec[0] * aCC / 2.0) * cos(sqrt(3.0) / 2.0 * lVec[1] * aCC);
+	std::complex<double> S23 = 1i * sqrt(3.0) / 2.0 * (Ssigma + Spi) * exp(-1i * lVec[0] * aCC / 2.0) * sin(sqrt(3.0) / 2.0 * lVec[1] * aCC);
 	std::complex<double> S31 = -S13;
 	std::complex<double> S32 = S23;
 	std::complex<double> S33 = Spi * exp(1i * lVec[0] * aCC) + (Spi - 3.0 * Ssigma) / 2.0 * exp(-1i * lVec[0] * aCC / 2.0) * cos(sqrt(3) / 2.0 * lVec[1] * aCC);

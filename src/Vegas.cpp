@@ -4,8 +4,8 @@
 #include <iomanip>
 #include <iostream>
 
-#include "Linear_Algebra.hpp"
-#include "Statistics.hpp"
+#include "libphysica/Linear_Algebra.hpp"
+#include "libphysica/Statistics.hpp"
 
 // Reference: These functions are taken from http://numerical.recipes/webnotes/nr3web9.pdf
 

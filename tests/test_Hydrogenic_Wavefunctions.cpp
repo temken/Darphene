@@ -3,9 +3,8 @@
 #include <functional>
 #include <limits>
 
-// Headers from libphysica
-#include "Natural_Units.hpp"
-#include "Numerics.hpp"
+#include "libphysica/Natural_Units.hpp"
+#include "libphysica/Numerics.hpp"
 
 #include "Hydrogenic_Wavefunctions.hpp"
 #include "Multidimensional_Integration.hpp"

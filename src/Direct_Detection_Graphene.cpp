@@ -2,9 +2,8 @@
 
 #include <random>
 
-// Headers from libphysica
-#include "Natural_Units.hpp"
-#include "Statistics.hpp"
+#include "libphysica/Natural_Units.hpp"
+#include "libphysica/Statistics.hpp"
 
 #include "Multidimensional_Integration.hpp"
 #include "Vegas.hpp"
@@ -78,15 +77,16 @@ double perform_integral(double E_e, obscura::DM_Particle& DM, obscura::DM_Distri
 double perform_integral_vegas(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band)
 {
 	//1. Prefactor
-	double mDM		 = DM.mass;
-	double mu		 = libphysica::Reduced_Mass(mDM, mElectron);
-	double sigma_e	 = 0.1 * pb;
-	double aCC		 = 1.42 * Angstrom;
-	double a		 = aCC * sqrt(3.0);
-	double N_C		 = 5.0e25 / kg;
-	double A_UC		 = 3.0 * sqrt(3.0) * aCC * aCC / 2.0;
-	double k_final	 = sqrt(2.0 * mElectron * E_e);
-	double prefactor = 12.0 * sigma_e * DM_distr.DM_density / mDM * N_C * A_UC * mElectron * k_final / pow(2.0 * M_PI, 5.0) / mu / mu * E_e;
+	double mDM	   = DM.mass;
+	double mu	   = libphysica::Reduced_Mass(mDM, mElectron);
+	double sigma_e = 0.1 * pb;
+	double aCC	   = 1.42 * Angstrom;
+	double a	   = aCC * sqrt(3.0);
+	double N_C	   = 5.0e25 / kg;
+	double A_UC	   = 3.0 * sqrt(3.0) * aCC * aCC / 2.0;
+	double k_final = sqrt(2.0 * mElectron * E_e);
+	// double prefactor = 8.0 * sqrt(3.0) * M_PI * sigma_e * DM_distr.DM_density / mDM * N_C * A_UC * mElectron * k_final / pow(2.0 * M_PI, 6.0) / mu / mu * E_e;
+	double prefactor = 2.0 * sqrt(3.0) * sigma_e * DM_distr.DM_density / mDM * N_C * A_UC * mElectron * k_final / pow(2.0 * M_PI, 6.0) / mu / mu * E_e;
 
 	double work_function = 4.3 * eV;
 	double vMax			 = DM_distr.Maximum_DM_Speed();
@@ -115,7 +115,7 @@ double perform_integral_vegas(double E_e, obscura::DM_Particle& DM, obscura::DM_
 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(k_final, acos(cos_theta_kf), phi_kf);
 		double vMin				   = vMinimum_Graphene(DM.mass, q, E_l, k_final);
-		return prefactor * lVec[0] / sqrt(3.0) * (qMax - qMin) * q * DM_distr.Eta_Function(vMin) * F_DM * graphene.DM_Response(band, lVec, qVec - k_FinalVec);
+		return prefactor * lVec[0] * (qMax - qMin) * q * DM_distr.Eta_Function(vMin) * F_DM * F_DM * graphene.DM_Response(band, lVec, qVec - k_FinalVec);
 	};
 	double tgral, sd, chi2a;
 	vegas(regn, integrand_vegas, 0, 100000, 5, -1, tgral, sd, chi2a);

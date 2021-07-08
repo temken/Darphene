@@ -4,15 +4,13 @@
 #include <iostream>
 #include <random>
 
-// Headers from libphysica
-#include "Natural_Units.hpp"
-#include "Numerics.hpp"
-#include "Statistics.hpp"
-#include "Utilities.hpp"
+#include "libphysica/Natural_Units.hpp"
+#include "libphysica/Numerics.hpp"
+#include "libphysica/Statistics.hpp"
+#include "libphysica/Utilities.hpp"
 
-// Headers from obscura
-#include "DM_Distribution.hpp"
-#include "DM_Particle_Standard.hpp"
+#include "obscura/DM_Halo_Models.hpp"
+#include "obscura/DM_Particle_Standard.hpp"
 
 #include "Direct_Detection_Graphene.hpp"
 #include "Graphene.hpp"
@@ -51,6 +49,9 @@ int main(int argc, char* argv[])
 	// 		f << E / eV << "\t" << kg * year * 2.0 * perform_integral_vegas(E, DM, SHM, graphene, i) << std::endl;
 	// 	f.close();
 	// }
+	double aCC = 1.42 * Angstrom;
+	double a   = aCC * sqrt(3.0);
+	std::cout << graphene.Energy_Dispersion_Sigma({2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0})[0] << std::endl;
 
 	double E_e = 100 * eV;
 	// for(int i = 0; i < 4; i++)
@@ -58,7 +59,7 @@ int main(int argc, char* argv[])
 	for(int i = 0; i < 1; i++)
 	{
 		std::cout << perform_integral(E_e, DM, SHM, graphene, i) << std::endl;
-		std::cout << 2.0 * perform_integral_vegas(E_e, DM, SHM, graphene, i) << std::endl
+		std::cout << perform_integral_vegas(E_e, DM, SHM, graphene, i) << std::endl
 				  << std::endl;
 	}
 

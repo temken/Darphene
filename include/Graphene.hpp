@@ -6,8 +6,7 @@
 #include <cmath>
 #include <complex>
 
-// Headers from libphysica
-#include "Natural_Units.hpp"
+#include "libphysica/Natural_Units.hpp"
 
 namespace graphene
 {
