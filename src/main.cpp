@@ -15,13 +15,10 @@
 #include "Direct_Detection_Graphene.hpp"
 #include "Graphene.hpp"
 #include "Hydrogenic_Wavefunctions.hpp"
-#include "Multidimensional_Integration.hpp"
-#include "Vegas.hpp"
 #include "version.hpp"
 
 using namespace libphysica::natural_units;
 using namespace graphene;
-// using namespace boost::math::quadrature;
 
 int main(int argc, char* argv[])
 {
@@ -38,30 +35,25 @@ int main(int argc, char* argv[])
 
 	obscura::Standard_Halo_Model SHM(0.4 * GeV / cm / cm / cm, 220.0 * km / sec, 232.0 * km / sec, 550.0 * km / sec);
 	obscura::DM_Particle_SI DM(100 * MeV);
+	DM.Set_Sigma_Electron(1.0e-37 * cm * cm);
 	Graphene graphene;
 
-	// std::vector<double> energies = libphysica::Log_Space(0.2 * eV, 250 * eV, 50);
-	// for(int i = 0; i < 1; i++)
-	// {
-	// 	std::ofstream f;
-	// 	f.open("Graphene_Spectrum_" + std::to_string(i) + ".txt");
-	// 	for(auto& E : energies)
-	// 		f << E / eV << "\t" << kg * year * 2.0 * perform_integral_vegas(E, DM, SHM, graphene, i) << std::endl;
-	// 	f.close();
-	// }
-	double aCC = 1.42 * Angstrom;
-	double a   = aCC * sqrt(3.0);
-	std::cout << graphene.Energy_Dispersion_Sigma({2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0})[0] << std::endl;
+	double E_e = 10 * eV;
+	int band   = 0;
+	std::cout << E_e / eV << "\t" << In_Units(dR_dlnE(E_e, DM, SHM, graphene, band), 1.0 / kg / year) << std::endl;
 
-	double E_e = 100 * eV;
-	// for(int i = 0; i < 4; i++)
-	// 	std::cout << kg * year * perform_integral(E_e, DM, SHM, graphene, i) << std::endl;
-	for(int i = 0; i < 1; i++)
+	std::vector<double> energies = libphysica::Log_Space(1.0e-1 * eV, 1.0e3 * eV, 50);
+	std::ofstream f;
+	f.open("Spectrum_Hochberg.txt");
+	for(auto& E_e : energies)
 	{
-		std::cout << perform_integral(E_e, DM, SHM, graphene, i) << std::endl;
-		std::cout << perform_integral_vegas(E_e, DM, SHM, graphene, i) << std::endl
-				  << std::endl;
+		std::cout << E_e / eV << std::endl;
+		f << In_Units(E_e, eV);
+		for(int band = 0; band < 4; band++)
+			f << "\t" << In_Units(dR_dlnE(E_e, DM, SHM, graphene, band), 1.0 / kg / year);
+		f << std::endl;
 	}
+	f.close();
 
 	////////////////////////////////////////////////////////////////////////
 	//Final terminal output

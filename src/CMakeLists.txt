@@ -20,9 +20,7 @@
 	add_library(graphene_library STATIC
 	    Direct_Detection_Graphene.cpp
 	    Graphene.cpp
-	    Hydrogenic_Wavefunctions.cpp
-		Multidimensional_Integration.cpp
-		Vegas.cpp)
+	    Hydrogenic_Wavefunctions.cpp)
 
 	set_target_properties(graphene_library PROPERTIES PREFIX "")
 
