@@ -8,7 +8,7 @@ namespace graphene
 {
 using namespace libphysica::natural_units;
 
-// Position space
+// Position space (Normalized to 1)
 double Hydrogenic_Wavefunction(const Eigen::Vector3d& position, const std::string& orbital, double Zeff)
 {
 	double r = position.norm();
@@ -46,7 +46,7 @@ double Hydrogenic_Wavefunction(const Eigen::Vector3d& position, const std::strin
 	}
 }
 
-// Momentum space
+// Momentum space (Normalized to (2 pi)^3)
 double Hydrogenic_Wavefunction_Momentum(const Eigen::Vector3d& momentum, const std::string& orbital, double Zeff)
 {
 	double k = momentum.norm();
