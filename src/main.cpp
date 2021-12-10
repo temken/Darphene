@@ -22,7 +22,7 @@ using namespace graphene;
 
 int main(int argc, char* argv[])
 {
-	//Initial terminal output
+	// Initial terminal output
 	auto time_start	  = std::chrono::system_clock::now();
 	auto time_start_t = std::chrono::system_clock::to_time_t(time_start);
 	auto* ctime_start = ctime(&time_start_t);
@@ -41,22 +41,47 @@ int main(int argc, char* argv[])
 	double E_e = 10 * eV;
 	int band   = 0;
 	std::cout << E_e / eV << "\t" << In_Units(dR_dlnE(E_e, DM, SHM, graphene, band), 1.0 / kg / year) << std::endl;
+	std::cout << E_e / eV << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, band), 1.0 / kg / year) << std::endl;
+	// std::cout << E_e / eV << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, band), 1.0 / kg / year) << std::endl;
 
-	std::vector<double> energies = libphysica::Log_Space(1.0e-1 * eV, 1.0e3 * eV, 50);
+	// Eigen::Vector3d rVec(Bohr_Radius, 2.0 * Bohr_Radius, 3.0 * Bohr_Radius);
+	// Eigen::Vector3d kVec(1.0 / Bohr_Radius, 2.0 / Bohr_Radius, 3.0 / Bohr_Radius);
+	// Eigen::Vector3d lVec(1.0 / Bohr_Radius, 2.0 / Bohr_Radius, 0.0);
+
+	// std::cout << graphene.Wavefunction_Pi(rVec, lVec) << std::endl;
+	// std::cout << graphene.Wavefunction_Pi_Analytic(rVec, lVec) << std::endl
+	// 		  << std::endl;
+
+	// std::cout << graphene.Wavefunction_Momentum_Pi(kVec, lVec) << std::endl;
+	// std::cout << graphene.Wavefunction_Momentum_Pi_Analytic(kVec, lVec) << std::endl;
+
+	// std::cout << DM.mass / MeV << std::endl;
+
+	std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 200 * eV, 100);
 	std::ofstream f;
-	f.open("Spectrum_Hochberg.txt");
+	f.open("Corrected_Spectrum_Pi_100_MeV.txt");
 	for(auto& E_e : energies)
 	{
 		std::cout << E_e / eV << std::endl;
-		f << In_Units(E_e, eV);
-		for(int band = 0; band < 4; band++)
-			f << "\t" << In_Units(dR_dlnE(E_e, DM, SHM, graphene, band), 1.0 / kg / year);
-		f << std::endl;
+		f << In_Units(E_e, eV) << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, 0), 1.0 / kg / year) << std::endl;
 	}
 	f.close();
 
+	// std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 30 * eV, 50);
+	// std::ofstream f;
+	// f.open("Spectrum_Emken_10_MeV.txt");
+	// for(auto& E_e : energies)
+	// {
+	// 	std::cout << E_e / eV << std::endl;
+	// 	f << In_Units(E_e, eV);
+	// 	for(int band = 0; band < 4; band++)
+	// 		f << "\t" << In_Units(dR_dlnE(E_e, DM, SHM, graphene, band), 1.0 / kg / year);
+	// 	f << std::endl;
+	// }
+	// f.close();
+
 	////////////////////////////////////////////////////////////////////////
-	//Final terminal output
+	// Final terminal output
 	auto time_end		 = std::chrono::system_clock::now();
 	double durationTotal = 1e-6 * std::chrono::duration_cast<std::chrono::microseconds>(time_end - time_start).count();
 	std::cout << "\n[Finished in " << libphysica::Time_Display(durationTotal) << "]\a" << std::endl;

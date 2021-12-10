@@ -9,6 +9,7 @@
 namespace graphene
 {
 extern double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
+extern double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
 
 }	// namespace graphene
 

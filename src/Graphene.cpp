@@ -309,4 +309,26 @@ double Graphene::DM_Response(int band, const Eigen::Vector3d& lVec, const Eigen:
 	return std::norm(psi);
 }
 
+double Graphene::DM_Response_corrected(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
+{
+	std::complex<double> psi;
+	if(band == 0)
+	{
+		std::complex<double> f = f_aux(lVec);
+		double phi_l		   = -atan2(f.imag(), f.real());
+		double phi_2pz		   = Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
+		double norm			   = 1.0;
+		for(int i = 0; i < 3; i++)
+			norm += s * cos(phi_l + nearest_neighbors[i].dot(lVec));
+		double N_l = 1.0 / std::sqrt(norm);
+		return std::pow(N_l * phi_2pz, 2.0) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(lVec + kVec)));
+	}
+	else
+	{
+		// psi = Wavefunction_Momentum_Sigma(kVec, lVec, band - 1);
+		psi = 0.0;
+		return std::norm(psi);
+	}
+}
+
 }	// namespace graphene
