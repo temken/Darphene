@@ -349,8 +349,20 @@ double Graphene::DM_Response_corrected(int band, const Eigen::Vector3d& lVec, co
 	}
 	else
 	{
-		// psi = Wavefunction_Momentum_Sigma(kVec, lVec, band - 1);
-		psi = 0.0;
+		int i														   = band - 1;
+		Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges = EigenSolution_Sigma(lVec);
+
+		std::complex<double> C1	 = ges.eigenvectors().col((i))[0];
+		std::complex<double> C2	 = ges.eigenvectors().col((i))[1];
+		std::complex<double> C3	 = ges.eigenvectors().col((i))[2];
+		std::complex<double> C4	 = ges.eigenvectors().col((i))[3];
+		std::complex<double> C5	 = ges.eigenvectors().col((i))[4];
+		std::complex<double> C6	 = ges.eigenvectors().col((i))[5];
+		Eigen::MatrixXcd S		 = S_Matrix_Sigma(lVec);
+		double norm				 = ges.eigenvectors().col((i)).dot(S * ges.eigenvectors().col((i))).real();
+		double N_l				 = 1.0 / std::sqrt(norm);
+		std::complex<double> aux = std::exp(1i * nearest_neighbors[0].dot(lVec + kVec));
+		psi						 = N_l * ((C1 + C4 * aux) * Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * aux) * Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * aux) * Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
 		return std::norm(psi);
 	}
 }
