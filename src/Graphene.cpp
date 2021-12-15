@@ -216,6 +216,30 @@ bool Graphene::In_1BZ(const Eigen::Vector3d& lVec)
 		return true;
 }
 
+Eigen::Vector3d Graphene::Find_1BZ_Vector(const Eigen::Vector3d& lVec)
+{
+	if(In_1BZ(lVec))
+		return lVec;
+	else
+	{
+		Eigen::Vector3d lVec_1BZ = lVec;
+		lVec_1BZ[0]				 = std::fmod(lVec_1BZ[0], 2.0 * M_PI / sqrt(3.0) / a);
+		lVec_1BZ[1]				 = std::fmod(lVec_1BZ[1], 4.0 * M_PI / 3.0 / a);
+		if(In_1BZ(lVec_1BZ))
+		{
+		}
+		else if(lVec_1BZ[0] < 0.0 && lVec_1BZ[1] < 0.0)
+			lVec_1BZ += reciprocal_lattice_vectors[0];
+		else if(lVec_1BZ[0] < 0.0 && lVec_1BZ[1] > 0.0)
+			lVec_1BZ += reciprocal_lattice_vectors[1];
+		else if(lVec_1BZ[0] > 0.0 && lVec_1BZ[1] < 0.0)
+			lVec_1BZ -= reciprocal_lattice_vectors[1];
+		else if(lVec_1BZ[0] > 0.0 && lVec_1BZ[1] > 0.0)
+			lVec_1BZ -= reciprocal_lattice_vectors[0];
+		return lVec_1BZ;
+	}
+}
+
 std::complex<double> Graphene::Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, int i) const
 {
 	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges = EigenSolution_Pi(lVec);

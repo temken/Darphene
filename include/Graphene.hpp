@@ -50,6 +50,7 @@ class Graphene
 	std::vector<std::vector<double>> Energy_Bands(unsigned int k_points);
 
 	bool In_1BZ(const Eigen::Vector3d& lVec);
+	Eigen::Vector3d Find_1BZ_Vector(const Eigen::Vector3d& lVec);
 
 	std::complex<double> Wavefunction_Pi(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, int i = 0) const;
 	std::complex<double> Wavefunction_Pi_Analytic(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec) const;

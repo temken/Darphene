@@ -79,7 +79,7 @@ double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distr
 	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (work_function + E_e));
 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (work_function + E_e));
 
-	// Order of integrand arguments: l_1, xi = l_2 / (l_1/sqrt(3)) , y = (q-qMin)/(qMax-qMin), cos_theta_q, phi_q, cos_theta_kf, phi_kf
+	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
 	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, &DM, band, k_final, work_function, E_e, mDM, vMax, qMinGlobal, qMaxGlobal](const std::vector<double>& x, const double wgt) {
 		double q			= x[0];
 		double cos_theta_q	= x[1];
@@ -92,14 +92,9 @@ double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distr
 
 		Eigen::Vector3d lVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
 
-		// std::cout << lVec[0] / graphene.b * 2.0 << std::endl;
-		// double n = 0.5 * (std::floor(2.0 / graphene.b * lVec[0]) + std::floor(2.0 / std::sqrt(3.0) / graphene.b * lVec[1]));
-		// double m = 0.5 * (std::floor(2.0 / graphene.b * lVec[0]) - std::floor(2.0 / std::sqrt(3.0) / graphene.b * lVec[0]));
-		// std::cout << "nm=" << n << " " << m << std::endl;
+		lVec = graphene.Find_1BZ_Vector(lVec);
 
-		double E_l	= graphene.Valence_Band_Energies(lVec, band);	// Note that E_l is negative!!! (unlike in the paper by Hochberg et al)
-		double qMin = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (work_function - E_l + E_e));
-		double qMax = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (work_function - E_l + E_e));
+		double E_l = graphene.Valence_Band_Energies(lVec, band);   // Note that E_l is negative!!! (unlike in the paper by Hochberg et al)
 
 		double vMin = vMinimum_Graphene(DM.mass, q, E_l, k_final);
 		// double vDM	= 1.0e-3;	// cancels
