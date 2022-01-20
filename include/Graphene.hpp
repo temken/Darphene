@@ -61,7 +61,7 @@ class Graphene
 	std::complex<double> Wavefunction_Momentum_Sigma(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i = 0) const;
 
 	double DM_Response(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec);
-	double DM_Response_corrected(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec);
+	double DM_Response_corrected(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& k_FinalVec);
 };
 }	// namespace graphene
 

@@ -59,7 +59,7 @@ double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& D
 		return lVec[0] * (qMax - qMin) * q * DM_distr.Eta_Function(vMin) * vDM * vDM * DM.dSigma_dq2_Electron(q, vDM) * graphene.DM_Response(band, lVec, qVec - k_FinalVec);
 	};
 	std::vector<double> region = {0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 0.0, 2.0 * M_PI / sqrt(3.0) / a, 1.0, 1.0, +1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 10000, method);
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 5000, method);
 	return std::isnan(result) ? 0.0 : result;
 }
 
@@ -90,18 +90,18 @@ double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distr
 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(k_final, acos(cos_theta_kf), phi_kf);
 
+		// Determine the crystal momentum vector l
 		Eigen::Vector3d lVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
-
 		lVec = graphene.Find_1BZ_Vector(lVec);
 
 		double E_l = graphene.Valence_Band_Energies(lVec, band);   // Note that E_l is negative!!! (unlike in the paper by Hochberg et al)
 
 		double vMin = vMinimum_Graphene(DM.mass, q, E_l, k_final);
-		// double vDM	= 1.0e-3;	// cancels
-		return q * DM_distr.Eta_Function(vMin) * graphene.DM_Response_corrected(band, lVec, qVec - k_FinalVec);
+		return q * DM_distr.Eta_Function(vMin) * graphene.DM_Response_corrected(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 10000, method);
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 5000, method);
+
 	return std::isnan(result) ? 0.0 : result;
 }
 

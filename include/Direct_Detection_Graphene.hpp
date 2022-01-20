@@ -8,6 +8,7 @@
 
 namespace graphene
 {
+extern Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi);
 extern double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
 extern double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
 
