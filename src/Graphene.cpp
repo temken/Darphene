@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "libphysica/Statistics.hpp"
 #include "libphysica/Utilities.hpp"
 
 #include "Hydrogenic_Wavefunctions.hpp"
@@ -136,18 +137,23 @@ Graphene::Graphene()
 	high_symmetry_point_K = {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0};
 
 	// Overlap and transfer integrals
-	s		   = 0.129;
-	sPrime	   = 0.00866032;
-	Sss		   = 0.212;
-	Ssp		   = 0.159931;
-	Ssigma	   = 0.146;
-	Spi		   = 0.129;
-	t		   = -3.033 * eV;
-	Hss		   = -6.769 * eV;
-	Hsp		   = -5.580 * eV;
-	Hsigma	   = -5.037 * eV;
-	Hpi		   = -3.033 * eV;
-	epsilon_2s = -8.868 * eV;
+	std::random_device rd;
+	std::mt19937 PRNG(rd());
+	double variation = 0.1;
+
+	s	   = libphysica::Sample_Gauss(PRNG, 0.129, variation * 0.129);
+	sPrime = libphysica::Sample_Gauss(PRNG, 0.00866032, variation * 0.00866032);
+	Sss	   = libphysica::Sample_Gauss(PRNG, 0.212, variation * 0.212);
+	Ssp	   = libphysica::Sample_Gauss(PRNG, 0.159931, variation * 0.159931);
+	Ssigma = libphysica::Sample_Gauss(PRNG, 0.146, variation * 0.146);
+	Spi	   = libphysica::Sample_Gauss(PRNG, 0.129, variation * 0.129);
+
+	t		   = libphysica::Sample_Gauss(PRNG, -3.033 * eV, variation * -3.033 * eV);
+	Hss		   = libphysica::Sample_Gauss(PRNG, -6.769 * eV, variation * -6.769 * eV);
+	Hsp		   = libphysica::Sample_Gauss(PRNG, -5.580 * eV, variation * -5.580 * eV);
+	Hsigma	   = libphysica::Sample_Gauss(PRNG, -5.037 * eV, variation * -5.037 * eV);
+	Hpi		   = libphysica::Sample_Gauss(PRNG, -3.033 * eV, variation * -3.033 * eV);
+	epsilon_2s = libphysica::Sample_Gauss(PRNG, -8.868 * eV, variation * -8.868 * eV);
 	epsilon_2p = 0.0;
 
 	Zeff_2s		 = 4.59381;
