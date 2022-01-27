@@ -34,51 +34,23 @@ int main(int argc, char* argv[])
 	////////////////////////////////////////////////////////////////////////
 
 	obscura::Standard_Halo_Model SHM(0.4 * GeV / cm / cm / cm, 220.0 * km / sec, 232.0 * km / sec, 550.0 * km / sec);
-	obscura::DM_Particle_SI DM(100 * MeV);
-	DM.Set_Sigma_Electron(1.0e-37 * cm * cm);
 	Graphene graphene;
 
-	double E_e = 10 * eV;
-	int band   = 0;
-	std::cout << E_e / eV << "\t" << In_Units(dR_dlnE(E_e, DM, SHM, graphene, band), 1.0 / kg / year) << std::endl;
-	std::cout << E_e / eV << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, band), 1.0 / kg / year) << std::endl;
-	// std::cout << E_e / eV << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, band), 1.0 / kg / year) << std::endl;
+	obscura::DM_Particle_SI DM(100 * MeV);
+	DM.Set_Sigma_Electron(1.0e-37 * cm * cm);
 
-	// Eigen::Vector3d rVec(Bohr_Radius, 2.0 * Bohr_Radius, 3.0 * Bohr_Radius);
-	// Eigen::Vector3d kVec(1.0 / Bohr_Radius, 2.0 / Bohr_Radius, 3.0 / Bohr_Radius);
-	// Eigen::Vector3d lVec(1.0 / Bohr_Radius, 2.0 / Bohr_Radius, 0.0);
-
-	// std::cout << graphene.Wavefunction_Pi(rVec, lVec) << std::endl;
-	// std::cout << graphene.Wavefunction_Pi_Analytic(rVec, lVec) << std::endl
-	// 		  << std::endl;
-
-	// std::cout << graphene.Wavefunction_Momentum_Pi(kVec, lVec) << std::endl;
-	// std::cout << graphene.Wavefunction_Momentum_Pi_Analytic(kVec, lVec) << std::endl;
-
-	// std::cout << DM.mass / MeV << std::endl;
-
-	std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 200 * eV, 100);
+	std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 250 * eV, 75);
 	std::ofstream f;
-	f.open("Corrected_Spectrum_Pi_100_MeV.txt");
+	f.open("Spectrum_100_MeV.txt");
 	for(auto& E_e : energies)
 	{
 		std::cout << E_e / eV << std::endl;
-		f << In_Units(E_e, eV) << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, 0), 1.0 / kg / year) << std::endl;
+		f << In_Units(E_e, eV);
+		for(int band = 0; band < 4; band++)
+			f << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, band), 1.0 / kg / year);
+		f << std::endl;
 	}
 	f.close();
-
-	// std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 30 * eV, 50);
-	// std::ofstream f;
-	// f.open("Spectrum_Emken_10_MeV.txt");
-	// for(auto& E_e : energies)
-	// {
-	// 	std::cout << E_e / eV << std::endl;
-	// 	f << In_Units(E_e, eV);
-	// 	for(int band = 0; band < 4; band++)
-	// 		f << "\t" << In_Units(dR_dlnE(E_e, DM, SHM, graphene, band), 1.0 / kg / year);
-	// 	f << std::endl;
-	// }
-	// f.close();
 
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output
