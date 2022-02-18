@@ -114,11 +114,12 @@ Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> Graphene::EigenSoluti
 	return Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd>(H, S, compute_eigenvectors);
 }
 
-Graphene::Graphene()
+Graphene::Graphene(double workfunction)
 {
-	aCC = 1.42 * Angstrom;
-	a	= aCC * sqrt(3.0);
-	b	= 4.0 * M_PI / sqrt(3.0) / a;
+	aCC			  = 1.42 * Angstrom;
+	a			  = aCC * sqrt(3.0);
+	b			  = 4.0 * M_PI / sqrt(3.0) / a;
+	work_function = workfunction;
 
 	lattice_vectors = {
 		{3.0 / 2.0 * aCC, a / 2.0, 0.0},

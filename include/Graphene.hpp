@@ -36,11 +36,11 @@ class Graphene
 
   public:
 	// Graphene lattice geometry
-	double aCC, a, b;
+	double aCC, a, b, work_function;
 	std::vector<Eigen::Vector3d> lattice_vectors, reciprocal_lattice_vectors, nearest_neighbors;
 	Eigen::Vector3d high_symmetry_point_G, high_symmetry_point_M, high_symmetry_point_K;
 
-	Graphene();
+	Graphene(double workfunction = 4.3 * libphysica::natural_units::eV);
 
 	std::vector<double> Energy_Dispersion_Pi(const Eigen::Vector3d& lVec) const;
 	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& lVec) const;
