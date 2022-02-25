@@ -51,32 +51,22 @@ int main(int argc, char* argv[])
 	obscura::DM_Particle_SI DM(400 * MeV);
 	DM.Set_Sigma_Electron(1.0e-37 * cm * cm);
 
-	double R_simple = R_Total_corrected(DM, SHM, graphene);
-	double R_full	= R_Total_Full_Integral(DM, SHM, graphene);
-	std::cout << "\tR_1 = " << In_Units(R_simple, 1.0 / kg / year) << std::endl;
-	std::cout << "\tR_2 = " << In_Units(R_full, 1.0 / kg / year) << std::endl;
+	// Compute recoil spectrum
+	int points					  = 40;
+	std::string velocity_integral = "Full";
+	auto spectrum				  = Tabulate_dR_dlnE(points, DM, SHM, graphene, velocity_integral);
+	libphysica::Export_Table("Spectrum_mDM_400MeV_Simplified.txt", spectrum, {eV, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year});
 
-	// std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 500 * eV, 50);
-	// std::ofstream f;
-	// f.open("Spectrum_400_MeV_Simplified_Integral.txt");
-	// // f.open("Spectrum_1000_MeV_Simplified_Integral.txt");
-	// for(auto& E_e : energies)
-	// {
-	// 	std::cout << E_e / eV << "\t" << std::flush;
-	// 	double tot = 0.0;
-	// 	f << In_Units(E_e, eV);
-	// 	for(int band = 0; band < 4; band++)
-	// 	{
-	// 		// double dR = dR_dlnE_Full_Integral(E_e, DM, SHM, graphene, band);
-	// 		double dR = dR_dlnE_corrected(E_e, DM, SHM, graphene, band);
-	// 		tot += dR;
-	// 		f << "\t" << In_Units(dR, 1.0 / kg / year);
-	// 		// std::cout << "\t" << In_Units(dR, 1.0 / kg / year) << std::endl;
-	// 	}
-	// 	f << "\t" << In_Units(tot, 1.0 / kg / year) << std::endl;
-	// 	std::cout << In_Units(tot, 1.0 / kg / year) << std::endl;
-	// }
-	// f.close();
+	// Total rate over the course of a day
+	double R_simple = R_Total_simplified(DM, SHM, graphene, 0);
+	std::cout << "\tR_simple = " << In_Units(R_simple, 1.0 / kg / year) << std::endl;
+	auto t_list = libphysica::Linear_Space(0.0, 1.0, 20);
+	for(auto& t : t_list)
+	{
+		SHM.Set_Observer_Velocity(Earth_Velocity(t * day, v_earth));
+		double R = R_Total(DM, SHM, graphene, 0);
+		std::cout << "t = " << t << "\tR = " << In_Units(R, 1.0 / kg / year) << std::endl;
+	}
 
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output
