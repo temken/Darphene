@@ -33,24 +33,50 @@ int main(int argc, char* argv[])
 			  << std::endl;
 	////////////////////////////////////////////////////////////////////////
 
-	obscura::Standard_Halo_Model SHM(0.4 * GeV / cm / cm / cm, 220.0 * km / sec, 232.0 * km / sec, 550.0 * km / sec);
-	Graphene graphene;
+	// Initialize DM halo model
+	double rho_DM  = 0.4 * GeV / cm / cm / cm;
+	double v0	   = 220.0 * km / sec;
+	double v_earth = 232.0 * km / sec;
+	double v_esc   = 544.0 * km / sec;
+	obscura::Standard_Halo_Model SHM(rho_DM, v0, v_earth, v_esc);
+	double t = 0.2 * day;
+	SHM.Set_Observer_Velocity(Earth_Velocity(t, v_earth));
+	SHM.Print_Summary();
 
-	obscura::DM_Particle_SI DM(100 * MeV);
+	// Initialize graphene
+	double work_function = 5 * eV;
+	Graphene graphene(work_function);
+
+	// Initialize DM particle
+	obscura::DM_Particle_SI DM(400 * MeV);
 	DM.Set_Sigma_Electron(1.0e-37 * cm * cm);
 
-	std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 250 * eV, 75);
-	std::ofstream f;
-	f.open("Spectrum_100_MeV.txt");
-	for(auto& E_e : energies)
-	{
-		std::cout << E_e / eV << std::endl;
-		f << In_Units(E_e, eV);
-		for(int band = 0; band < 4; band++)
-			f << "\t" << In_Units(dR_dlnE_corrected(E_e, DM, SHM, graphene, band), 1.0 / kg / year);
-		f << std::endl;
-	}
-	f.close();
+	double R_simple = R_Total_corrected(DM, SHM, graphene);
+	double R_full	= R_Total_Full_Integral(DM, SHM, graphene);
+	std::cout << "\tR_1 = " << In_Units(R_simple, 1.0 / kg / year) << std::endl;
+	std::cout << "\tR_2 = " << In_Units(R_full, 1.0 / kg / year) << std::endl;
+
+	// std::vector<double> energies = libphysica::Log_Space(2.0e-1 * eV, 500 * eV, 50);
+	// std::ofstream f;
+	// f.open("Spectrum_400_MeV_Simplified_Integral.txt");
+	// // f.open("Spectrum_1000_MeV_Simplified_Integral.txt");
+	// for(auto& E_e : energies)
+	// {
+	// 	std::cout << E_e / eV << "\t" << std::flush;
+	// 	double tot = 0.0;
+	// 	f << In_Units(E_e, eV);
+	// 	for(int band = 0; band < 4; band++)
+	// 	{
+	// 		// double dR = dR_dlnE_Full_Integral(E_e, DM, SHM, graphene, band);
+	// 		double dR = dR_dlnE_corrected(E_e, DM, SHM, graphene, band);
+	// 		tot += dR;
+	// 		f << "\t" << In_Units(dR, 1.0 / kg / year);
+	// 		// std::cout << "\t" << In_Units(dR, 1.0 / kg / year) << std::endl;
+	// 	}
+	// 	f << "\t" << In_Units(tot, 1.0 / kg / year) << std::endl;
+	// 	std::cout << In_Units(tot, 1.0 / kg / year) << std::endl;
+	// }
+	// f.close();
 
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output
