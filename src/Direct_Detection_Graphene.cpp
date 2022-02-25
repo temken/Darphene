@@ -231,7 +231,7 @@ double R_Total_Full_Integral(obscura::DM_Particle& DM, obscura::DM_Distribution&
 
 		double E_l = graphene.Valence_Band_Energies(lVec, band);
 		double v   = (kf * kf / (2.0 * mElectron) - E_l + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
-		if(v > vMax)
+		if(v > vMax || v < 0.0)
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 
@@ -293,7 +293,7 @@ double dR_dlnE_Full_Integral(double E_e, obscura::DM_Particle& DM, obscura::DM_D
 
 		double E_l = graphene.Valence_Band_Energies(lVec, band);
 		double v   = (kf * kf / (2.0 * mElectron) - E_l + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
-		if(v > vMax)
+		if(v > vMax || v < 0.0)
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 
