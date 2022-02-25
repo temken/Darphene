@@ -5,6 +5,7 @@
 #include "libphysica/Integration.hpp"
 #include "libphysica/Natural_Units.hpp"
 #include "libphysica/Statistics.hpp"
+#include "libphysica/Utilities.hpp"
 
 namespace graphene
 {
@@ -56,7 +57,7 @@ double vMinimum_Graphene(double mDM, double q, double energy_crystal, double fin
 	return (E_final - energy_crystal + work_function) / q + q / 2.0 / mDM;
 }
 
-double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+double dR_dlnE_Hochberg(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -90,14 +91,14 @@ double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& D
 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(k_final, acos(cos_theta_kf), phi_kf);
 		double vMin				   = vMinimum_Graphene(DM.mass, q, E_l, k_final, graphene.work_function);
 		double vDM				   = 1.0e-3;   // cancels
-		return lVec[0] * (qMax - qMin) * q * DM_distr.Eta_Function(vMin) * vDM * vDM * DM.dSigma_dq2_Electron(q, vDM) * graphene.DM_Response(band, lVec, qVec - k_FinalVec);
+		return lVec[0] * (qMax - qMin) * q * DM_distr.Eta_Function(vMin) * vDM * vDM * DM.dSigma_dq2_Electron(q, vDM) * graphene.DM_Response_Hochberg(band, lVec, qVec - k_FinalVec);
 	};
 	std::vector<double> region = {0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 0.0, 2.0 * M_PI / sqrt(3.0) / a, 1.0, 1.0, +1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 5000, method);
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+double dR_dlnE_simplified(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -116,7 +117,7 @@ double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distr
 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
 
 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, &DM, band, k_final, E_e, mDM, vMax, qMinGlobal, qMaxGlobal](const std::vector<double>& x, const double wgt) {
+	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, band, k_final, mDM](const std::vector<double>& x, const double wgt) {
 		double q			= x[0];
 		double cos_theta_q	= x[1];
 		double phi_q		= x[2];
@@ -132,8 +133,8 @@ double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distr
 
 		double E_l = graphene.Valence_Band_Energies(lVec, band);   // Note that E_l is negative!!! (unlike in the paper by Hochberg et al)
 
-		double vMin = vMinimum_Graphene(DM.mass, q, E_l, k_final, graphene.work_function);
-		return q * DM_distr.Eta_Function(vMin) * graphene.DM_Response_corrected(band, qVec, k_FinalVec);
+		double vMin = vMinimum_Graphene(mDM, q, E_l, k_final, graphene.work_function);
+		return q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 5000, method);
@@ -141,7 +142,7 @@ double dR_dlnE_corrected(double E_e, obscura::DM_Particle& DM, obscura::DM_Distr
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double R_Total_corrected(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -158,7 +159,7 @@ double R_Total_corrected(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_
 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
 
 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, &DM, band, mDM, vMax, qMinGlobal, qMaxGlobal, kfMin, kfMax](const std::vector<double>& x, const double wgt) {
+	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, band, mDM](const std::vector<double>& x, const double wgt) {
 		double q			= x[0];
 		double cos_theta_q	= x[1];
 		double phi_q		= x[2];
@@ -175,23 +176,23 @@ double R_Total_corrected(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_
 
 		double E_l = graphene.Valence_Band_Energies(lVec, band);   // Note that E_l is negative!!! (unlike in the paper by Hochberg et al)
 
-		double vMin = vMinimum_Graphene(DM.mass, q, E_l, kf, graphene.work_function);
-		return kf * kf * q * DM_distr.Eta_Function(vMin) * graphene.DM_Response_corrected(band, qVec, k_FinalVec);
+		double vMin = vMinimum_Graphene(mDM, q, E_l, kf, graphene.work_function);
+		return kf * kf * q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 200000, method);
 
 	return std::isnan(result) ? 0.0 : result;
 }
-double R_Total_corrected(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
+double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
 {
 	double rTot = 0.0;
 	for(int band = 0; band < 4; band++)
-		rTot += R_Total_corrected(DM, DM_distr, graphene, band, method);
+		rTot += R_Total_simplified(DM, DM_distr, graphene, band, method);
 	return rTot;
 }
 
-double R_Total_Full_Integral(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -208,7 +209,7 @@ double R_Total_Full_Integral(obscura::DM_Particle& DM, obscura::DM_Distribution&
 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
 
 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, &DM, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
+	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
 		double q			= x[0];
 		double cos_theta_q	= x[1];
 		double phi_q		= x[2];
@@ -235,7 +236,7 @@ double R_Total_Full_Integral(obscura::DM_Particle& DM, obscura::DM_Distribution&
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 
-		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response_corrected(band, qVec, k_FinalVec);
+		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 100000, method);
@@ -243,15 +244,15 @@ double R_Total_Full_Integral(obscura::DM_Particle& DM, obscura::DM_Distribution&
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double R_Total_Full_Integral(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
+double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
 {
 	double rTot = 0.0;
 	for(int band = 0; band < 4; band++)
-		rTot += R_Total_Full_Integral(DM, DM_distr, graphene, band, method);
+		rTot += R_Total(DM, DM_distr, graphene, band, method);
 	return rTot;
 }
 
-double dR_dlnE_Full_Integral(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -271,7 +272,7 @@ double dR_dlnE_Full_Integral(double E_e, obscura::DM_Particle& DM, obscura::DM_D
 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
 
 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [kf, &DM_distr, &graphene, &DM, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
+	std::function<double(const std::vector<double>&, const double)> integrand = [kf, &DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
 		double q			= x[0];
 		double cos_theta_q	= x[1];
 		double phi_q		= x[2];
@@ -297,12 +298,36 @@ double dR_dlnE_Full_Integral(double E_e, obscura::DM_Particle& DM, obscura::DM_D
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 
-		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response_corrected(band, qVec, k_FinalVec);
+		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 20000, method);
 
 	return std::isnan(result) ? 0.0 : result;
+}
+
+std::vector<std::vector<double>> Tabulate_dR_dlnE(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
+{
+	double E_min			   = 0.1 * eV;
+	double v_max			   = DM_distr.Maximum_DM_Speed();
+	double E_max			   = 0.99 * DM.mass / 2.0 * v_max * v_max;
+	std::vector<double> E_list = libphysica::Log_Space(E_min, E_max, points);
+	std::vector<std::vector<double>> spectrum;
+	for(auto& E_er : E_list)
+	{
+		std::cout << E_er / eV << std::endl;
+		std::vector<double> row = {E_er};
+		double dRdlnE			= 0.0;
+		for(int band = 0; band < 4; band++)
+		{
+			double band_contribution = (method == "Full") ? dR_dlnE(E_er, DM, DM_distr, graphene, band) : dR_dlnE_simplified(E_er, DM, DM_distr, graphene, band);
+			row.push_back(band_contribution);
+			dRdlnE += band_contribution;
+		}
+		row.push_back(dRdlnE);
+		spectrum.push_back(row);
+	}
+	return spectrum;
 }
 
 }	// namespace graphene

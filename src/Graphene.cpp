@@ -327,7 +327,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d
 	return 1.0 / std::sqrt(norm) * ((C1 + C4 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
 }
 
-double Graphene::DM_Response(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
+double Graphene::DM_Response_Hochberg(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
 {
 	std::complex<double> psi;
 	if(band == 0)
@@ -337,7 +337,7 @@ double Graphene::DM_Response(int band, const Eigen::Vector3d& lVec, const Eigen:
 	return std::norm(psi);
 }
 
-double Graphene::DM_Response_corrected(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& k_FinalVec)
+double Graphene::DM_Response(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& k_FinalVec)
 {
 	std::complex<double> psi;
 
