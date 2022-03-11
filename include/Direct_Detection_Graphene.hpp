@@ -23,8 +23,10 @@ extern double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribut
 extern double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
 extern double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method = "Vegas");
 extern double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
+extern double dR_dcosk_dphik(double cos_k, double phi_k, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
 
 extern std::vector<std::vector<double>> Tabulate_dR_dlnE(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method = "Full");
+extern std::vector<std::vector<double>> Tabulate_dR_dcosk_dphik(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene);
 
 }	// namespace graphene
 
