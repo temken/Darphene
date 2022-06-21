@@ -11,9 +11,6 @@ namespace graphene
 extern Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi);
 extern libphysica::Vector Earth_Velocity(double t, double v_earth);
 
-// Reproducing Hochberg et al.
-extern double dR_dlnE_Hochberg(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
-
 // Correct response functions, simplified velocity integral
 extern double dR_dlnE_simplified(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
 extern double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method = "Vegas");
