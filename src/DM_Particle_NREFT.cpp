@@ -118,7 +118,7 @@ double DM_Particle_NREFT::Squared_Amplitude_Electron(const Eigen::Vector3d& qVec
 	// Squared amplitude
 	double M2_1 = C[0] * C[0] + C[2] * C[2] / 4. * v_perp_cross_q_sq + C[6] * C[6] / 4. * v_perp_sq + C[9] * C[9] / 4. * q_me_sq;
 	double M2_2 = 3. * C[3] * C[3] + (4. * C[4] * C[4] - 2. * C[11] * C[14]) * v_perp_cross_q_sq + C[5] * C[5] * q_me_sq * q_me_sq + (4. * C[7] * C[7] + 2. * C[11] * C[11]) * v_perp_sq + (2. * C[8] * C[8] + 4. * C[10] * C[10] + 2. * C[3] * C[5]) * q_me_sq + (C[12] * C[12] + C[13] * C[13]) * q_me_sq * v_perp_sq + C[14] * C[14] * q_me_sq * v_perp_cross_q_sq + 2. * C[12] * C[13] * v_perp_dot_q * v_perp_dot_q;
-	double M2	= M2_1 * spin * (spin + 1.0) / 12.0 * M2_2;
+	double M2	= M2_1 + spin * (spin + 1.0) / 12.0 * M2_2;
 
 	double first_bracket  = (C[2] * C[2] / 2. * (v_perp_dot_q * qVec / mElectron - q_me_sq * vel_perp) - C[6] * C[6] / 2. * vel_perp).dot(q_minus_k);
 	double second_bracket = ((4. * C[4] * C[4] + C[14] * C[14] * q_me_sq) * (v_perp_dot_q * qVec / mElectron - q_me_sq * vel_perp) - (4. * C[7] * C[7] + 2. * C[11] * C[11] + (C[12] * C[12] + C[13] * C[13]) * q_me_sq) * vel_perp - 2. * C[11] * C[14] * (v_perp_dot_q * qVec / mElectron - q_me_sq * vel_perp) - 2. * C[12] * C[13] * v_perp_dot_q * qVec / mElectron).dot(q_minus_k);
