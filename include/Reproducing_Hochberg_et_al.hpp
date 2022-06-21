@@ -6,6 +6,11 @@
 #include <cmath>
 #include <complex>
 
+#include "obscura/DM_Distribution.hpp"
+#include "obscura/DM_Particle.hpp"
+
+#include "libphysica/Natural_Units.hpp"
+
 namespace Hochberg_et_al
 {
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "libphysica/Integration.hpp"
 #include "libphysica/Utilities.hpp"
 
 #include "Hydrogenic_Wavefunctions.hpp"
@@ -13,14 +14,14 @@ using namespace std::complex_literals;
 
 std::complex<double> Graphene::Bloch_Wavefunction_A(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, const std::string& orbital, double Zeff) const
 {
-	return Hydrogenic_Wavefunction(rVec, orbital, Zeff);
+	return graphene::Hydrogenic_Wavefunction(rVec, orbital, Zeff);
 }
 
 std::complex<double> Graphene::Bloch_Wavefunction_B(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, const std::string& orbital, double Zeff) const
 {
 	std::complex<double> Phi = 0.0;
 	for(auto& R : nearest_neighbors)
-		Phi += exp(1i * lVec.dot(R)) * Hydrogenic_Wavefunction(rVec - R, orbital, Zeff);
+		Phi += exp(1i * lVec.dot(R)) * graphene::Hydrogenic_Wavefunction(rVec - R, orbital, Zeff);
 	return Phi;
 }
 
@@ -224,7 +225,7 @@ std::complex<double> Graphene::Wavefunction_Pi_Analytic(const Eigen::Vector3d& r
 	// double norm			   = 1.0;
 	double norm = 2.0;
 	for(int i = 0; i < 3; i++)
-		norm += s * cos(phi + nearest_neighbors[i].dot(lVec)) + sPrime * cos(lVec.dot(lattice_vectors[i]));
+		norm += s * cos(phi + nearest_neighbors[i].dot(lVec));	 // + sPrime * cos(lVec.dot(lattice_vectors[i]));
 	return pow(2.0 * norm, -0.5) * (Bloch_Wavefunction_A(rVec, lVec, "2pz", Zeff_2pz) + exp(1i * phi) * Bloch_Wavefunction_B(rVec, lVec, "2pz", Zeff_2pz));
 }
 
@@ -252,7 +253,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Pi(const Eigen::Vector3d& k
 	std::complex<double> f	= f_aux(lVec + kVec);
 
 	double norm = 1.0;	 // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
-	return 1.0 / std::sqrt(norm) * (C1 + C2 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
+	return 1.0 / std::sqrt(norm) * (C1 + C2 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
 }
 
 std::complex<double> Graphene::Wavefunction_Momentum_Pi_Analytic(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec) const
@@ -265,7 +266,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Pi_Analytic(const Eigen::Ve
 	double norm = 2.0;	 // This normalization is faulty due to the inaccurate Bloch wave functions.
 	for(int i = 0; i < 3; i++)
 		norm += s * cos(phi + nearest_neighbors[i].dot(lVec));	 // + sPrime * cos(lVec.dot(lattice_vectors[i]));
-	return pow(2.0 * norm, -0.5) * (1.0 + exp(1i * phi) * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
+	return pow(2.0 * norm, -0.5) * (1.0 + exp(1i * phi) * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
 }
 
 std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i) const
@@ -281,7 +282,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d
 	std::complex<double> f	= f_aux(lVec + kVec);
 
 	double norm = 1.0;	 // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
-	return 1.0 / std::sqrt(norm) * ((C1 + C4 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
+	return 1.0 / std::sqrt(norm) * ((C1 + C4 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
 }
 
 double Graphene::DM_Response_Hochberg(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
@@ -298,6 +299,11 @@ double vMinimum_Graphene(double mDM, double q, double energy_crystal, double fin
 {
 	double E_final = final_momentum * final_momentum / 2.0 / mElectron;
 	return (E_final - energy_crystal + work_function) / q + q / 2.0 / mDM;
+}
+
+Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi)
+{
+	return Eigen::Vector3d(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta));
 }
 
 double dR_dlnE_Hochberg(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Hochberg_et_al::Graphene& graphene, int band, const std::string& method)
