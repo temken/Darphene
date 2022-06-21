@@ -16,7 +16,7 @@ DM_Form_Factor::DM_Form_Factor()
 {
 }
 
-DM_Form_Factor::DM_Form_Factor(std::string& type, double parameter)
+DM_Form_Factor::DM_Form_Factor(const std::string& type, double parameter)
 : form_factor_type(type), qRef(aEM * mElectron)
 {
 	if(form_factor_type == "General")
@@ -74,7 +74,7 @@ void DM_Particle_NREFT::Set_Interaction_Parameter(double par, std::string target
 {
 }
 
-void DM_Particle_NREFT::Set_Coupling(int index, double value, std::string form_factor, double param)
+void DM_Particle_NREFT::Set_Coupling(int index, double value, const std::string& form_factor, double param)
 {
 	if(index < 1 || index > 15 || index == 2)
 	{
@@ -83,6 +83,12 @@ void DM_Particle_NREFT::Set_Coupling(int index, double value, std::string form_f
 	}
 	couplings[index - 1]	   = value;
 	DM_form_factors[index - 1] = DM_Form_Factor(form_factor, param);
+}
+
+void DM_Particle_NREFT::Set_Cross_Section(int index, double sigma, const std::string& form_factor, double param)
+{
+	double c = 4.0 * std::sqrt(M_PI * sigma) * mass * mElectron / libphysica::Reduced_Mass(mass, mElectron);
+	Set_Coupling(index, c, form_factor, param);
 }
 
 void DM_Particle_NREFT::Reset_All_Couplings()
@@ -123,11 +129,6 @@ double DM_Particle_NREFT::Squared_Amplitude_Electron(const Eigen::Vector3d& qVec
 	double me_squared_part = first_term + spin * (spin + 1.0) / 12.0 * bracket;
 
 	return M2 + me_real_part + me_squared_part;
-}
-
-double DM_Particle_NREFT::Sigma_Total_Electron(double vDM, double param)
-{
-	return 0.0;
 }
 
 void DM_Particle_NREFT::Print_Summary(int rank) const

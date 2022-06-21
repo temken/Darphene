@@ -19,7 +19,7 @@ class DM_Form_Factor
 
   public:
 	DM_Form_Factor();
-	DM_Form_Factor(std::string& type, double parameter = 0.0);
+	DM_Form_Factor(const std::string& type, double parameter = 0.0);
 
 	void Print_Summary(int rank = 0) const;
 
@@ -40,12 +40,11 @@ class DM_Particle_NREFT : public obscura::DM_Particle
 	virtual double Get_Interaction_Parameter(std::string target) const override;
 	virtual void Set_Interaction_Parameter(double par, std::string target) override;
 
-	void Set_Coupling(int index, double value, std::string form_factor = "Contact", double param = 0.0);
+	void Set_Coupling(int index, double value, const std::string& form_factor = "Contact", double param = 0.0);
+	void Set_Cross_Section(int index, double sigma, const std::string& form_factor = "Contact", double param = 0.0);
 	void Reset_All_Couplings();
 
 	double Squared_Amplitude_Electron(const Eigen::Vector3d& qVec, const Eigen::Vector3d& velDM, const Eigen::Vector3d& kPrime);
-
-	virtual double Sigma_Total_Electron(double vDM, double param = -1.0) override;
 
 	virtual void Print_Summary(int rank = 0) const override;
 };
