@@ -9,7 +9,7 @@ using namespace libphysica::natural_units;
 
 TEST(TestGraphene, TestEnergyDispersionPi)
 {
-	//ARRANGE
+	// ARRANGE
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
@@ -18,7 +18,7 @@ TEST(TestGraphene, TestEnergyDispersionPi)
 												{-2.6864482 * eV, 3.4822043 * eV},
 												{0.0 * eV, 0.0 * eV}};
 	double tolerance						 = 1.0e-5 * eV;
-	//ACT & ASSERT
+	// ACT & ASSERT
 	int i = 0;
 	for(auto& lVec : high_symmetry_points)
 	{
@@ -30,12 +30,12 @@ TEST(TestGraphene, TestEnergyDispersionPi)
 
 TEST(TestGraphene, TestEnergyDispersionPiAnalytic)
 {
-	//ARRANGE
+	// ARRANGE
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
 	Graphene graphene;
-	//ACT & ASSERT
+	// ACT & ASSERT
 	for(auto& lVec : high_symmetry_points)
 	{
 		std::vector<double> energy_analytic = graphene.Energy_Dispersion_Pi_Analytic(lVec);
@@ -47,7 +47,7 @@ TEST(TestGraphene, TestEnergyDispersionPiAnalytic)
 
 TEST(TestGraphene, TestEnergyDispersionSigma)
 {
-	//ARRANGE
+	// ARRANGE
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
@@ -57,7 +57,7 @@ TEST(TestGraphene, TestEnergyDispersionSigma)
 		{-14.802126408956223 * eV, -11.691743504673768 * eV, -7.06817 * eV, 10.476314847203604 * eV, 12.661549197487779 * eV, 20.1867 * eV},
 		{-13.064658876661905 * eV, -13.064658876661898 * eV, -8.56991 * eV, 12.119618979416404 * eV, 12.119618979416412 * eV, 20.604255319148937 * eV}};
 	double tolerance = 1.0e-5 * eV;
-	//ACT & ASSERT
+	// ACT & ASSERT
 	int i = 0;
 	for(auto& lVec : high_symmetry_points)
 	{
@@ -89,18 +89,18 @@ TEST(TestGraphene, TestEnergyBands)
 		EXPECT_NEAR(energy_bands[0][i], energy_bands[N - 1][i], tolerance);
 }
 
-TEST(TestGraphene, TestWaveFunctionPi)
-{
-	// ARRANGE
-	Graphene graphene;
+// TEST(TestGraphene, TestWaveFunctionPi)
+// {
+// 	// ARRANGE
+// 	Graphene graphene;
 
-	Eigen::Vector3d rVec({Bohr_Radius, 2 * Bohr_Radius, 3 * Bohr_Radius});
-	Eigen::Vector3d lVec({1.0 / Bohr_Radius, 2 / Bohr_Radius, 3.0 / Bohr_Radius});
+// 	Eigen::Vector3d rVec({Bohr_Radius, 2 * Bohr_Radius, 3 * Bohr_Radius});
+// 	Eigen::Vector3d lVec({1.0 / Bohr_Radius, 2 / Bohr_Radius, 3.0 / Bohr_Radius});
 
-	double psiNorm = 6.1979866e-11;
-	// ACT & ASSERT
-	ASSERT_FLOAT_EQ(std::abs(graphene.Wavefunction_Pi(rVec, lVec, 0)), psiNorm);
-}
+// 	double psiNorm = 6.1979866e-11;
+// 	// ACT & ASSERT
+// 	ASSERT_FLOAT_EQ(std::fabs(graphene.Wavefunction_Pi(rVec, lVec, 0)), psiNorm);
+// }
 
 TEST(TestGraphene, TestWaveFunctionPiAnalytic)
 {
