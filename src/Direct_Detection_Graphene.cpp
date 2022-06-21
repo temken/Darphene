@@ -51,107 +51,7 @@ Eigen::Vector3d Spherical_Coordinates_Axis(double r, double theta, double phi, c
 	}
 }
 
-double vMinimum_Graphene(double mDM, double q, double energy_crystal, double final_momentum, double work_function)
-{
-	double E_final = final_momentum * final_momentum / 2.0 / mElectron;
-	return (E_final - energy_crystal + work_function) / q + q / 2.0 / mDM;
-}
-
-double dR_dlnE_simplified(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
-{
-	// 1. Prefactor
-	double mDM		 = DM.mass;
-	double sigma_e	 = DM.Sigma_Electron();
-	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
-	double N_UC		 = 0.5 * 5.0e25 / kg;
-	double k_final	 = sqrt(2.0 * mElectron * E_e);
-	double prefactor = 0.5 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sqrt(2.0 * pow(mElectron * E_e, 3.0)) * sigma_e / mu_e / mu_e;
-
-	double vMax = DM_distr.Maximum_DM_Speed();
-	double EMax = mDM / 2.0 * vMax * vMax;
-	if(E_e > EMax)
-		return 0.0;
-
-	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
-	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
-
-	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, band, k_final, mDM](const std::vector<double>& x, const double wgt) {
-		double q			= x[0];
-		double cos_theta_q	= x[1];
-		double phi_q		= x[2];
-		double cos_theta_kf = x[3];
-		double phi_kf		= x[4];
-
-		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
-		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(k_final, acos(cos_theta_kf), phi_kf);
-
-		// Determine the crystal momentum vector l
-		Eigen::Vector3d lVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
-		lVec = graphene.Find_1BZ_Vector(lVec);
-
-		double E_l = graphene.Valence_Band_Energies(lVec, band);   // Note that E_l is negative!!! (unlike in the paper by Hochberg et al)
-
-		double vMin = vMinimum_Graphene(mDM, q, E_l, k_final, graphene.work_function);
-		return q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
-	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 5000, method);
-
-	return std::isnan(result) ? 0.0 : result;
-}
-
-double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
-{
-	// 1. Prefactor
-	double mDM		 = DM.mass;
-	double sigma_e	 = DM.Sigma_Electron();
-	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
-	double N_UC		 = 0.5 * 5.0e25 / kg;
-	double prefactor = 0.5 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sigma_e / mu_e / mu_e;
-
-	double vMax	 = DM_distr.Maximum_DM_Speed();
-	double kfMin = 0.0;
-	double kfMax = sqrt(mElectron * mDM) * vMax;
-
-	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
-	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
-
-	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, band, mDM](const std::vector<double>& x, const double wgt) {
-		double q			= x[0];
-		double cos_theta_q	= x[1];
-		double phi_q		= x[2];
-		double kf			= x[3];
-		double cos_theta_kf = x[4];
-		double phi_kf		= x[5];
-
-		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
-		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
-
-		// Determine the crystal momentum vector l
-		Eigen::Vector3d lVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
-		lVec = graphene.Find_1BZ_Vector(lVec);
-
-		double E_l = graphene.Valence_Band_Energies(lVec, band);   // Note that E_l is negative!!! (unlike in the paper by Hochberg et al)
-
-		double vMin = vMinimum_Graphene(mDM, q, E_l, kf, graphene.work_function);
-		return kf * kf * q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
-	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 200000, method);
-
-	return std::isnan(result) ? 0.0 : result;
-}
-double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
-{
-	double rTot = 0.0;
-	for(int band = 0; band < 4; band++)
-		rTot += R_Total_simplified(DM, DM_distr, graphene, band, method);
-	return rTot;
-}
-
-double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -186,11 +86,11 @@ double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Gra
 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
 
 		// Determine the crystal momentum vector l
-		Eigen::Vector3d lVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
-		lVec = graphene.Find_1BZ_Vector(lVec);
+		Eigen::Vector3d kVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
+		kVec = graphene.Find_1BZ_Vector(kVec);
 
-		double E_l = graphene.Valence_Band_Energies(lVec, band);
-		double v   = (kf * kf / (2.0 * mElectron) - E_l + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
+		double E_k = graphene.Valence_Band_Energies(kVec, band);
+		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
 		if(v > vMax || v < 0.0)
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
@@ -198,81 +98,25 @@ double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Gra
 		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 500000, method);
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 1000000, method);
 
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double R_Total(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
+double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
 {
 	double rTot = 0.0;
 	for(int band = 0; band < 4; band++)
-		rTot += R_Total(DM, DM_distr, graphene, band, method);
+		rTot += R_Total_Standard(DM, DM_distr, graphene, band, method);
 	return rTot;
 }
 
-double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
-	double sigma_e	 = DM.Sigma_Electron();
-	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
 	double N_UC		 = 0.5 * 5.0e25 / kg;
-	double prefactor = std::sqrt(2.0 * std::pow(mElectron * E_e, 3.0)) / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sigma_e / mu_e / mu_e;
-
-	double kf = std::sqrt(2.0 * mElectron * E_e);
-
-	double vMax = DM_distr.Maximum_DM_Speed();
-	double EMax = mDM / 2.0 * vMax * vMax;
-	if(E_e > EMax)
-		return 0.0;
-
-	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
-	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
-
-	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [kf, &DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
-		double q			= x[0];
-		double cos_theta_q	= x[1];
-		double phi_q		= x[2];
-		double cos_theta_kf = x[3];
-		double phi_kf		= x[4];
-		double cos_theta_v	= x[5];
-		double phi_v		= x[6];
-
-		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
-		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
-
-		// Determine the angle between vVec and qVec
-		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
-		double cos_alpha			 = v_unitvector.dot(qVec) / q;
-
-		// Determine the crystal momentum vector l
-		Eigen::Vector3d lVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
-		lVec = graphene.Find_1BZ_Vector(lVec);
-
-		double E_l = graphene.Valence_Band_Energies(lVec, band);
-		double v   = (kf * kf / (2.0 * mElectron) - E_l + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
-		if(v > vMax || v < 0.0)
-			return 0.0;
-		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
-
-		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
-	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 30000, method);
-
-	return std::isnan(result) ? 0.0 : result;
-}
-
-double dR_dcosk_dphik(double cos_k, double phi_k, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
-{
-	// 1. Prefactor
-	double mDM		 = DM.mass;
-	double sigma_e	 = DM.Sigma_Electron();
-	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
-	double N_UC		 = 0.5 * 5.0e25 / kg;
-	double prefactor = 1.0 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sigma_e / mu_e / mu_e;
+	double prefactor = 1.0 / pow(2.0 * M_PI, 5) * DM_distr.DM_density / mDM * N_UC / 8.0 / mDM / mDM / mElectron / mElectron;
 
 	double vMax	 = DM_distr.Maximum_DM_Speed();
 	double kfMin = 0.0;
@@ -282,90 +126,302 @@ double dR_dcosk_dphik(double cos_k, double phi_k, obscura::DM_Particle& DM, obsc
 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
 
 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
-	std::function<double(const std::vector<double>&, const double)> integrand = [cos_k, phi_k, &DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
-		double q		   = x[0];
-		double cos_theta_q = x[1];
-		double phi_q	   = x[2];
-		double kf		   = x[3];
-		double cos_theta_v = x[4];
-		double phi_v	   = x[5];
+	std::function<double(const std::vector<double>&, const double)> integrand = [&DM, &DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
+		double q			= x[0];
+		double cos_theta_q	= x[1];
+		double phi_q		= x[2];
+		double kf			= x[3];
+		double cos_theta_kf = x[4];
+		double phi_kf		= x[5];
+		double cos_theta_v	= x[6];
+		double phi_v		= x[7];
 
 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
-		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_k), phi_k);
+		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
 
 		// Determine the angle between vVec and qVec
 		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
 
-		// Determine the crystal momentum vector l
-		Eigen::Vector3d lVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
-		lVec = graphene.Find_1BZ_Vector(lVec);
+		// Determine the crystal momentum vector k
+		Eigen::Vector3d kVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
+		kVec = graphene.Find_1BZ_Vector(kVec);
 
-		double E_l = graphene.Valence_Band_Energies(lVec, band);
-		double v   = (kf * kf / (2.0 * mElectron) - E_l + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
+		double E_k = graphene.Valence_Band_Energies(kVec, band);
+		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
 		if(v > vMax || v < 0.0)
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
-
-		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+		Eigen::Vector3d vVec_eigen({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
+		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Squared_Amplitude_Electron(qVec, vVec_eigen, k_FinalVec) * graphene.DM_Response(band, qVec, k_FinalVec);
 	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 30000, method);
-
+	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 10000000, method);
 	return std::isnan(result) ? 0.0 : result;
 }
-
-std::vector<std::vector<double>> Tabulate_dR_dlnE(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
+double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
 {
-	std::cout << std::endl;
-	double E_min			   = 0.1 * eV;
-	double v_max			   = DM_distr.Maximum_DM_Speed();
-	double E_max			   = 0.99 * DM.mass / 2.0 * v_max * v_max;
-	std::vector<double> E_list = libphysica::Log_Space(E_min, E_max, points);
-	std::vector<std::vector<double>> spectrum;
-	int counter = 0;
-	for(auto& E_er : E_list)
-	{
-		libphysica::Print_Progress_Bar(1.0 * counter++ / points, 0, 50);
-		std::vector<double> row = {E_er};
-		double dRdlnE			= 0.0;
-		for(int band = 0; band < 4; band++)
-		{
-			double band_contribution = (method == "Full") ? dR_dlnE(E_er, DM, DM_distr, graphene, band) : dR_dlnE_simplified(E_er, DM, DM_distr, graphene, band);
-			row.push_back(band_contribution);
-			dRdlnE += band_contribution;
-		}
-		row.push_back(dRdlnE);
-		spectrum.push_back(row);
-	}
-	libphysica::Print_Progress_Bar(1.0, 0, 50);
-
-	std::cout << std::endl;
-	return spectrum;
+	double rTot = 0.0;
+	for(int band = 0; band < 4; band++)
+		rTot += R_Total_NREFT(DM, DM_distr, graphene, band, method);
+	return rTot;
 }
 
-std::vector<std::vector<double>> Tabulate_dR_dcosk_dphik(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene)
-{
-	std::cout << std::endl;
+// double vMinimum_Graphene(double mDM, double q, double energy_crystal, double final_momentum, double work_function)
+// {
+// 	double E_final = final_momentum * final_momentum / 2.0 / mElectron;
+// 	return (E_final - energy_crystal + work_function) / q + q / 2.0 / mDM;
+// }
 
-	auto cos_k_list = libphysica::Linear_Space(-1.0, 1.0, points);
-	auto phi_k_list = libphysica::Linear_Space(0.0, 2.0 * M_PI, points);
+// double dR_dlnE_simplified(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+// {
+// 	// 1. Prefactor
+// 	double mDM		 = DM.mass;
+// 	double sigma_e	 = DM.Sigma_Electron();
+// 	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
+// 	double N_UC		 = 0.5 * 5.0e25 / kg;
+// 	double k_final	 = sqrt(2.0 * mElectron * E_e);
+// 	double prefactor = 0.5 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sqrt(2.0 * pow(mElectron * E_e, 3.0)) * sigma_e / mu_e / mu_e;
 
-	std::vector<std::vector<double>> spectrum;
-	int counter = 0;
-	for(auto& cos_theta : cos_k_list)
-		for(auto& phi : phi_k_list)
-		{
-			libphysica::Print_Progress_Bar(1.0 * counter++ / points / points, 0, 50);
+// 	double vMax = DM_distr.Maximum_DM_Speed();
+// 	double EMax = mDM / 2.0 * vMax * vMax;
+// 	if(E_e > EMax)
+// 		return 0.0;
 
-			double dR = 0.0;
-			for(int band = 0; band < 4; band++)
-				dR += dR_dcosk_dphik(cos_theta, phi, DM, DM_distr, graphene, band);
-			spectrum.push_back({cos_theta, phi, dR});
-		}
-	libphysica::Print_Progress_Bar(1.0, 0, 50);
-	std::cout << std::endl;
-	return spectrum;
-}
+// 	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
+// 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
+
+// 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
+// 	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, band, k_final, mDM](const std::vector<double>& x, const double wgt) {
+// 		double q			= x[0];
+// 		double cos_theta_q	= x[1];
+// 		double phi_q		= x[2];
+// 		double cos_theta_kf = x[3];
+// 		double phi_kf		= x[4];
+
+// 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
+// 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(k_final, acos(cos_theta_kf), phi_kf);
+
+// 		// Determine the crystal momentum vector l
+// 		Eigen::Vector3d kVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
+// 		kVec = graphene.Find_1BZ_Vector(kVec);
+
+// 		double E_k = graphene.Valence_Band_Energies(kVec, band);   // Note that E_k is negative!!! (unlike in the paper by Hochberg et al)
+
+// 		double vMin = vMinimum_Graphene(mDM, q, E_k, k_final, graphene.work_function);
+// 		return q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
+// 	};
+// 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
+// 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 5000, method);
+
+// 	return std::isnan(result) ? 0.0 : result;
+// }
+
+// double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+// {
+// 	// 1. Prefactor
+// 	double mDM		 = DM.mass;
+// 	double sigma_e	 = DM.Sigma_Electron();
+// 	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
+// 	double N_UC		 = 0.5 * 5.0e25 / kg;
+// 	double prefactor = 0.5 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sigma_e / mu_e / mu_e;
+
+// 	double vMax	 = DM_distr.Maximum_DM_Speed();
+// 	double kfMin = 0.0;
+// 	double kfMax = sqrt(mElectron * mDM) * vMax;
+
+// 	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+// 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+
+// 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
+// 	std::function<double(const std::vector<double>&, const double)> integrand = [&DM_distr, &graphene, band, mDM](const std::vector<double>& x, const double wgt) {
+// 		double q			= x[0];
+// 		double cos_theta_q	= x[1];
+// 		double phi_q		= x[2];
+// 		double kf			= x[3];
+// 		double cos_theta_kf = x[4];
+// 		double phi_kf		= x[5];
+
+// 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
+// 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
+
+// 		// Determine the crystal momentum vector l
+// 		Eigen::Vector3d kVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
+// 		kVec = graphene.Find_1BZ_Vector(kVec);
+
+// 		double E_k = graphene.Valence_Band_Energies(kVec, band);   // Note that E_k is negative!!! (unlike in the paper by Hochberg et al)
+
+// 		double vMin = vMinimum_Graphene(mDM, q, E_k, kf, graphene.work_function);
+// 		return kf * kf * q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
+// 	};
+// 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
+// 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 200000, method);
+
+// 	return std::isnan(result) ? 0.0 : result;
+// }
+// double R_Total_simplified(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
+// {
+// 	double rTot = 0.0;
+// 	for(int band = 0; band < 4; band++)
+// 		rTot += R_Total_simplified(DM, DM_distr, graphene, band, method);
+// 	return rTot;
+// }
+
+// double dR_dlnE(double E_e, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+// {
+// 	// 1. Prefactor
+// 	double mDM		 = DM.mass;
+// 	double sigma_e	 = DM.Sigma_Electron();
+// 	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
+// 	double N_UC		 = 0.5 * 5.0e25 / kg;
+// 	double prefactor = std::sqrt(2.0 * std::pow(mElectron * E_e, 3.0)) / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sigma_e / mu_e / mu_e;
+
+// 	double kf = std::sqrt(2.0 * mElectron * E_e);
+
+// 	double vMax = DM_distr.Maximum_DM_Speed();
+// 	double EMax = mDM / 2.0 * vMax * vMax;
+// 	if(E_e > EMax)
+// 		return 0.0;
+
+// 	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
+// 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * (graphene.work_function + E_e));
+
+// 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
+// 	std::function<double(const std::vector<double>&, const double)> integrand = [kf, &DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
+// 		double q			= x[0];
+// 		double cos_theta_q	= x[1];
+// 		double phi_q		= x[2];
+// 		double cos_theta_kf = x[3];
+// 		double phi_kf		= x[4];
+// 		double cos_theta_v	= x[5];
+// 		double phi_v		= x[6];
+
+// 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
+// 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
+
+// 		// Determine the angle between vVec and qVec
+// 		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
+// 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
+
+// 		// Determine the crystal momentum vector l
+// 		Eigen::Vector3d kVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
+// 		kVec = graphene.Find_1BZ_Vector(kVec);
+
+// 		double E_k = graphene.Valence_Band_Energies(kVec, band);
+// 		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
+// 		if(v > vMax || v < 0.0)
+// 			return 0.0;
+// 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
+
+// 		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+// 	};
+// 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
+// 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 30000, method);
+
+// 	return std::isnan(result) ? 0.0 : result;
+// }
+
+// double dR_dcosk_dphik(double cos_k, double phi_k, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, const std::string& method)
+// {
+// 	// 1. Prefactor
+// 	double mDM		 = DM.mass;
+// 	double sigma_e	 = DM.Sigma_Electron();
+// 	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
+// 	double N_UC		 = 0.5 * 5.0e25 / kg;
+// 	double prefactor = 1.0 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * N_UC * sigma_e / mu_e / mu_e;
+
+// 	double vMax	 = DM_distr.Maximum_DM_Speed();
+// 	double kfMin = 0.0;
+// 	double kfMax = sqrt(mElectron * mDM) * vMax;
+
+// 	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+// 	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+
+// 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
+// 	std::function<double(const std::vector<double>&, const double)> integrand = [cos_k, phi_k, &DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
+// 		double q		   = x[0];
+// 		double cos_theta_q = x[1];
+// 		double phi_q	   = x[2];
+// 		double kf		   = x[3];
+// 		double cos_theta_v = x[4];
+// 		double phi_v	   = x[5];
+
+// 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
+// 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_k), phi_k);
+
+// 		// Determine the angle between vVec and qVec
+// 		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
+// 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
+
+// 		// Determine the crystal momentum vector l
+// 		Eigen::Vector3d kVec({k_FinalVec[0] - qVec[0], k_FinalVec[1] - qVec[1], 0.0});
+// 		kVec = graphene.Find_1BZ_Vector(kVec);
+
+// 		double E_k = graphene.Valence_Band_Energies(kVec, band);
+// 		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
+// 		if(v > vMax || v < 0.0)
+// 			return 0.0;
+// 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
+
+// 		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+// 	};
+// 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
+// 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 30000, method);
+
+// 	return std::isnan(result) ? 0.0 : result;
+// }
+
+// std::vector<std::vector<double>> Tabulate_dR_dlnE(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& method)
+// {
+// 	std::cout << std::endl;
+// 	double E_min			   = 0.1 * eV;
+// 	double v_max			   = DM_distr.Maximum_DM_Speed();
+// 	double E_max			   = 0.99 * DM.mass / 2.0 * v_max * v_max;
+// 	std::vector<double> E_kist = libphysica::Log_Space(E_min, E_max, points);
+// 	std::vector<std::vector<double>> spectrum;
+// 	int counter = 0;
+// 	for(auto& E_er : E_kist)
+// 	{
+// 		libphysica::Print_Progress_Bar(1.0 * counter++ / points, 0, 50);
+// 		std::vector<double> row = {E_er};
+// 		double dRdlnE			= 0.0;
+// 		for(int band = 0; band < 4; band++)
+// 		{
+// 			double band_contribution = (method == "Full") ? dR_dlnE(E_er, DM, DM_distr, graphene, band) : dR_dlnE_simplified(E_er, DM, DM_distr, graphene, band);
+// 			row.push_back(band_contribution);
+// 			dRdlnE += band_contribution;
+// 		}
+// 		row.push_back(dRdlnE);
+// 		spectrum.push_back(row);
+// 	}
+// 	libphysica::Print_Progress_Bar(1.0, 0, 50);
+
+// 	std::cout << std::endl;
+// 	return spectrum;
+// }
+
+// std::vector<std::vector<double>> Tabulate_dR_dcosk_dphik(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene)
+// {
+// 	std::cout << std::endl;
+
+// 	auto cos_k_list = libphysica::Linear_Space(-1.0, 1.0, points);
+// 	auto phi_k_list = libphysica::Linear_Space(0.0, 2.0 * M_PI, points);
+
+// 	std::vector<std::vector<double>> spectrum;
+// 	int counter = 0;
+// 	for(auto& cos_theta : cos_k_list)
+// 		for(auto& phi : phi_k_list)
+// 		{
+// 			libphysica::Print_Progress_Bar(1.0 * counter++ / points / points, 0, 50);
+
+// 			double dR = 0.0;
+// 			for(int band = 0; band < 4; band++)
+// 				dR += dR_dcosk_dphik(cos_theta, phi, DM, DM_distr, graphene, band);
+// 			spectrum.push_back({cos_theta, phi, dR});
+// 		}
+// 	libphysica::Print_Progress_Bar(1.0, 0, 50);
+// 	std::cout << std::endl;
+// 	return spectrum;
+// }
 
 }	// namespace graphene
