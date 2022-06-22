@@ -34,7 +34,7 @@ class Graphene
 
   public:
 	// Graphene lattice geometry
-	double aCC, a, b, work_function;
+	double aCC, a, b, work_function, N_cell;
 	std::vector<Eigen::Vector3d> lattice_vectors, reciprocal_lattice_vectors, nearest_neighbors;
 	Eigen::Vector3d high_symmetry_point_G, high_symmetry_point_M, high_symmetry_point_K;
 

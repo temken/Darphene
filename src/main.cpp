@@ -62,55 +62,9 @@ int main(int argc, char* argv[])
 	int band				 = 0;
 	double R_standard		 = R_Total_Standard(DM_standard, SHM, graphene, band, 1e5);			 //, band);
 	double R_standard_simple = R_Total_Standard_Simple(DM_standard, SHM, graphene, band, 1e5);	 //, band);
-	// double R_nreft	  = R_Total_NREFT(DM_nreft, SHM, graphene, 0, 1e6);			//, band);
+	double R_nreft			 = R_Total_NREFT(DM_nreft, SHM, graphene, 0, 1e6);					 //, band);
 
-	// std::cout << In_Units(R_standard, 1.0 / kg / year) << " " << In_Units(R_nreft, 1.0 / kg / year) << std::endl;
-	std::cout << In_Units(R_standard, 1.0 / kg / year) << " " << In_Units(R_standard_simple, 1.0 / kg / year) << std::endl;
-
-	// Eigen::Vector3d qVec(0.1 * keV, 0.1 * keV, 0.1 * keV);
-	// Eigen::Vector3d velDM(100 * km / sec, 100 * km / sec, 100 * km / sec);
-	// Eigen::Vector3d kPrime(0.1 * keV, 0.1 * keV, 0.1 * keV);
-	// std::cout << DM.Squared_Amplitude_Electron(qVec, velDM, kPrime) << std::endl;
-
-	// // Initialize DM particle
-	// obscura::DM_Particle_SI DM(5 * MeV);
-	// DM.Set_Sigma_Electron(1.0e-37 * cm * cm);
-
-	// // Compute recoil spectrum
-	// int points					  = 80;
-	// std::string velocity_integral = "Simplified";
-	// auto spectrum				  = Tabulate_dR_dlnE(points, DM, SHM, graphene, velocity_integral);
-	// libphysica::Export_Table("Spectrum_mDM_5_MeV_Simplified.txt", spectrum, {eV, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year});
-
-	// // Total rate over the course of a day
-	// double R_simple = R_Total_simplified(DM, SHM, graphene);
-	// std::cout << "\tR_simple = " << In_Units(R_simple, 1.0 / kg / year) << std::endl;
-	// auto t_list = libphysica::Range(0, 24);
-	// std::ofstream f("Daily_Modulation_10_MeV/R_Total.dat");
-	// double R_s = R_Total_simplified(DM, SHM, graphene);
-	// for(auto& t : t_list)
-	// {
-	// 	SHM.Set_Observer_Velocity(Earth_Velocity(t * hr, v_earth));
-
-	// 	double R = R_Total(DM, SHM, graphene);
-
-	// 	std::cout << "t = " << t << "\tR = " << In_Units(R, 1.0 / kg / year) << std::endl;
-	// 	f << t << "\t" << In_Units(R, 1.0 / kg / year) << "\t" << In_Units(R_s, 1.0 / kg / year) << std::endl;
-
-	// 	auto spectrum = Tabulate_dR_dlnE(30, DM, SHM, graphene);
-	// 	libphysica::Export_Table("Daily_Modulation_10_MeV/Spectrum_" + std::to_string(t) + ".dat", spectrum, {eV, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year, 1.0 / kg / year});
-	// }
-	// f.close();
-
-	// // Directional spectrum
-	// int points = 25;
-	// for(int t = 1; t < 24; t++)
-	// {
-	// 	std::cout << "t = " << t << std::endl;
-	// 	SHM.Set_Observer_Velocity(Earth_Velocity(t * hr, v_earth));
-	// 	auto spectrum = Tabulate_dR_dcosk_dphik(points, DM, SHM, graphene);
-	// 	libphysica::Export_Table("Directional_Spectrum_10_MeV_t=" + std::to_string(t) + ".dat", spectrum, {1.0, 1.0, 1.0 / kg / year});
-	// }
+	std::cout << In_Units(R_standard, 1.0 / kg / year) << " " << In_Units(R_standard_simple, 1.0 / kg / year) << " " << In_Units(R_nreft, 1.0 / kg / year) << std::endl;
 
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output

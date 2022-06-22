@@ -107,6 +107,7 @@ Graphene::Graphene(double workfunction)
 	a			  = aCC * sqrt(3.0);
 	b			  = 4.0 * M_PI / sqrt(3.0) / a;
 	work_function = workfunction;
+	N_cell		  = 0.5 * 5.0e25 / kg;
 
 	lattice_vectors = {
 		{3.0 / 2.0 * aCC, a / 2.0, 0.0},

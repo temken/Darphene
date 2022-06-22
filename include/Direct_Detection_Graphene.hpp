@@ -4,7 +4,7 @@
 #include "DM_Particle_NREFT.hpp"
 #include "Graphene.hpp"
 
-#include "obscura/DM_Distribution.hpp"
+#include "obscura/DM_Halo_Models.hpp"
 #include "obscura/DM_Particle.hpp"
 
 namespace graphene
@@ -49,8 +49,8 @@ extern std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int point
 extern std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
 
 // 4.3 Daily Modulation
-extern std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
-extern std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
+extern std::vector<std::vector<double>> Daily_Modulation_Standard(int points, double vEarth, obscura::DM_Particle& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points);
+extern std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, double vEarth, DM_Particle_NREFT& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, unsigned int MC_points);
 
 }	// namespace graphene
 
