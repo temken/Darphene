@@ -59,12 +59,27 @@ int main(int argc, char* argv[])
 	DM_nreft.Set_Cross_Section(1, pb, "Contact");
 	DM_nreft.Print_Summary();
 
+	std::cout << "\nQty\tStd\tSimple\tNREFT" << std::endl;
 	int band				 = 0;
 	double R_standard		 = R_Total_Standard(DM_standard, SHM, graphene, band, 1e5);			 //, band);
 	double R_standard_simple = R_Total_Standard_Simple(DM_standard, SHM, graphene, band, 1e5);	 //, band);
 	double R_nreft			 = R_Total_NREFT(DM_nreft, SHM, graphene, 0, 1e6);					 //, band);
 
-	std::cout << In_Units(R_standard, 1.0 / kg / year) << " " << In_Units(R_standard_simple, 1.0 / kg / year) << " " << In_Units(R_nreft, 1.0 / kg / year) << std::endl;
+	std::cout << "R\t" << In_Units(R_standard, 1.0 / kg / year) << "\t" << In_Units(R_standard_simple, 1.0 / kg / year) << "\t" << In_Units(R_nreft, 1.0 / kg / year) << std::endl;
+
+	double Ee					   = 5.0 * eV;
+	double dR_dlnE_standard		   = dR_dlnE_Standard(Ee, DM_standard, SHM, graphene, band, 1e6);		   //, band);
+	double dR_dlnE_standard_simple = dR_dlnE_Standard_Simple(Ee, DM_standard, SHM, graphene, band, 1e5);   //, band);
+	double dR_dlnE_nreft		   = dR_dlnE_NREFT(Ee, DM_nreft, SHM, graphene, 0, 1e6);				   //, band);
+
+	std::cout << "dRdE\t" << In_Units(dR_dlnE_standard, 1.0 / kg / year) << "\t" << In_Units(dR_dlnE_standard_simple, 1.0 / kg / year) << "\t" << In_Units(dR_dlnE_nreft, 1.0 / kg / year) << std::endl;
+
+	double cos					 = 0.3;
+	double phi					 = 0.3;
+	double dR_dcos_dphi_standard = dR_dcos_dphi_Standard(cos, phi, DM_standard, SHM, graphene, band, 1e6);	 //, band);
+	double dR_dcos_dphi_nreft	 = dR_dcos_dphi_NREFT(cos, phi, DM_nreft, SHM, graphene, 0, 1e6);			 //, band);
+
+	std::cout << "dRdcdp\t" << In_Units(dR_dcos_dphi_standard, 1.0 / kg / year) << "\t\t" << In_Units(dR_dcos_dphi_nreft, 1.0 / kg / year) << std::endl;
 
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output
