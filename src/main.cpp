@@ -52,11 +52,8 @@ int main(int argc, char* argv[])
 	DM_standard.Set_Sigma_Electron(1.0e-36 * cm * cm);
 	DM_standard.Print_Summary();
 
-	DM_Particle_NREFT DM_nreft(100.0 * MeV, 0.5);
+	DM_Particle_NREFT DM_nreft = DM_Dark_Photon(100.0 * MeV, pb, "Contact");
 	// DM.Set_Coupling(3, 1.0, "Contact");
-	// DM.Set_Coupling(5, 0.1, "Power", 3);
-	// DM.Set_Coupling(7, 0.1, "General", 100 * MeV);
-	DM_nreft.Set_Cross_Section(1, pb, "Contact");
 	DM_nreft.Print_Summary();
 
 	std::cout << "\nQty\tStd\tSimple\tNREFT" << std::endl;

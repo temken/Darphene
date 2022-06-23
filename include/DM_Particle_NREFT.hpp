@@ -49,5 +49,12 @@ class DM_Particle_NREFT : public obscura::DM_Particle
 	virtual void Print_Summary(int rank = 0) const override;
 };
 
+// 3. Class for benchmark models
+extern DM_Particle_NREFT DM_Dark_Photon(double mDM, double sigma_e, const std::string& form_factor = "Contact", double mMediator = 0.0);
+extern DM_Particle_NREFT DM_Electric_Dipole(double mDM, double g_over_lambda);
+extern DM_Particle_NREFT DM_Magnetic_Dipole(double mDM, double g_over_lambda);
+extern DM_Particle_NREFT DM_Anapole(double mDM, double g_over_lambda_2);
+
 }	// namespace graphene
+
 #endif

@@ -153,4 +153,46 @@ void DM_Particle_NREFT::Print_Summary(int rank) const
 	}
 }
 
+DM_Particle_NREFT DM_Dark_Photon(double mDM, double sigma_e, const std::string& form_factor, double mMediator)
+{
+	DM_Particle_NREFT DM(mDM);
+	DM.Set_Cross_Section(1, sigma_e, form_factor, mMediator);
+	return DM;
+}
+
+DM_Particle_NREFT DM_Electric_Dipole(double mDM, double g_over_lambda)
+{
+	DM_Particle_NREFT DM(mDM);
+	double qRef = aEM * mElectron;
+	double c11	= 16.0 * Elementary_Charge * mDM * mElectron * mElectron * g_over_lambda / qRef / qRef;
+	DM.Set_Coupling(11, c11, "Long-Range");
+	return DM;
+}
+
+DM_Particle_NREFT DM_Magnetic_Dipole(double mDM, double g_over_lambda)
+{
+	DM_Particle_NREFT DM(mDM);
+	double qRef = aEM * mElectron;
+	double c1	= 4.0 * Elementary_Charge * mElectron * g_over_lambda;
+	double c4	= 4.0 * Elementary_Charge * mDM * g_over_lambda;
+	double c5	= 16.0 * Elementary_Charge * mDM * mElectron * mElectron * g_over_lambda / qRef / qRef;
+	double c6	= -c5;
+	DM.Set_Coupling(1, c1, "Contact");
+	DM.Set_Coupling(4, c4, "Contact");
+	DM.Set_Coupling(5, c5, "Long-Range");
+	DM.Set_Coupling(6, c6, "Long-Range");
+	return DM;
+}
+
+DM_Particle_NREFT DM_Anapole(double mDM, double g_over_lambda_2)
+{
+	DM_Particle_NREFT DM(mDM);
+
+	double c8 = 8.0 * Elementary_Charge * mElectron * mDM * g_over_lambda_2;
+	double c9 = -c8;
+	DM.Set_Coupling(8, c8, "Contact");
+	DM.Set_Coupling(9, c9, "Contact");
+	return DM;
+}
+
 }	// namespace graphene
