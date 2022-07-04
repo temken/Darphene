@@ -131,7 +131,7 @@ void Configuration::Construct_DM_Particle_NREFT(double mDM)
 		double param			= config.lookup("NREFT_couplings")[i][3];
 		if(form_factor == "General")
 			param *= MeV;
-		dynamic_cast<DM_Particle_NREFT*>(DM)->Set_Coupling(op, coupling, form_factor, param);
+		dynamic_cast<DM_Particle_NREFT*>(DM_NREFT)->Set_Coupling(op, coupling, form_factor, param);
 	}
 }
 
