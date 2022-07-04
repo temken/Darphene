@@ -27,10 +27,12 @@ set_target_properties(graphene_library PROPERTIES PREFIX "")
 target_compile_options(graphene_library PUBLIC -Wall -pedantic)
 
 target_link_libraries(graphene_library
-	PUBLIC
+	PRIVATE
+	OpenMP::OpenMP_CXX
 	${Boost_LIBRARIES}
-	coverage_config
+	PUBLIC
 	Eigen3::Eigen
+	coverage_config
 	libobscura
 	libphysica)
 

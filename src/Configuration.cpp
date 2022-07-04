@@ -211,6 +211,15 @@ void Configuration::Import_Graphene_Parameters()
 		std::cerr << "No 'grid_points' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+	try
+	{
+		threads = config.lookup("threads");
+	}
+	catch(const SettingNotFoundException& nfex)
+	{
+		std::cerr << "No 'threads' setting in configuration file." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 	// Graphene - Work function
 	try
 	{
@@ -263,6 +272,7 @@ void Configuration::Print_Summary(int mpi_rank)
 				  << "\tRun modus:\t\t\t" << run_modus << std::endl
 				  << "\tMC points:\t\t\t" << MC_points << std::endl
 				  << "\tGrid points:\t\t\t" << grid_points << std::endl
+				  << "\tThreads:\t\t\t" << threads << std::endl
 				  << "\tGraphene work function [eV]:\t" << graphene_work_function / eV << std::endl;
 		std::cout << SEPARATOR << std::endl;
 	}

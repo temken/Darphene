@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 	if(cfg.run_modus == "Energy-Spectrum" || cfg.run_modus == "All")
 	{
 		std::cout << "Tabulate dR/dlnE:" << std::endl;
-		auto spectrum_nreft	  = Tabulate_dR_dlnE_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
+		auto spectrum_nreft	  = Tabulate_dR_dlnE_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points, cfg.threads);
 		std::string file_path = results_path + "dR_dlnE.txt";
 		libphysica::Export_Table(file_path, spectrum_nreft, {eV, dim, dim, dim, dim, dim});
 		std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 	if(cfg.run_modus == "Directional-Spectrum" || cfg.run_modus == "All")
 	{
 		std::cout << "Tabulate dR/(dcos dphi):" << std::endl;
-		auto spectrum_nreft	  = Tabulate_dR_dcos_dphi_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
+		auto spectrum_nreft	  = Tabulate_dR_dcos_dphi_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points, cfg.threads);
 		std::string file_path = results_path + "dR_dcos_dphi.txt";
 		libphysica::Export_Table(file_path, spectrum_nreft, {1.0, 1.0, dim});
 		std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 	if(cfg.run_modus == "Daily-Modulation" || cfg.run_modus == "All")
 	{
 		std::cout << "Calculate daily modulation:" << std::endl;
-		auto daily_nreft	  = Daily_Modulation_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
+		auto daily_nreft	  = Daily_Modulation_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points, cfg.threads);
 		std::string file_path = results_path + "Daily_Modulation.txt";
 		libphysica::Export_Table(file_path, daily_nreft, {1.0, dim});
 		std::cout << "\nDone. Table saved to " << file_path << "." << std::endl;
@@ -111,11 +111,6 @@ int main(int argc, char* argv[])
 		// std::cout << "Tabulate daily modulation for nreft" << std::endl;
 		// auto daily_nreft = Daily_Modulation_NREFT(points, DM_nreft, SHM, graphene, 2e6);
 		// libphysica::Export_Table("Daily_Modulation_NREFT.txt", daily_nreft, {1.0, dim});
-	}
-	else
-	{
-		std::cerr << "Error in graphene: Run modus " << cfg.run_modus << " is not recognized." << std::endl;
-		std::exit(EXIT_FAILURE);
 	}
 
 	////////////////////////////////////////////////////////////////////////
