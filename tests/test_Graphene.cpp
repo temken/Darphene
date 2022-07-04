@@ -2,7 +2,7 @@
 
 #include "libphysica/Natural_Units.hpp"
 
-#include "Graphene.hpp"
+#include "graphene/Graphene.hpp"
 
 using namespace graphene;
 using namespace libphysica::natural_units;

@@ -1,10 +1,10 @@
-#include "Graphene.hpp"
+#include "graphene/Graphene.hpp"
 
 #include <algorithm>
 
 #include "libphysica/Utilities.hpp"
 
-#include "Hydrogenic_Wavefunctions.hpp"
+#include "graphene/Hydrogenic_Wavefunctions.hpp"
 
 namespace graphene
 {

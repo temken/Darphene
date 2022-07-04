@@ -1,11 +1,11 @@
-#include "Reproducing_Hochberg_et_al.hpp"
+#include "graphene/Reproducing_Hochberg_et_al.hpp"
 
 #include <algorithm>
 
 #include "libphysica/Integration.hpp"
 #include "libphysica/Utilities.hpp"
 
-#include "Hydrogenic_Wavefunctions.hpp"
+#include "graphene/Hydrogenic_Wavefunctions.hpp"
 
 namespace Hochberg_et_al
 {

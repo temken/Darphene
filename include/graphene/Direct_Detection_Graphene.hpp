@@ -1,11 +1,11 @@
 #ifndef __Direct_Detection_Graphene_hpp_
 #define __Direct_Detection_Graphene_hpp_
 
-#include "DM_Particle_NREFT.hpp"
-#include "Graphene.hpp"
-
 #include "obscura/DM_Halo_Models.hpp"
 #include "obscura/DM_Particle.hpp"
+
+#include "graphene/DM_Particle_NREFT.hpp"
+#include "graphene/Graphene.hpp"
 
 namespace graphene
 {

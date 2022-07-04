@@ -1,11 +1,11 @@
-#include "Direct_Detection_Graphene.hpp"
-
-#include "obscura/DM_Halo_Models.hpp"
+#include "graphene/Direct_Detection_Graphene.hpp"
 
 #include "libphysica/Integration.hpp"
 #include "libphysica/Natural_Units.hpp"
 #include "libphysica/Statistics.hpp"
 #include "libphysica/Utilities.hpp"
+
+#include "obscura/DM_Halo_Models.hpp"
 
 namespace graphene
 {

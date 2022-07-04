@@ -12,10 +12,10 @@
 #include "obscura/DM_Halo_Models.hpp"
 #include "obscura/DM_Particle_Standard.hpp"
 
-#include "DM_Particle_NREFT.hpp"
-#include "Direct_Detection_Graphene.hpp"
-#include "Graphene.hpp"
-#include "Hydrogenic_Wavefunctions.hpp"
+#include "graphene/DM_Particle_NREFT.hpp"
+#include "graphene/Direct_Detection_Graphene.hpp"
+#include "graphene/Graphene.hpp"
+#include "graphene/Hydrogenic_Wavefunctions.hpp"
 #include "version.hpp"
 
 using namespace libphysica::natural_units;
