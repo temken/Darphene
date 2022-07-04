@@ -49,8 +49,8 @@ extern std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, 
 
 // 4.3 Daily Modulation
 extern libphysica::Vector Earth_Velocity(double t, double v_earth);
-extern std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, unsigned int MC_points);
-extern std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_NREFT& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, unsigned int MC_points);
+extern std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
+extern std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
 
 }	// namespace graphene
 

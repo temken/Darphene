@@ -313,7 +313,7 @@ double dR_dlnE_NREFT(double Ee, DM_Particle_NREFT& DM, obscura::DM_Distribution&
 
 	double vMax = DM_distr.Maximum_DM_Speed();
 	double EMax = mDM / 2.0 * vMax * vMax;
-	if(Ee > EMax)
+	if(Ee + graphene.work_function > EMax)
 		return 0.0;
 
 	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
@@ -518,6 +518,7 @@ std::vector<std::vector<double>> Tabulate_dR_dlnE_NREFT(int points, DM_Particle_
 	double E_max			   = 0.99 * DM.mass / 2.0 * v_max * v_max;
 	std::vector<double> E_kist = libphysica::Log_Space(E_min, E_max, points);
 	std::vector<std::vector<double>> spectrum;
+	int counter = 0;
 	for(auto& E_er : E_kist)
 	{
 		std::vector<double> row = {E_er};
@@ -530,7 +531,10 @@ std::vector<std::vector<double>> Tabulate_dR_dlnE_NREFT(int points, DM_Particle_
 		}
 		row.push_back(dRdlnE);
 		spectrum.push_back(row);
+		libphysica::Print_Progress_Bar(1.0 * counter++ / points);
 	}
+	libphysica::Print_Progress_Bar(1.0);
+
 	return spectrum;
 }
 
@@ -554,10 +558,14 @@ std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Part
 	auto phi_k_list = libphysica::Linear_Space(0.0, 2.0 * M_PI, points);
 
 	std::vector<std::vector<double>> spectrum;
+	int counter = 0;
 	for(auto& cos_theta : cos_k_list)
 		for(auto& phi : phi_k_list)
+		{
 			spectrum.push_back({cos_theta, phi, dR_dcos_dphi_NREFT(cos_theta, phi, DM, DM_distr, graphene, MC_points)});
-
+			libphysica::Print_Progress_Bar(1.0 * counter++ / points / points);
+		}
+	libphysica::Print_Progress_Bar(1.0);
 	return spectrum;
 }
 
@@ -575,33 +583,36 @@ libphysica::Vector Earth_Velocity(double t, double v_earth)
 	return libphysica::Vector({v_earth * sina * sinb, v_earth * sina * cosa * (cosb - 1.0), v_earth * (cosa * cosa + sina * sina * cosb)});
 }
 
-std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, unsigned int MC_points)
+std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	// Total rate over the course of a day
 	std::vector<double> t_list = libphysica::Linear_Space(0.0, 24.0, points);
 	std::vector<std::vector<double>> daily_modulation_list;
-	double vEarth = DM_distr.Get_Observer_Velocity().Norm();
+	double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Get_Observer_Velocity().Norm();
 	for(auto& t : t_list)
 	{
-		DM_distr.Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
+		dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
 		double R = R_Total_Standard(DM, DM_distr, graphene, "Full", MC_points);
 		daily_modulation_list.push_back({t, R});
 	}
 	return daily_modulation_list;
 }
 
-std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_NREFT& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, unsigned int MC_points)
+std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	// Total rate over the course of a day
 	std::vector<double> t_list = libphysica::Linear_Space(0.0, 24.0, points);
 	std::vector<std::vector<double>> daily_modulation_list;
-	double vEarth = DM_distr.Get_Observer_Velocity().Norm();
+	double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Get_Observer_Velocity().Norm();
+	int counter	  = 0;
 	for(auto& t : t_list)
 	{
-		DM_distr.Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
+		libphysica::Print_Progress_Bar(1.0 * counter++ / points);
+		dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
 		double R = R_Total_NREFT(DM, DM_distr, graphene, MC_points);
 		daily_modulation_list.push_back({t, R});
 	}
+	libphysica::Print_Progress_Bar(1.0);
 	return daily_modulation_list;
 }
 

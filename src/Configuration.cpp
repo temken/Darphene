@@ -73,9 +73,9 @@ void Configuration::Construct_DM_Particle()
 		std::cerr << "Error in graphene::Configuration::Construct_DM_Particle(): 'DM_interaction' setting " << DM_interaction << " in configuration file not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	DM->Set_Spin(DM_spin);
-	DM->Set_Fractional_Density(DM_fraction);
-	DM->Set_Low_Mass_Mode(true);
+	DM_NREFT->Set_Spin(DM_spin);
+	DM_NREFT->Set_Fractional_Density(DM_fraction);
+	DM_NREFT->Set_Low_Mass_Mode(true);
 }
 
 void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
@@ -116,12 +116,12 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 		std::cerr << "Error in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_cross_section_electron' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	DM = new DM_Particle_NREFT(DM_Dark_Photon(mDM, DM_cross_section_electron, DM_form_factor, DM_mediator_mass));
+	DM_NREFT = new DM_Particle_NREFT(DM_Dark_Photon(mDM, DM_cross_section_electron, DM_form_factor, DM_mediator_mass));
 }
 
 void Configuration::Construct_DM_Particle_NREFT(double mDM)
 {
-	DM			= new DM_Particle_NREFT(mDM);
+	DM_NREFT	= new DM_Particle_NREFT(mDM);
 	int entries = config.lookup("NREFT_couplings").getLength();
 	for(int i = 0; i < entries; i++)
 	{
@@ -147,7 +147,7 @@ void Configuration::Construct_DM_Particle_Electric_Dipole(double mDM)
 		std::cerr << "Error in Configuration::Construct_DM_Particle_Electric_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	DM = new DM_Particle_NREFT(DM_Electric_Dipole(mDM, DM_coupling));
+	DM_NREFT = new DM_Particle_NREFT(DM_Electric_Dipole(mDM, DM_coupling));
 }
 
 void Configuration::Construct_DM_Particle_Magnetic_Dipole(double mDM)
@@ -162,7 +162,7 @@ void Configuration::Construct_DM_Particle_Magnetic_Dipole(double mDM)
 		std::cerr << "Error in Configuration::Construct_DM_Particle_Magnetic_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	DM = new DM_Particle_NREFT(DM_Magnetic_Dipole(mDM, DM_coupling));
+	DM_NREFT = new DM_Particle_NREFT(DM_Magnetic_Dipole(mDM, DM_coupling));
 }
 
 void Configuration::Construct_DM_Particle_Anapole(double mDM)
@@ -177,7 +177,7 @@ void Configuration::Construct_DM_Particle_Anapole(double mDM)
 		std::cerr << "Error in Configuration::Construct_DM_Particle_Anapole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	DM = new DM_Particle_NREFT(DM_Anapole(mDM, DM_coupling));
+	DM_NREFT = new DM_Particle_NREFT(DM_Anapole(mDM, DM_coupling));
 }
 
 void Configuration::Import_Graphene_Parameters()
@@ -214,8 +214,8 @@ void Configuration::Import_Graphene_Parameters()
 	// Graphene - Work function
 	try
 	{
-		double work_function = config.lookup("work_function");
-		graphene			 = Graphene(work_function * eV);
+		graphene_work_function = config.lookup("work_function");
+		graphene_work_function *= eV;
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
@@ -257,13 +257,13 @@ void Configuration::Print_Summary(int mpi_rank)
 				  << std::endl
 				  << "Config file:\t" << cfg_file << std::endl
 				  << "ID:\t\t" << ID << std::endl;
-		DM->Print_Summary(mpi_rank);
+		DM_NREFT->Print_Summary(mpi_rank);
 		DM_distr->Print_Summary(mpi_rank);
 		std::cout << "Graphene options" << std::endl
 				  << "\tRun modus:\t\t\t" << run_modus << std::endl
 				  << "\tMC points:\t\t\t" << MC_points << std::endl
 				  << "\tGrid points:\t\t\t" << grid_points << std::endl
-				  << "\tGraphene work function [eV]:\t" << graphene.work_function / eV << std::endl;
+				  << "\tGraphene work function [eV]:\t" << graphene_work_function / eV << std::endl;
 		std::cout << SEPARATOR << std::endl;
 	}
 }

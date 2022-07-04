@@ -3,6 +3,7 @@
 
 #include "obscura/Configuration.hpp"
 
+#include "graphene/DM_Particle_NREFT.hpp"
 #include "graphene/Graphene.hpp"
 
 namespace graphene
@@ -26,7 +27,8 @@ class Configuration : public obscura::Configuration
 	std::vector<double> NREFT_parameters;
 
   public:
-	Graphene graphene;
+	DM_Particle_NREFT* DM_NREFT;
+	double graphene_work_function;
 	std::string run_modus;
 	unsigned int MC_points, grid_points;
 
