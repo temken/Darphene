@@ -121,7 +121,18 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 
 void Configuration::Construct_DM_Particle_NREFT(double mDM)
 {
-	// int entries = config.lookup("included_bands").getLength();
+	DM			= new DM_Particle_NREFT(mDM);
+	int entries = config.lookup("NREFT_couplings").getLength();
+	for(int i = 0; i < entries; i++)
+	{
+		int op					= config.lookup("NREFT_couplings")[i][0];
+		double coupling			= config.lookup("NREFT_couplings")[i][1];
+		std::string form_factor = config.lookup("NREFT_couplings")[i][2].c_str();
+		double param			= config.lookup("NREFT_couplings")[i][3];
+		if(form_factor == "General")
+			param *= MeV;
+		dynamic_cast<DM_Particle_NREFT*>(DM)->Set_Coupling(op, coupling, form_factor, param);
+	}
 }
 
 void Configuration::Construct_DM_Particle_Electric_Dipole(double mDM)
