@@ -15,4 +15,6 @@
 #define PROJECT_DIR "@PROJECT_SOURCE_DIR@/"
 #define TOP_LEVEL_DIR "@CMAKE_SOURCE_DIR@/"
 
+#define SEPARATOR "\n-----------------------------------------------------\n"
+
 #endif
