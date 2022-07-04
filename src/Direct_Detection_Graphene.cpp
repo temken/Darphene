@@ -17,19 +17,6 @@ Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi)
 	return Eigen::Vector3d(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta));
 }
 
-extern libphysica::Vector Earth_Velocity(double t, double v_earth)
-{
-	double alpha = 42.0 * deg;
-	double beta	 = 2.0 * M_PI * t / day;
-
-	double cosa = cos(alpha);
-	double sina = sin(alpha);
-	double cosb = cos(beta);
-	double sinb = sin(beta);
-
-	return libphysica::Vector({v_earth * sina * sinb, v_earth * sina * cosa * (cosb - 1.0), v_earth * (cosa * cosa + sina * sina * cosb)});
-}
-
 Eigen::Vector3d Spherical_Coordinates_Axis(double r, double theta, double phi, const libphysica::Vector& axis)
 {
 	libphysica::Vector ev = axis.Normalized();
@@ -116,7 +103,7 @@ double R_Total_Standard_Simple(obscura::DM_Particle& DM, obscura::DM_Distributio
 	double mDM		 = DM.mass;
 	double sigma_e	 = DM.Sigma_Electron();
 	double mu_e		 = libphysica::Reduced_Mass(mElectron, mDM);
-	double prefactor = 1.0 / 2.0 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * graphene.N_cell * sigma_e / mu_e / mu_e;
+	double prefactor = 0.5 / pow(2.0 * M_PI, 4) * DM_distr.DM_density / mDM * graphene.N_cell * sigma_e / mu_e / mu_e;
 
 	double vMax	 = DM_distr.Maximum_DM_Speed();
 	double kfMin = 0.0;
@@ -575,7 +562,20 @@ std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Part
 }
 
 // 4.3 Daily Modulation
-std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
+libphysica::Vector Earth_Velocity(double t, double v_earth)
+{
+	double alpha = 42.0 * deg;
+	double beta	 = 2.0 * M_PI * t / day;
+
+	double cosa = cos(alpha);
+	double sina = sin(alpha);
+	double cosb = cos(beta);
+	double sinb = sin(beta);
+
+	return libphysica::Vector({v_earth * sina * sinb, v_earth * sina * cosa * (cosb - 1.0), v_earth * (cosa * cosa + sina * sina * cosb)});
+}
+
+std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::Standard_Halo_Model& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	// Total rate over the course of a day
 	std::vector<double> t_list = libphysica::Linear_Space(0.0, 24.0, points);
@@ -584,7 +584,7 @@ std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::
 	for(auto& t : t_list)
 	{
 		DM_distr.Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
-		double R = R_Total_Standard(DM, DM_distr, graphene, velocity_integral, MC_points);
+		double R = R_Total_Standard(DM, DM_distr, graphene, "Full", MC_points);
 		daily_modulation_list.push_back({t, R});
 	}
 	return daily_modulation_list;

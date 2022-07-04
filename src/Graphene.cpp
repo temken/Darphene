@@ -228,57 +228,12 @@ Eigen::Vector3d Graphene::Find_1BZ_Vector(const Eigen::Vector3d& kVec)
 	}
 }
 
-std::complex<double> Graphene::Wavefunction_Momentum_Pi(const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec, int i) const
-{
-	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges = EigenSolution_Pi(kVec);
-
-	std::complex<double> C1 = ges.eigenvectors().col(i)[0];
-	std::complex<double> C2 = ges.eigenvectors().col(i)[1];
-	std::complex<double> f	= f_aux(kVec + lVec);
-
-	double norm = 1.0;	 // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
-	return 1.0 / std::sqrt(norm) * (C1 + C2 * f) * Hydrogenic_Wavefunction_Momentum(lVec, "2pz", Zeff_2pz);
-}
-
-std::complex<double> Graphene::Wavefunction_Momentum_Pi_Analytic(const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec) const
-{
-	std::complex<double> f = f_aux(kVec);
-	double phi			   = -atan2(f.imag(), f.real());
-
-	f = f_aux(kVec + lVec);
-
-	double norm = 1.0;
-	for(int i = 0; i < 3; i++)
-		norm += s * cos(phi + nearest_neighbors[i].dot(kVec));	 // + sPrime * cos(kVec.dot(lattice_vectors[i]));
-
-	return pow(2.0 * norm, -0.5) * (1.0 + exp(1i * phi) * f) * Hydrogenic_Wavefunction_Momentum(lVec, "2pz", Zeff_2pz);
-}
-
-std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec, int i) const
-{
-
-	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges = EigenSolution_Sigma(kVec);
-
-	std::complex<double> C1 = ges.eigenvectors().col(i)[0];
-	std::complex<double> C2 = ges.eigenvectors().col(i)[1];
-	std::complex<double> C3 = ges.eigenvectors().col(i)[2];
-	std::complex<double> C4 = ges.eigenvectors().col(i)[3];
-	std::complex<double> C5 = ges.eigenvectors().col(i)[4];
-	std::complex<double> C6 = ges.eigenvectors().col(i)[5];
-	std::complex<double> f	= f_aux(kVec + lVec);
-
-	double norm = 1.0;	 // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
-	return 1.0 / std::sqrt(norm) * ((C1 + C4 * f) * Hydrogenic_Wavefunction_Momentum(lVec, "2s", Zeff_2s) + (C2 + C5 * f) * Hydrogenic_Wavefunction_Momentum(lVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * Hydrogenic_Wavefunction_Momentum(lVec, "2py", Zeff_2px_2py));
-}
-
 double Graphene::DM_Response(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& kPrimeVec)
 {
-	std::complex<double> psi;
+	Eigen::Vector3d lVec = kPrimeVec - qVec;
 
-	Eigen::Vector3d lVec = qVec - kPrimeVec;
-
-	// Determine the crystal momentum vector k
-	Eigen::Vector3d kVec({kPrimeVec[0] - qVec[0], kPrimeVec[1] - qVec[1], 0.0});
+	// Determine the crystal momentum vector k = G* - (k'-q)^||
+	Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
 	kVec = Find_1BZ_Vector(kVec);
 
 	if(band == 0)
@@ -289,11 +244,12 @@ double Graphene::DM_Response(int band, const Eigen::Vector3d& qVec, const Eigen:
 		double norm			   = 1.0;
 		for(int i = 0; i < 3; i++)
 			norm += s * cos(phi_l + nearest_neighbors[i].dot(kVec));
-		double N_l = 1.0 / std::sqrt(norm);
-		return std::pow(N_l * phi_2pz, 2.0) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(kVec + lVec)));
+		double N_l_sq = 1.0 / norm;
+		return N_l_sq * std::pow(phi_2pz, 2.0) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(kVec + lVec)));
 	}
 	else
 	{
+		std::complex<double> psi;
 		int i														   = band - 1;
 		Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges = EigenSolution_Sigma(kVec);
 
@@ -303,9 +259,7 @@ double Graphene::DM_Response(int band, const Eigen::Vector3d& qVec, const Eigen:
 		std::complex<double> C4	 = ges.eigenvectors().col((i))[3];
 		std::complex<double> C5	 = ges.eigenvectors().col((i))[4];
 		std::complex<double> C6	 = ges.eigenvectors().col((i))[5];
-		Eigen::MatrixXcd S		 = S_Matrix_Sigma(kVec);
-		double norm				 = ges.eigenvectors().col((i)).dot(S * ges.eigenvectors().col((i))).real();
-		double N_l				 = 1.0 / std::sqrt(norm);
+		double N_l				 = 1.0;	  // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
 		std::complex<double> aux = std::exp(1i * nearest_neighbors[0].dot(kVec + lVec));
 		psi						 = N_l * ((C1 + C4 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2s", Zeff_2s) + (C2 + C5 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2px", Zeff_2px_2py) + (C3 + C6 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2py", Zeff_2px_2py));
 		return std::norm(psi);

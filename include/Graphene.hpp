@@ -19,18 +19,18 @@ class Graphene
 
 	double Zeff_2s, Zeff_2px_2py, Zeff_2pz;
 
-	std::complex<double> f_aux(const Eigen::Vector3d& clown) const;
+	std::complex<double> f_aux(const Eigen::Vector3d& kVec) const;
 
 	Eigen::Vector3d Path_1BZ(double k) const;
 
-	Eigen::MatrixXcd S_Matrix_Pi(const Eigen::Vector3d& clown) const;
-	Eigen::MatrixXcd H_Matrix_Pi(const Eigen::Vector3d& clown) const;
+	Eigen::MatrixXcd S_Matrix_Pi(const Eigen::Vector3d& kVec) const;
+	Eigen::MatrixXcd H_Matrix_Pi(const Eigen::Vector3d& kVec) const;
 
-	Eigen::MatrixXcd S_Matrix_Sigma(const Eigen::Vector3d& clown) const;
-	Eigen::MatrixXcd H_Matrix_Sigma(const Eigen::Vector3d& clown) const;
+	Eigen::MatrixXcd S_Matrix_Sigma(const Eigen::Vector3d& kVec) const;
+	Eigen::MatrixXcd H_Matrix_Sigma(const Eigen::Vector3d& kVec) const;
 
-	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Pi(const Eigen::Vector3d& clown, bool compute_eigenvectors = true) const;
-	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Sigma(const Eigen::Vector3d& clown, bool compute_eigenvectors = true) const;
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Pi(const Eigen::Vector3d& kVec, bool compute_eigenvectors = true) const;
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Sigma(const Eigen::Vector3d& kVec, bool compute_eigenvectors = true) const;
 
   public:
 	// Graphene lattice geometry
@@ -40,21 +40,17 @@ class Graphene
 
 	Graphene(double workfunction = 4.3 * libphysica::natural_units::eV);
 
-	std::vector<double> Energy_Dispersion_Pi(const Eigen::Vector3d& clown) const;
-	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& clown) const;
-	std::vector<double> Energy_Dispersion_Sigma(const Eigen::Vector3d& clown) const;
-	double Valence_Band_Energies(const Eigen::Vector3d& clown, unsigned int energy_band);
+	std::vector<double> Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const;
+	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& kVec) const;
+	std::vector<double> Energy_Dispersion_Sigma(const Eigen::Vector3d& kVec) const;
+	double Valence_Band_Energies(const Eigen::Vector3d& kVec, unsigned int energy_band);
 
 	std::vector<std::vector<double>> Energy_Bands(unsigned int k_points);
 
-	bool In_1BZ(const Eigen::Vector3d& clown);
-	Eigen::Vector3d Find_1BZ_Vector(const Eigen::Vector3d& clown);
+	bool In_1BZ(const Eigen::Vector3d& kVec);
+	Eigen::Vector3d Find_1BZ_Vector(const Eigen::Vector3d& kVec);
 
-	std::complex<double> Wavefunction_Momentum_Pi(const Eigen::Vector3d& lVec, const Eigen::Vector3d& clown, int i = 0) const;
-	std::complex<double> Wavefunction_Momentum_Pi_Analytic(const Eigen::Vector3d& lVec, const Eigen::Vector3d& clown) const;
-	std::complex<double> Wavefunction_Momentum_Sigma(const Eigen::Vector3d& lVec, const Eigen::Vector3d& clown, int i = 0) const;
-
-	double DM_Response(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& k_Finaclown);
+	double DM_Response(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& k_FinakVec);
 };
 }	// namespace graphene
 
