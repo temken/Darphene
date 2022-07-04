@@ -12,6 +12,7 @@
 #include "obscura/DM_Halo_Models.hpp"
 #include "obscura/DM_Particle_Standard.hpp"
 
+#include "graphene/Configuration.hpp"
 #include "graphene/DM_Particle_NREFT.hpp"
 #include "graphene/Direct_Detection_Graphene.hpp"
 #include "graphene/Graphene.hpp"
@@ -34,26 +35,47 @@ int main(int argc, char* argv[])
 			  << std::endl;
 	////////////////////////////////////////////////////////////////////////
 
-	// Initialize DM halo model (values from 2105.00599)
-	double rho_DM  = 0.4 * GeV / cm / cm / cm;
-	double v0	   = 238.0 * km / sec;
-	double v_earth = 250.552 * km / sec;
-	double v_esc   = 544.0 * km / sec;
-	obscura::Standard_Halo_Model SHM(rho_DM, v0, v_earth, v_esc);
-	double t = 0.0 * hr;
-	SHM.Set_Observer_Velocity(Earth_Velocity(t, v_earth));
-	// SHM.Print_Summary();
+	Configuration cfg(argv[1]);
+	cfg.Print_Summary();
 
-	// Initialize graphene
-	double work_function = 5 * eV;
-	double dim			 = 1.0 / kg / year;
-	Graphene graphene(work_function);
+	if(cfg.run_modus == "Energy-Spectrum")
+	{
+	}
+	else if(cfg.run_modus == "Directional-Spectrum")
+	{
+	}
+	else if(cfg.run_modus == "Daily-Modulation")
+	{
+	}
+	else if(cfg.run_modus == "Custom")
+	{
+	}
+	else
+	{
+		std::cerr << "Error in graphene: Run modus " << cfg.run_modus << " is not recognized." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 
-	obscura::DM_Particle_SI DM_standard(100 * MeV);
-	DM_standard.Set_Sigma_Electron(1.0e-36 * cm * cm);
-	// DM_standard.Print_Summary();
+	// // Initialize DM halo model (values from 2105.00599)
+	// double rho_DM  = 0.4 * GeV / cm / cm / cm;
+	// double v0	   = 238.0 * km / sec;
+	// double v_earth = 250.552 * km / sec;
+	// double v_esc   = 544.0 * km / sec;
+	// obscura::Standard_Halo_Model SHM(rho_DM, v0, v_earth, v_esc);
+	// double t = 0.0 * hr;
+	// SHM.Set_Observer_Velocity(Earth_Velocity(t, v_earth));
+	// // SHM.Print_Summary();
 
-	DM_Particle_NREFT DM_nreft = DM_Dark_Photon(100.0 * MeV, pb, "Contact");
+	// // Initialize graphene
+	// double work_function = 5 * eV;
+	// double dim			 = 1.0 / kg / year;
+	// Graphene graphene(work_function);
+
+	// obscura::DM_Particle_SI DM_standard(100 * MeV);
+	// DM_standard.Set_Sigma_Electron(1.0e-36 * cm * cm);
+	// // DM_standard.Print_Summary();
+
+	// DM_Particle_NREFT DM_nreft = DM_Dark_Photon(100.0 * MeV, pb, "Contact");
 	// DM.Set_Coupling(3, 1.0, "Contact");
 	// DM_nreft.Print_Summary();
 
@@ -92,14 +114,14 @@ int main(int argc, char* argv[])
 	// auto spectrum_nreft = Tabulate_dR_dlnE_NREFT(points, DM_nreft, SHM, graphene, 1e4);
 	// libphysica::Export_Table("dR_dlnE_NREFT.txt", spectrum_nreft, {eV, dim, dim, dim, dim, dim});
 
-	// 1. Daily modulation
-	int points = 4;
-	// std::cout << "Tabulate daily modulation for standard" << std::endl;
-	// auto daily_std = Daily_Modulation_Standard(points, DM_standard, SHM, graphene, 1e5);
-	// libphysica::Export_Table("Daily_Modulation_Standard.txt", daily_std, {1.0, dim});
-	std::cout << "Tabulate daily modulation for nreft" << std::endl;
-	auto daily_nreft = Daily_Modulation_NREFT(points, DM_nreft, SHM, graphene, 2e6);
-	libphysica::Export_Table("Daily_Modulation_NREFT.txt", daily_nreft, {1.0, dim});
+	// // 1. Daily modulation
+	// int points = 4;
+	// // std::cout << "Tabulate daily modulation for standard" << std::endl;
+	// // auto daily_std = Daily_Modulation_Standard(points, DM_standard, SHM, graphene, 1e5);
+	// // libphysica::Export_Table("Daily_Modulation_Standard.txt", daily_std, {1.0, dim});
+	// std::cout << "Tabulate daily modulation for nreft" << std::endl;
+	// auto daily_nreft = Daily_Modulation_NREFT(points, DM_nreft, SHM, graphene, 2e6);
+	// libphysica::Export_Table("Daily_Modulation_NREFT.txt", daily_nreft, {1.0, dim});
 
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output
