@@ -228,7 +228,7 @@ Eigen::Vector3d Graphene::Find_1BZ_Vector(const Eigen::Vector3d& kVec)
 	}
 }
 
-double Graphene::DM_Response(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& kPrimeVec)
+double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& kPrimeVec)
 {
 	Eigen::Vector3d lVec = kPrimeVec - qVec;
 

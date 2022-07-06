@@ -285,7 +285,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d
 	return 1.0 / std::sqrt(norm) * ((C1 + C4 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
 }
 
-double Graphene::DM_Response_Hochberg(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
+double Graphene::Material_Response_Function_Hochberg(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
 {
 	std::complex<double> psi;
 	if(band == 0)
@@ -340,7 +340,7 @@ double dR_dlnE_Hochberg(double E_e, obscura::DM_Particle& DM, obscura::DM_Distri
 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(k_final, acos(cos_theta_kf), phi_kf);
 		double vMin				   = vMinimum_Graphene(DM.mass, q, E_l, k_final, graphene.work_function);
 		double vDM				   = 1.0e-3;   // cancels
-		return lVec[0] * (qMax - qMin) * q * DM_distr.Eta_Function(vMin) * vDM * vDM * DM.dSigma_dq2_Electron(q, vDM) * graphene.DM_Response_Hochberg(band, lVec, qVec - k_FinalVec);
+		return lVec[0] * (qMax - qMin) * q * DM_distr.Eta_Function(vMin) * vDM * vDM * DM.dSigma_dq2_Electron(q, vDM) * graphene.Material_Response_Function_Hochberg(band, lVec, qVec - k_FinalVec);
 	};
 	std::vector<double> region = {0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 0.0, 2.0 * M_PI / sqrt(3.0) / a, 1.0, 1.0, +1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, 5000, method);

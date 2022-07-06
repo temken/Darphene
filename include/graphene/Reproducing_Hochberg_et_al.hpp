@@ -60,7 +60,7 @@ class Graphene
 	std::complex<double> Wavefunction_Momentum_Pi_Analytic(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec) const;
 	std::complex<double> Wavefunction_Momentum_Sigma(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i = 0) const;
 
-	double DM_Response_Hochberg(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec);
+	double Material_Response_Function_Hochberg(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec);
 };
 
 // Reproducing Hochberg et al.

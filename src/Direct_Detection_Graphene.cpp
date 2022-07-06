@@ -85,7 +85,7 @@ double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_d
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 
-		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
@@ -133,7 +133,7 @@ double R_Total_Standard_Simple(obscura::DM_Particle& DM, obscura::DM_Distributio
 		double E_k	= graphene.Valence_Band_Energies(kVec, band);
 		double vMin = vMinimum_Graphene(mDM, q, E_k, kf, graphene.work_function);
 
-		return kf * kf * q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return kf * kf * q * DM_distr.Eta_Function(vMin) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
 
@@ -182,7 +182,7 @@ double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, 
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 		Eigen::Vector3d vVec_eigen({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
-		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Squared_Amplitude_Electron(qVec, vVec_eigen, k_FinalVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Response_Function(qVec, vVec_eigen, k_FinalVec) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
@@ -256,7 +256,7 @@ double dR_dlnE_Standard(double Ee, obscura::DM_Particle& DM, obscura::DM_Distrib
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 
-		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
@@ -298,7 +298,7 @@ double dR_dlnE_Standard_Simple(double Ee, obscura::DM_Particle& DM, obscura::DM_
 		double E_k	= graphene.Valence_Band_Energies(kVec, band);
 		double vMin = vMinimum_Graphene(mDM, q, E_k, kf, graphene.work_function);
 
-		return q * DM_distr.Eta_Function(vMin) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return q * DM_distr.Eta_Function(vMin) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
@@ -348,7 +348,7 @@ double dR_dlnE_NREFT(double Ee, DM_Particle_NREFT& DM, obscura::DM_Distribution&
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 		Eigen::Vector3d vVec_eigen({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
-		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Squared_Amplitude_Electron(qVec, vVec_eigen, k_FinalVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Response_Function(qVec, vVec_eigen, k_FinalVec) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
@@ -420,7 +420,7 @@ double dR_dcos_dphi_Standard(double cos_theta, double phi, obscura::DM_Particle&
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 
-		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
@@ -466,7 +466,7 @@ double dR_dcos_dphi_NREFT(double cos_theta, double phi, DM_Particle_NREFT& DM, o
 			return 0.0;
 		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
 		Eigen::Vector3d vVec_eigen({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
-		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Squared_Amplitude_Electron(qVec, vVec_eigen, k_FinalVec) * graphene.DM_Response(band, qVec, k_FinalVec);
+		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Response_Function(qVec, vVec_eigen, k_FinalVec) * graphene.Material_Response_Function(band, qVec, k_FinalVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
