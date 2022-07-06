@@ -105,7 +105,7 @@ double DM_Particle_NREFT::Squared_Amplitude_Electron(const Eigen::Vector3d& qVec
 	Eigen::Vector3d vel_perp  = velDM - qVec / 2.0 / libphysica::Reduced_Mass(mass, mElectron);
 	double v_perp_sq		  = vel_perp.squaredNorm();
 	double v_perp_dot_q		  = vel_perp.dot(qVec) / mElectron;
-	double v_perp_cross_q_sq  = q * q / mElectron / mElectron * v_perp_sq - v_perp_dot_q * v_perp_dot_q / mElectron / mElectron;
+	double v_perp_cross_q_sq  = q * q / mElectron / mElectron * v_perp_sq - v_perp_dot_q * v_perp_dot_q;
 	double q_me_sq			  = q * q / mElectron / mElectron;
 	double q_minus_k_sq		  = q_minus_k.squaredNorm();
 	double q_qk_prime		  = q_minus_k.dot(qVec) / mElectron;
