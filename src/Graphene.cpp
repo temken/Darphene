@@ -228,11 +228,9 @@ Eigen::Vector3d Graphene::Find_1BZ_Vector(const Eigen::Vector3d& kVec)
 	}
 }
 
-double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& qVec, const Eigen::Vector3d& kPrimeVec)
+double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVec)
 {
-	Eigen::Vector3d lVec = kPrimeVec - qVec;
-
-	// Determine the crystal momentum vector k = G* - (k'-q)^||
+	// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
 	Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
 	kVec = Find_1BZ_Vector(kVec);
 
@@ -245,7 +243,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& qVe
 		for(int i = 0; i < 3; i++)
 			norm += s * cos(phi_l + nearest_neighbors[i].dot(kVec));
 		double N_l_sq = 1.0 / norm;
-		return N_l_sq * std::pow(phi_2pz, 2.0) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(kVec + lVec)));
+		return std::pow(2.0 * M_PI, -3) * N_l_sq * std::pow(phi_2pz, 2.0) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(kVec + lVec)));
 	}
 	else
 	{
@@ -262,7 +260,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& qVe
 		double N_l				 = 1.0;	  // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
 		std::complex<double> aux = std::exp(1i * nearest_neighbors[0].dot(kVec + lVec));
 		psi						 = N_l * ((C1 + C4 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2s", Zeff_2s) + (C2 + C5 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2px", Zeff_2px_2py) + (C3 + C6 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2py", Zeff_2px_2py));
-		return std::norm(psi);
+		return std::pow(2.0 * M_PI, -3) * std::norm(psi);
 	}
 }
 
