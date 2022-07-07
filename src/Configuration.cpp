@@ -4,7 +4,10 @@
 
 #include "libphysica/Natural_Units.hpp"
 
+#include "obscura/DM_Halo_Models.hpp"
+
 #include "graphene/DM_Particle_NREFT.hpp"
+#include "graphene/Direct_Detection_Graphene.hpp"
 #include "version.hpp"
 
 namespace graphene
@@ -231,6 +234,17 @@ void Configuration::Import_Graphene_Parameters()
 		std::cerr << "No 'work_function' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+	// Time of the day (t=0 is DM wind from top, t=12 DM wind parallel to graphene)
+	try
+	{
+		time = config.lookup("time");
+		time *= hr;
+	}
+	catch(const SettingNotFoundException& nfex)
+	{
+		std::cerr << "No 'time' setting in configuration file." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 }
 
 Configuration::Configuration(std::string cfg_filename, int MPI_rank)
@@ -255,6 +269,10 @@ Configuration::Configuration(std::string cfg_filename, int MPI_rank)
 
 	// 6. Graphene specific parameters
 	Import_Graphene_Parameters();
+
+	// Rotate the vel_Earth vector.
+	double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(DM_distr)->Get_Observer_Velocity().Norm();
+	dynamic_cast<obscura::Standard_Halo_Model*>(DM_distr)->Set_Observer_Velocity(Earth_Velocity(time, vEarth));
 }
 
 void Configuration::Print_Summary(int mpi_rank)
@@ -273,7 +291,8 @@ void Configuration::Print_Summary(int mpi_rank)
 				  << "\tMC points:\t\t\t" << MC_points << std::endl
 				  << "\tGrid points:\t\t\t" << grid_points << std::endl
 				  << "\tThreads:\t\t\t" << threads << std::endl
-				  << "\tGraphene work function [eV]:\t" << graphene_work_function / eV << std::endl;
+				  << "\tGraphene work function [eV]:\t" << graphene_work_function / eV << std::endl
+				  << "\tTime of day [hr]:\t\t" << time / hr << std::endl;
 		std::cout << SEPARATOR << std::endl;
 	}
 }
