@@ -1,4 +1,4 @@
-#include "graphene/Direct_Detection_Graphene.hpp"
+#include "graphene/Direct_Detection_Standard.hpp"
 
 #include <omp.h>
 
@@ -158,7 +158,8 @@ double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, 
 		Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
 		kVec = graphene.Find_1BZ_Vector(kVec);
 
-		double E_k = graphene.Valence_Band_Energies(kVec, band);
+		// double E_k = graphene.Valence_Band_Energies(kVec, band);
+		double E_k = -9.0 * eV;
 		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
 		if(v > vMax || v < 0.0)
 			return 0.0;
@@ -463,7 +464,6 @@ double dR_dcos_NREFT(double cos_theta, DM_Particle_NREFT& DM, obscura::DM_Distri
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
-	std::cout << band << "\t" << result * gram * year << std::endl;
 	return std::isnan(result) ? 0.0 : result;
 }
 

@@ -7,7 +7,7 @@
 #include "obscura/DM_Halo_Models.hpp"
 
 #include "graphene/DM_Particle_NREFT.hpp"
-#include "graphene/Direct_Detection_Graphene.hpp"
+#include "graphene/Direct_Detection_Standard.hpp"
 #include "version.hpp"
 
 namespace graphene

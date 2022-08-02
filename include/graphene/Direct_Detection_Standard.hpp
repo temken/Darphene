@@ -1,5 +1,5 @@
-#ifndef __Direct_Detection_Graphene_hpp_
-#define __Direct_Detection_Graphene_hpp_
+#ifndef __Direct_Detection_Standard_hpp_
+#define __Direct_Detection_Standard_hpp_
 
 #include "obscura/DM_Halo_Models.hpp"
 #include "obscura/DM_Particle.hpp"
