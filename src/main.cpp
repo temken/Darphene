@@ -14,6 +14,7 @@
 
 #include "graphene/Configuration.hpp"
 #include "graphene/DM_Particle_NREFT.hpp"
+#include "graphene/Direct_Detection_NREFT.hpp"
 #include "graphene/Direct_Detection_Standard.hpp"
 #include "graphene/Graphene.hpp"
 #include "graphene/Hydrogenic_Wavefunctions.hpp"
@@ -89,7 +90,30 @@ int main(int argc, char* argv[])
 		}
 		f.close();
 
+		f.open(cfg.results_path + "dR_dcos_t=12.txt");
+		double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Get_Observer_Velocity().Norm();
+		dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Set_Observer_Velocity(Earth_Velocity(12.0 * hr, vEarth));
+		for(auto cos : cos_list)
+		{
+			double dR_dcos = dR_dcos_NREFT(cos, *cfg.DM_NREFT, *cfg.DM_distr, graphene, 0, cfg.MC_points);
+			f << cos << "\t" << dR_dcos / rate_unit << std::endl;
+			std::cout << cos << "\t" << dR_dcos / rate_unit << std::endl;
+		}
+		f.close();
 		///////////////////////////////////////////////
+
+		// double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Get_Observer_Velocity().Norm();
+
+		// dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Set_Observer_Velocity(Earth_Velocity(0.0 * hr, vEarth));
+		// double dR_dcos_0 = dR_dcos_NREFT(+1.0, *cfg.DM_NREFT, *cfg.DM_distr, graphene, 0, cfg.MC_points);
+		// std::cout << "dR_dcos_0 = " << dR_dcos_0 / rate_unit << std::endl;
+
+		// dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Set_Observer_Velocity(Earth_Velocity(12.0 * hr, vEarth));
+		// double dR_dcos_12 = dR_dcos_NREFT(+1.0, *cfg.DM_NREFT, *cfg.DM_distr, graphene, 0, cfg.MC_points);
+		// std::cout << "dR_dcos_12 = " << dR_dcos_12 / rate_unit << std::endl;
+
+		///////////////////////////////////////////////
+
 		// double mDM				= 20.0 * MeV;
 		// std::string interaction = "Long-Range";
 		// std::ofstream f(TOP_LEVEL_DIR "results/Total_Rate_" + interaction + ".txt");
