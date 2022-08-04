@@ -9,9 +9,4 @@
 - continuous integration with [Github Actions](https://github.com/actions)
 - unit testing with [googletest](https://github.com/google/googletest)
 - code coverage with [codecov](https://codecov.io/).
-- imports the static library [obscura](https://github.com/temken/obscura) and thereby also [libphysica](https://github.com/temken/libphysica)
-
-
-## Dependencies
-
-- [libconfig](https://github.com/hyperrealm/libconfig)
+- imports the static library [obscura](https://github.com/temken/obscura) and thereby also [libphysica](https://github.com/temken/libphysica) and [libconfig](https://github.com/hyperrealm/libconfig)
