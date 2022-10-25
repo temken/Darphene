@@ -5,8 +5,6 @@
 #include "libphysica/Integration.hpp"
 #include "libphysica/Utilities.hpp"
 
-#include "graphene/Hydrogenic_Wavefunctions.hpp"
-
 namespace Hochberg_et_al
 {
 using namespace libphysica::natural_units;

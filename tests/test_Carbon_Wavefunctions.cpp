@@ -7,7 +7,7 @@
 #include "libphysica/Linear_Algebra.hpp"
 #include "libphysica/Natural_Units.hpp"
 
-#include "graphene/Hydrogenic_Wavefunctions.hpp"
+#include "graphene/Carbon_Wavefunctions.hpp"
 
 using namespace libphysica::natural_units;
 using namespace graphene;

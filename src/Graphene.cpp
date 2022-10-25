@@ -4,7 +4,7 @@
 
 #include "libphysica/Utilities.hpp"
 
-#include "graphene/Hydrogenic_Wavefunctions.hpp"
+#include "graphene/Carbon_Wavefunctions.hpp"
 
 namespace graphene
 {

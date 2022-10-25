@@ -1,5 +1,5 @@
-#ifndef __Hydrogenic_Wavefunctions_hpp_
-#define __Hydrogenic_Wavefunctions_hpp_
+#ifndef __Carbon_Wavefunctions_hpp_
+#define __Carbon_Wavefunctions_hpp_
 
 #include <Eigen/Geometry>
 #include <complex>

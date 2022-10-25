@@ -8,7 +8,7 @@
 
 #include "libphysica/Natural_Units.hpp"
 
-#include "Hydrogenic_Wavefunctions.hpp"
+#include "Carbon_Wavefunctions.hpp"
 
 namespace graphene
 {

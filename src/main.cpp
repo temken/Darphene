@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 
+#include "libphysica/Integration.hpp"
 #include "libphysica/Natural_Units.hpp"
 #include "libphysica/Numerics.hpp"
 #include "libphysica/Statistics.hpp"
@@ -12,12 +13,12 @@
 #include "obscura/DM_Halo_Models.hpp"
 #include "obscura/DM_Particle_Standard.hpp"
 
+#include "graphene/Carbon_Wavefunctions.hpp"
 #include "graphene/Configuration.hpp"
 #include "graphene/DM_Particle_NREFT.hpp"
 #include "graphene/Direct_Detection_NREFT.hpp"
 #include "graphene/Direct_Detection_Standard.hpp"
 #include "graphene/Graphene.hpp"
-#include "graphene/Hydrogenic_Wavefunctions.hpp"
 #include "version.hpp"
 
 using namespace libphysica::natural_units;
@@ -79,118 +80,139 @@ int main(int argc, char* argv[])
 	}
 	else if(cfg.run_modus == "Custom")
 	{
+		// // 1. DM model and mass
+		// // std::vector<double> DM_masses = libphysica::Log_Space(mMin, 100.0 * MeV, 10);
+		// std::vector<int> DM_masses = {2, 5, 10, 20, 50, 100};
 
-		auto cos_list = libphysica::Linear_Space(-1.0, 1.0, 25);
-		std::ofstream f(cfg.results_path + "dR_dcos_t=0.txt");
-		for(auto cos : cos_list)
-		{
-			double dR_dcos = dR_dcos_NREFT(cos, *cfg.DM_NREFT, *cfg.DM_distr, graphene, 0, cfg.MC_points);
-			f << cos << "\t" << dR_dcos / rate_unit << std::endl;
-			std::cout << cos << "\t" << dR_dcos / rate_unit << std::endl;
-		}
-		f.close();
+		// std::vector<int> operators			  = {1, 3};
+		// std::vector<std::string> interactions = {"C", "L"};
+		// for(auto& op : operators)
+		// 	for(auto& inter : interactions)
+		// 		for(auto& mDM : DM_masses)
+		// 		{
+		// 			std::cout << "Operator " << op << "\tInteraction " << inter << "\tDM mass = " << mDM << " MeV" << std::endl;
+		// 			DM_Particle_NREFT DM(mDM * MeV);
+		// 			if(inter == "C")
+		// 				DM.Set_Coupling(op, 1.0, "Contact");
+		// 			else if(inter == "L")
+		// 				DM.Set_Coupling(op, 1.0, "Long-Range");
+		// 			// 2. Compute the daily modulation
+		// 			std::string file_path = results_path + "Daily_Modulation_O" + std::to_string(op) + inter + "_m_" + std::to_string(mDM) + "MeV.txt";
+		// 			if(libphysica::File_Exists(file_path) == false)
+		// 			{
+		// 				std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
+		// 				libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 			}
+		// 		}
 
-		f.open(cfg.results_path + "dR_dcos_t=12.txt");
-		double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Get_Observer_Velocity().Norm();
-		dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Set_Observer_Velocity(Earth_Velocity(12.0 * hr, vEarth));
-		for(auto cos : cos_list)
-		{
-			double dR_dcos = dR_dcos_NREFT(cos, *cfg.DM_NREFT, *cfg.DM_distr, graphene, 0, cfg.MC_points);
-			f << cos << "\t" << dR_dcos / rate_unit << std::endl;
-			std::cout << cos << "\t" << dR_dcos / rate_unit << std::endl;
-		}
-		f.close();
-		///////////////////////////////////////////////
-
-		// double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Get_Observer_Velocity().Norm();
-
-		// dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Set_Observer_Velocity(Earth_Velocity(0.0 * hr, vEarth));
-		// double dR_dcos_0 = dR_dcos_NREFT(+1.0, *cfg.DM_NREFT, *cfg.DM_distr, graphene, 0, cfg.MC_points);
-		// std::cout << "dR_dcos_0 = " << dR_dcos_0 / rate_unit << std::endl;
-
-		// dynamic_cast<obscura::Standard_Halo_Model*>(cfg.DM_distr)->Set_Observer_Velocity(Earth_Velocity(12.0 * hr, vEarth));
-		// double dR_dcos_12 = dR_dcos_NREFT(+1.0, *cfg.DM_NREFT, *cfg.DM_distr, graphene, 0, cfg.MC_points);
-		// std::cout << "dR_dcos_12 = " << dR_dcos_12 / rate_unit << std::endl;
-
-		///////////////////////////////////////////////
-
-		// double mDM				= 20.0 * MeV;
-		// std::string interaction = "Long-Range";
-		// std::ofstream f(TOP_LEVEL_DIR "results/Total_Rate_" + interaction + ".txt");
-		// for(int op = 1; op < 16; op++)
+		// for(auto& mDM : DM_masses)
 		// {
-		// 	if(op == 2)
-		// 		continue;
-		// 	std::cout << "\nCalculate " << interaction << " interaction for op = " << op << std::endl;
-		// 	DM_Particle_NREFT DM_nreft(mDM);
-		// 	DM_nreft.Set_Coupling(op, 1.0, interaction);
-
-		// 	std::cout << "\nTabulate dR/dlnE:" << std::endl;
-		// 	auto spectrum_nreft	  = Tabulate_dR_dlnE_NREFT(cfg.grid_points, DM_nreft, *cfg.DM_distr, graphene, cfg.MC_points, cfg.threads);
-		// 	std::string file_path = TOP_LEVEL_DIR "results/all_spectra/O" + std::to_string(op) + "_dR_dlnE_" + interaction + ".txt";
-		// 	libphysica::Export_Table(file_path, spectrum_nreft, {eV, rate_unit, rate_unit, rate_unit, rate_unit, rate_unit});
-		// 	std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
-
-		// 	std::cout << "\nCompute total rate R:" << std::endl;
-		// 	double R = R_Total_NREFT(DM_nreft, *cfg.DM_distr, graphene, cfg.MC_points);
-		// 	f << "O" << op << ":\tR = " << In_Units(R, rate_unit) << " /gr / year" << std::endl;
-		// 	std::cout << "O" << op << ":\tR = " << In_Units(R, rate_unit) << " /gr / year" << std::endl;
-		// 	std::cout << "\nDone. Total rate saved to " << file_path << "." << std::endl;
+		// 	std::cout << "Electric dipole with mDM = " << mDM << " MeV" << std::endl;
+		// 	DM_Particle_NREFT DM = DM_Electric_Dipole(mDM * MeV, 1.0);
+		// 	// 2. Compute the daily modulation
+		// 	std::string file_path = results_path + "Daily_Modulation_ED_m_" + std::to_string(mDM) + "MeV.txt";
+		// 	if(libphysica::File_Exists(file_path) == false)
+		// 	{
+		// 		std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
+		// 		libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 	}
 		// }
-		// f.close();
-		///////////////////////////////////////////////
 
-		// extern double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
+		// for(auto& mDM : DM_masses)
+		// {
+		// 	std::cout << "Magnetic dipole with mDM = " << mDM << " MeV" << std::endl;
+		// 	DM_Particle_NREFT DM = DM_Magnetic_Dipole(mDM * MeV, 1.0);
 
-		// double R = R_Total_NREFT(*cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
-		// std::cout << "R = " << In_Units(R, 1.0 / gram / year) << std::endl;
+		// 	// 2. Compute the daily modulation
+		// 	std::string file_path = results_path + "Daily_Modulation_MD_m_" + std::to_string(mDM) + "MeV.txt";
+		// 	if(libphysica::File_Exists(file_path) == false)
+		// 	{
+		// 		std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
+		// 		libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 	}
+		// }
 
-		// obscura::DM_Particle_SI DM_standard(100 * MeV);
-		// DM_standard.Set_Sigma_Electron(1.0e-36 * cm * cm);
-		// DM_Particle_NREFT DM_nreft = DM_Dark_Photon(100.0 * MeV, pb, "Contact");
+		// for(auto& mDM : DM_masses)
+		// {
+		// 	std::cout << "Anapole with mDM = " << mDM << " MeV" << std::endl;
+		// 	DM_Particle_NREFT DM = DM_Anapole(mDM * MeV, 1.0);
 
-		// int band = 0;
-		// std::cout << "\nQty\tStd\tSimple\tNREFT" << std::endl;
-		// double R_standard		 = R_Total_Standard(DM_standard, *cfg.DM_distr, graphene, band, 1e5);		   //, band);
-		// double R_standard_simple = R_Total_Standard_Simple(DM_standard, *cfg.DM_distr, graphene, band, 1e4);   //, band);
-		// double R_nreft			 = R_Total_NREFT(DM_nreft, *cfg.DM_distr, graphene, 0, 1e7);				   //, band);
+		// 	// 2. Compute the daily modulation
+		// 	std::string file_path = results_path + "Daily_Modulation_A_m_" + std::to_string(mDM) + "MeV.txt";
+		// 	if(libphysica::File_Exists(file_path) == false)
+		// 	{
+		// 		std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
+		// 		libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 	}
+		// }
 
-		// std::cout << "R\t" << In_Units(R_standard, rate_unit) << "\t" << In_Units(R_standard_simple, rate_unit) << "\t" << In_Units(R_nreft, rate_unit) << std::endl;
+		// Tabulate the response function
 
-		// double Ee					   = 5.0 * eV;
-		// double dR_dlnE_standard		   = dR_dlnE_Standard(Ee, DM_standard, SHM, graphene, band, 1e4);		   //, band);
-		// double dR_dlnE_standard_simple = dR_dlnE_Standard_Simple(Ee, DM_standard, SHM, graphene, band, 1e4);   //, band);
-		// double dR_dlnE_nreft		   = dR_dlnE_NREFT(Ee, DM_nreft, SHM, graphene, 0, 1e5);				   //, band);
+		auto l_list = libphysica::Linear_Space(0 * keV, 20 * keV, 50);
+		std::vector<std::vector<double>> response_function;
 
-		// std::cout << "dRdE\t" << In_Units(dR_dlnE_standard, rate_unit) << "\t" << In_Units(dR_dlnE_standard_simple, rate_unit) << "\t" << In_Units(dR_dlnE_nreft, rate_unit) << std::endl;
-		// double cos					 = 0.3;
-		// double phi					 = 0.3;
-		// double dR_dcos_dphi_standard = dR_dcos_dphi_Standard(cos, phi, DM_standard, SHM, graphene, band, 1e5);	 //, band);
-		// double dR_dcos_dphi_nreft	 = dR_dcos_dphi_NREFT(cos, phi, DM_nreft, SHM, graphene, 0, 1e5);			 //, band);
+		// 1. lPerpendicular
+		for(auto& l : l_list)
+		{
+			std::cout << "l = " << l / keV << " keV" << std::endl;
+			std::vector<double> row = {l};
+			Eigen::Vector3d lVec({0, 0, l});
+			double W = 0.0;
+			for(int band = 0; band < 4; band++)
+			{
 
-		// std::cout << "dRdcdp\t" << In_Units(dR_dcos_dphi_standard, rate_unit) << "\t\t" << In_Units(dR_dcos_dphi_nreft, rate_unit) << std::endl;
-		// 1. Energy spectra
-		// int points = 15;
-		// std::cout << "Tabulate dR/dlnE for standard" << std::endl;
-		// auto spectrum_std = Tabulate_dR_dlnE_Standard(points, DM_standard, SHM, graphene, "Full", 1e4);
-		// libphysica::Export_Table("dR_dlnE_Standard.txt", spectrum_std, {eV, rate_unit, rate_unit, rate_unit, rate_unit, rate_unit});
-		// std::cout << "Tabulate dR/dlnE for simple" << std::endl;
-		// auto spectrum_sim = Tabulate_dR_dlnE_Standard(points, DM_standard, SHM, graphene, "Simplified", 1e3);
-		// libphysica::Export_Table("dR_dlnE_Simple.txt", spectrum_sim, {eV, rate_unit, rate_unit, rate_unit, rate_unit, rate_unit});
-		// std::cout << "Tabulate dR/dlnE for NREFT" << std::endl;
-		// auto spectrum_nreft = Tabulate_dR_dlnE_NREFT(points, DM_nreft, SHM, graphene, 1e4);
-		// libphysica::Export_Table("dR_dlnE_NREFT.txt", spectrum_nreft, {eV, rate_unit, rate_unit, rate_unit, rate_unit, rate_unit});
+				double w_band = graphene.Material_Response_Function(band, lVec);
+				W += w_band;
+				row.push_back(w_band);
+			}
+			row.push_back(W);
+			response_function.push_back(row);
+		}
+		libphysica::Export_Table(results_path + "Response_Function_lPerp.txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		// 2. lParallel (average)
+		response_function.clear();
+		for(auto& l : l_list)
+		{
+			std::cout << "l = " << l / keV << " keV" << std::endl;
+			std::vector<double> row = {l};
+			double W				= 0.0;
+			for(int band = 0; band < 4; band++)
+			{
+				std::function<double(double)> integrand = [&graphene, l, band](double phi) {
+					Eigen::Vector3d lVec = Spherical_Coordinates(l, M_PI / 2.0, phi);
+					return graphene.Material_Response_Function(band, lVec);
+				};
+				double W_band = 1.0 / 2.0 / M_PI * libphysica::Integrate(integrand, 0.0, 2 * M_PI, "Gauss-Kronrod");
+				W += W_band;
+				row.push_back(W_band);
+			}
+			row.push_back(W);
+			response_function.push_back(row);
+		}
+		libphysica::Export_Table(results_path + "Response_Function_lParallel.txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
 
-		// // 1. Daily modulation
-		// int points = 4;
-		// // std::cout << "Tabulate daily modulation for standard" << std::endl;
-		// // auto daily_std = Daily_Modulation_Standard(points, DM_standard, SHM, graphene, 1e5);
-		// // libphysica::Export_Table("Daily_Modulation_Standard.txt", daily_std, {1.0, rate_unit});
-		// std::cout << "Tabulate daily modulation for nreft" << std::endl;
-		// auto daily_nreft = Daily_Modulation_NREFT(points, DM_nreft, SHM, graphene, 2e6);
-		// libphysica::Export_Table("Daily_Modulation_NREFT.txt", daily_nreft, {1.0, rate_unit});
+		// 2. lNorm (Average)
+		response_function.clear();
+		for(auto& l : l_list)
+		{
+			std::cout << "l = " << l / keV << " keV" << std::endl;
+			std::vector<double> row = {l};
+			double W				= 0.0;
+			for(int band = 0; band < 4; band++)
+			{
+				std::function<double(double, double)> integrand = [&graphene, l, band](double cos_theta, double phi) {
+					Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+					return graphene.Material_Response_Function(band, lVec);
+				};
+				double W_band = 1.0 / 4.0 / M_PI * libphysica::Integrate_2D(integrand, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre");
+				W += W_band;
+				row.push_back(W_band);
+			}
+			row.push_back(W);
+			response_function.push_back(row);
+		}
+		libphysica::Export_Table(results_path + "Response_Function_lNorm.txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
 	}
-
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output
 	auto time_end		 = std::chrono::system_clock::now();
