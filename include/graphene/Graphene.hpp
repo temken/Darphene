@@ -8,6 +8,8 @@
 
 #include "libphysica/Natural_Units.hpp"
 
+#include "Hydrogenic_Wavefunctions.hpp"
+
 namespace graphene
 {
 
@@ -31,6 +33,8 @@ class Graphene
 
 	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Pi(const Eigen::Vector3d& kVec, bool compute_eigenvectors = true) const;
 	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> EigenSolution_Sigma(const Eigen::Vector3d& kVec, bool compute_eigenvectors = true) const;
+
+	Carbon_Wavefunctions* carbon_wavefunctions = {nullptr};
 
   public:
 	// Graphene lattice geometry

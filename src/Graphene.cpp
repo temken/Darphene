@@ -139,9 +139,11 @@ Graphene::Graphene(double workfunction)
 	epsilon_2s = -8.868 * eV;
 	epsilon_2p = 0.0;
 
-	Zeff_2s		 = 4.59381;
-	Zeff_2px_2py = 5.48626;
-	Zeff_2pz	 = 4.02474;
+	// Carbon atomic wavefunctions
+	Zeff_2s				 = 4.59381;
+	Zeff_2px_2py		 = 5.48626;
+	Zeff_2pz			 = 4.02474;
+	carbon_wavefunctions = new Hydrogenic(Zeff_2s, Zeff_2px_2py, Zeff_2pz);
 }
 
 std::vector<double> Graphene::Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const
@@ -236,14 +238,14 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 
 	if(band == 0)
 	{
-		std::complex<double> f = f_aux(kVec);
-		double phi_l		   = -atan2(f.imag(), f.real());
-		double phi_2pz		   = Hydrogenic_Wavefunction_Momentum(lVec, "2pz", Zeff_2pz);
-		double norm			   = 1.0;
+		std::complex<double> f		 = f_aux(kVec);
+		double phi_l				 = -atan2(f.imag(), f.real());
+		std::complex<double> phi_2pz = carbon_wavefunctions->Wavefunction_Momentum_2pz(lVec);
+		double norm					 = 1.0;
 		for(int i = 0; i < 3; i++)
 			norm += s * cos(phi_l + nearest_neighbors[i].dot(kVec));
 		double N_l_sq = 1.0 / norm;
-		return std::pow(2.0 * M_PI, -3) * N_l_sq * std::pow(phi_2pz, 2.0) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(kVec + lVec)));
+		return std::pow(2.0 * M_PI, -3) * N_l_sq * std::norm(phi_2pz) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(kVec + lVec)));
 	}
 	else
 	{
@@ -259,7 +261,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 		std::complex<double> C6	 = ges.eigenvectors().col((i))[5];
 		double N_l				 = 1.0;	  // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
 		std::complex<double> aux = std::exp(1i * nearest_neighbors[0].dot(kVec + lVec));
-		psi						 = N_l * ((C1 + C4 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2s", Zeff_2s) + (C2 + C5 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2px", Zeff_2px_2py) + (C3 + C6 * aux) * Hydrogenic_Wavefunction_Momentum(lVec, "2py", Zeff_2px_2py));
+		psi						 = N_l * ((C1 + C4 * aux) * carbon_wavefunctions->Wavefunction_Momentum_2s(lVec) + (C2 + C5 * aux) * carbon_wavefunctions->Wavefunction_Momentum_2px(lVec) + (C3 + C6 * aux) * carbon_wavefunctions->Wavefunction_Momentum_2py(lVec));
 		return std::pow(2.0 * M_PI, -3) * std::norm(psi);
 	}
 }
