@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 	////////////////////////////////////////////////////////////////////////
 
 	Configuration cfg(argv[1]);
-	Graphene graphene(cfg.graphene_work_function);
+	Graphene graphene(cfg.graphene_wavefunctions, cfg.graphene_work_function);
 	cfg.Print_Summary();
 	std::string results_path = TOP_LEVEL_DIR "results/" + cfg.ID + "/";
 	double rate_unit		 = 1.0 / gram / year;
