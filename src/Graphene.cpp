@@ -240,7 +240,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 	{
 		std::complex<double> f		 = f_aux(kVec);
 		double phi_l				 = -atan2(f.imag(), f.real());
-		std::complex<double> phi_2pz = carbon_wavefunctions->Wavefunction_Momentum_2pz(lVec);
+		std::complex<double> phi_2pz = carbon_wavefunctions->Wavefunction_Momentum(lVec, "2pz");
 		double norm					 = 1.0;
 		for(int i = 0; i < 3; i++)
 			norm += s * cos(phi_l + nearest_neighbors[i].dot(kVec));
@@ -261,7 +261,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 		std::complex<double> C6	 = ges.eigenvectors().col((i))[5];
 		double N_l				 = 1.0;	  // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
 		std::complex<double> aux = std::exp(1i * nearest_neighbors[0].dot(kVec + lVec));
-		psi						 = N_l * ((C1 + C4 * aux) * carbon_wavefunctions->Wavefunction_Momentum_2s(lVec) + (C2 + C5 * aux) * carbon_wavefunctions->Wavefunction_Momentum_2px(lVec) + (C3 + C6 * aux) * carbon_wavefunctions->Wavefunction_Momentum_2py(lVec));
+		psi						 = N_l * ((C1 + C4 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2s") + (C2 + C5 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2px") + (C3 + C6 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2py"));
 		return std::pow(2.0 * M_PI, -3) * std::norm(psi);
 	}
 }

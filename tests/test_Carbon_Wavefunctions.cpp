@@ -23,71 +23,21 @@ TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionValues)
 	double phi_2py = 6.325520187706432e-10;
 	double phi_2pz = 4.2170134584709545e-10;
 	// ACT & ASSERT
-	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position_2s(position), phi_2s);
-	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position_2px(position), phi_2px);
-	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position_2py(position), phi_2py);
-	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position_2pz(position), phi_2pz);
+	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position(position, "2s"), phi_2s);
+	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position(position, "2px"), phi_2px);
+	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position(position, "2py"), phi_2py);
+	EXPECT_FLOAT_EQ(hydrogenic.Wavefunction_Position(position, "2pz"), phi_2pz);
 }
 
-TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2s)
+TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization)
 {
 	// ARRANGE
 	double Zeff = 2.0;
 	Hydrogenic hydrogenic(Zeff, Zeff, Zeff);
-
-	std::function<double(libphysica::Vector)> integrand = [&hydrogenic](libphysica::Vector rVec) {
-		Eigen::Vector3d r_aux(rVec[0], rVec[1], rVec[2]);
-		double phi = hydrogenic.Wavefunction_Position_2s(r_aux);
-		return phi * phi;
-	};
-
+	std::vector<std::string> orbitals = {"2s", "2px", "2py", "2pz"};
 	// ACT & ASSERT
-	ASSERT_FLOAT_EQ(libphysica::Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI), 1.0);
-}
-
-TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2px)
-{
-	// ARRANGE
-	double Zeff = 2.0;
-	Hydrogenic hydrogenic(Zeff, Zeff, Zeff);
-	std::function<double(libphysica::Vector)> integrand = [&hydrogenic](libphysica::Vector rVec) {
-		Eigen::Vector3d r_aux(rVec[0], rVec[1], rVec[2]);
-		double phi = hydrogenic.Wavefunction_Position_2px(r_aux);
-		return phi * phi;
-	};
-
-	// ACT & ASSERT
-	ASSERT_FLOAT_EQ(libphysica::Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI), 1.0);
-}
-
-TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2py)
-{
-	// ARRANGE
-	double Zeff = 2.0;
-	Hydrogenic hydrogenic(Zeff, Zeff, Zeff);
-	std::function<double(libphysica::Vector)> integrand = [&hydrogenic](libphysica::Vector rVec) {
-		Eigen::Vector3d r_aux(rVec[0], rVec[1], rVec[2]);
-		double phi = hydrogenic.Wavefunction_Position_2py(r_aux);
-		return phi * phi;
-	};
-
-	// ACT & ASSERT
-	ASSERT_FLOAT_EQ(libphysica::Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI), 1.0);
-}
-
-TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionNormalization2pz)
-{
-	// ARRANGE
-	double Zeff = 2.0;
-	Hydrogenic hydrogenic(Zeff, Zeff, Zeff);
-	std::function<double(libphysica::Vector)> integrand = [&hydrogenic](libphysica::Vector rVec) {
-		Eigen::Vector3d r_aux(rVec[0], rVec[1], rVec[2]);
-		double phi = hydrogenic.Wavefunction_Position_2pz(r_aux);
-		return phi * phi;
-	};
-
-	// ACT & ASSERT
-	ASSERT_FLOAT_EQ(libphysica::Integrate_3D(integrand, 0.0, 20.0 * Bohr_Radius, -1.0, 1.0, 0.0, 2.0 * M_PI), 1.0);
+	for(auto orbital : orbitals)
+		EXPECT_FLOAT_EQ(hydrogenic.Normalization_Position(orbital), 1.0);
 }
 
 TEST(TestHydrogenicWavefunctions, TestMomentumWavefunctionValues)
@@ -101,8 +51,20 @@ TEST(TestHydrogenicWavefunctions, TestMomentumWavefunctionValues)
 	double phi_2py = 4.6677e6;
 	double phi_2pz = 7.00155e6;
 	// ACT & ASSERT
-	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum_2s(momentum)), phi_2s);
-	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum_2px(momentum)), phi_2px);
-	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum_2py(momentum)), phi_2py);
-	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum_2pz(momentum)), phi_2pz);
+	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum(momentum, "2s")), phi_2s);
+	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum(momentum, "2px")), phi_2px);
+	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum(momentum, "2py")), phi_2py);
+	EXPECT_FLOAT_EQ(std::abs(hydrogenic.Wavefunction_Momentum(momentum, "2pz")), phi_2pz);
+}
+
+TEST(TestHydrogenicWavefunctions, TestMomentumWavefunctionNormalization)
+{
+	// ARRANGE
+	double tol	= 1e-6;
+	double Zeff = 2.0;
+	Hydrogenic hydrogenic(Zeff, Zeff, Zeff);
+	std::vector<std::string> orbitals = {"2s", "2px", "2py", "2pz"};
+	// ACT & ASSERT
+	for(auto orbital : orbitals)
+		EXPECT_NEAR(hydrogenic.Normalization_Momentum(orbital), 1.0, tol);
 }

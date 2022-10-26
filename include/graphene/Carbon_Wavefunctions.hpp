@@ -16,16 +16,14 @@ class Carbon_Wavefunctions
 	Carbon_Wavefunctions() {};
 
 	// Position space wavefunctions
-	virtual double Wavefunction_Position_2s(const Eigen::Vector3d& xVec) { return 0; };
-	virtual double Wavefunction_Position_2px(const Eigen::Vector3d& xVec) { return 0; };
-	virtual double Wavefunction_Position_2py(const Eigen::Vector3d& xVec) { return 0; };
-	virtual double Wavefunction_Position_2pz(const Eigen::Vector3d& xVec) { return 0; };
+	virtual double Wavefunction_Position(const Eigen::Vector3d& xVec, const std::string& orbital) { return 0; };
 
 	// Momentum space wavefunctions
-	virtual std::complex<double> Wavefunction_Momentum_2s(const Eigen::Vector3d& kVec) { return 0; };
-	virtual std::complex<double> Wavefunction_Momentum_2px(const Eigen::Vector3d& kVec) { return 0; };
-	virtual std::complex<double> Wavefunction_Momentum_2py(const Eigen::Vector3d& kVec) { return 0; };
-	virtual std::complex<double> Wavefunction_Momentum_2pz(const Eigen::Vector3d& kVec) { return 0; };
+	virtual std::complex<double> Wavefunction_Momentum(const Eigen::Vector3d& kVec, const std::string& orbital) { return 0; };
+
+	// Normalization
+	double Normalization_Position(const std::string& orbital);
+	double Normalization_Momentum(const std::string& orbital);
 };
 
 // 2. Hydrogenic wavefunctions
@@ -39,16 +37,10 @@ class Hydrogenic : public Carbon_Wavefunctions
 	: Zeff_2s(Z2s), Zeff_2pxpy(Z2pxpy), Zeff_2pz(Z2pz) {};
 
 	// Position space wavefunctions
-	virtual double Wavefunction_Position_2s(const Eigen::Vector3d& xVec) override;
-	virtual double Wavefunction_Position_2px(const Eigen::Vector3d& xVec) override;
-	virtual double Wavefunction_Position_2py(const Eigen::Vector3d& xVec) override;
-	virtual double Wavefunction_Position_2pz(const Eigen::Vector3d& xVec) override;
+	virtual double Wavefunction_Position(const Eigen::Vector3d& xVec, const std::string& orbital) override;
 
 	// Momentum space wavefunctions
-	virtual std::complex<double> Wavefunction_Momentum_2s(const Eigen::Vector3d& kVec) override;
-	virtual std::complex<double> Wavefunction_Momentum_2px(const Eigen::Vector3d& kVec) override;
-	virtual std::complex<double> Wavefunction_Momentum_2py(const Eigen::Vector3d& kVec) override;
-	virtual std::complex<double> Wavefunction_Momentum_2pz(const Eigen::Vector3d& kVec) override;
+	virtual std::complex<double> Wavefunction_Momentum(const Eigen::Vector3d& kVec, const std::string& orbital) override;
 };
 
 }	// namespace graphene
