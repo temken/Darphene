@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 	////////////////////////////////////////////////////////////////////////
 
 	Configuration cfg(argv[1]);
-	Graphene graphene(cfg.graphene_wavefunctions, cfg.graphene_work_function);
+	Graphene graphene(cfg.carbon_wavefunctions, cfg.graphene_work_function);
 	cfg.Print_Summary();
 	std::string results_path = TOP_LEVEL_DIR "results/" + cfg.ID + "/";
 	double rate_unit		 = 1.0 / gram / year;
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 
 		// Tabulate the response function
 
-		auto l_list = libphysica::Linear_Space(0 * keV, 20 * keV, 50);
+		auto l_list = libphysica::Linear_Space(0 * keV, 25 * keV, 250);
 		std::vector<std::vector<double>> response_function;
 
 		// 1. lPerpendicular
@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
 			row.push_back(W);
 			response_function.push_back(row);
 		}
-		libphysica::Export_Table(results_path + "Response_Function_lPerp.txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		libphysica::Export_Table(results_path + "Response_Function_lPerp_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
 		// 2. lParallel (average)
 		response_function.clear();
 		for(auto& l : l_list)
@@ -189,29 +189,29 @@ int main(int argc, char* argv[])
 			row.push_back(W);
 			response_function.push_back(row);
 		}
-		libphysica::Export_Table(results_path + "Response_Function_lParallel.txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		libphysica::Export_Table(results_path + "Response_Function_lParallel_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
 
-		// 2. lNorm (Average)
-		response_function.clear();
-		for(auto& l : l_list)
-		{
-			std::cout << "l = " << l / keV << " keV" << std::endl;
-			std::vector<double> row = {l};
-			double W				= 0.0;
-			for(int band = 0; band < 4; band++)
-			{
-				std::function<double(double, double)> integrand = [&graphene, l, band](double cos_theta, double phi) {
-					Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-					return graphene.Material_Response_Function(band, lVec);
-				};
-				double W_band = 1.0 / 4.0 / M_PI * libphysica::Integrate_2D(integrand, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre");
-				W += W_band;
-				row.push_back(W_band);
-			}
-			row.push_back(W);
-			response_function.push_back(row);
-		}
-		libphysica::Export_Table(results_path + "Response_Function_lNorm.txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		// // 2. lNorm (Average)
+		// response_function.clear();
+		// for(auto& l : l_list)
+		// {
+		// 	std::cout << "l = " << l / keV << " keV" << std::endl;
+		// 	std::vector<double> row = {l};
+		// 	double W				= 0.0;
+		// 	for(int band = 0; band < 4; band++)
+		// 	{
+		// 		std::function<double(double, double)> integrand = [&graphene, l, band](double cos_theta, double phi) {
+		// 			Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+		// 			return graphene.Material_Response_Function(band, lVec);
+		// 		};
+		// 		double W_band = 1.0 / 4.0 / M_PI * libphysica::Integrate_2D(integrand, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre");
+		// 		W += W_band;
+		// 		row.push_back(W_band);
+		// 	}
+		// 	row.push_back(W);
+		// 	response_function.push_back(row);
+		// }
+		// libphysica::Export_Table(results_path + "Response_Function_lNorm.txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
 	}
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output

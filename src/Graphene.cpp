@@ -140,7 +140,6 @@ Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 	epsilon_2p = 0.0;
 
 	// Carbon atomic wavefunctions
-
 	if(wavefunctions == "Hydrogenic")
 	{
 		double Zeff_2s		 = 4.59381;
@@ -148,7 +147,7 @@ Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 		double Zeff_2pz		 = 4.02474;
 		carbon_wavefunctions = new Hydrogenic(Zeff_2s, Zeff_2px_2py, Zeff_2pz);
 	}
-	else if(wavefunctions == "Roothaan-Hartree-Fock")
+	else if(wavefunctions == "Roothaan-Hartree-Fock" || wavefunctions == "RHF")
 		carbon_wavefunctions = new Roothaan_Hartree_Fock();
 	else
 	{
