@@ -101,7 +101,7 @@ Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> Graphene::EigenSoluti
 	return Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd>(H, S, compute_eigenvectors);
 }
 
-Graphene::Graphene(double workfunction)
+Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 {
 	aCC			  = 1.42 * Angstrom;
 	a			  = aCC * sqrt(3.0);
@@ -140,10 +140,21 @@ Graphene::Graphene(double workfunction)
 	epsilon_2p = 0.0;
 
 	// Carbon atomic wavefunctions
-	Zeff_2s				 = 4.59381;
-	Zeff_2px_2py		 = 5.48626;
-	Zeff_2pz			 = 4.02474;
-	carbon_wavefunctions = new Hydrogenic(Zeff_2s, Zeff_2px_2py, Zeff_2pz);
+
+	if(wavefunctions == "Hydrogenic")
+	{
+		double Zeff_2s		 = 4.59381;
+		double Zeff_2px_2py	 = 5.48626;
+		double Zeff_2pz		 = 4.02474;
+		carbon_wavefunctions = new Hydrogenic(Zeff_2s, Zeff_2px_2py, Zeff_2pz);
+	}
+	else if(wavefunctions == "Roothaan-Hartree-Fock")
+		carbon_wavefunctions = new Roothaan_Hartree_Fock();
+	else
+	{
+		std::cerr << "Error in Graphene::Graphene(): Unknown wavefunction type " << wavefunctions << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 }
 
 std::vector<double> Graphene::Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const

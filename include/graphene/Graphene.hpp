@@ -19,8 +19,6 @@ class Graphene
 	// Overlap and transfer integrals
 	double s, sPrime, Sss, Ssp, Ssigma, Spi, t, Hss, Hsp, Hsigma, Hpi, epsilon_2s, epsilon_2p;
 
-	double Zeff_2s, Zeff_2px_2py, Zeff_2pz;
-
 	std::complex<double> f_aux(const Eigen::Vector3d& kVec) const;
 
 	Eigen::Vector3d Path_1BZ(double k) const;
@@ -42,7 +40,7 @@ class Graphene
 	std::vector<Eigen::Vector3d> lattice_vectors, reciprocal_lattice_vectors, nearest_neighbors;
 	Eigen::Vector3d high_symmetry_point_G, high_symmetry_point_M, high_symmetry_point_K;
 
-	Graphene(double workfunction = 4.3 * libphysica::natural_units::eV);
+	Graphene(const std::string& wavefunctions, double workfunction = 4.3 * libphysica::natural_units::eV);
 
 	std::vector<double> Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const;
 	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& kVec) const;

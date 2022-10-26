@@ -13,7 +13,7 @@ TEST(TestGraphene, TestEnergyDispersionPi)
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	std::vector<std::vector<double>> results = {{-6.5602 * eV, 14.843393 * eV},
 												{-2.6864482 * eV, 3.4822043 * eV},
 												{0.0 * eV, 0.0 * eV}};
@@ -34,7 +34,7 @@ TEST(TestGraphene, TestEnergyDispersionPiAnalytic)
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	// ACT & ASSERT
 	for(auto& lVec : high_symmetry_points)
 	{
@@ -51,7 +51,7 @@ TEST(TestGraphene, TestEnergyDispersionSigma)
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	std::vector<std::vector<double>> results = {
 		{-17.833129584352082 * eV, -2.93125 * eV, -2.93125 * eV, 3.08466 * eV, 3.08466 * eV, 31.425824175824184 * eV},
 		{-14.802126408956223 * eV, -11.691743504673768 * eV, -7.06817 * eV, 10.476314847203604 * eV, 12.661549197487779 * eV, 20.1867 * eV},
@@ -74,7 +74,7 @@ TEST(TestGraphene, TestEnergyDispersionSigma)
 TEST(TestGraphene, TestEnergyBands)
 {
 	// ARRANGE
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	int N			 = 100;
 	double tolerance = 1e-22;
 
