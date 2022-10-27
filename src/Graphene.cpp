@@ -210,12 +210,10 @@ std::vector<std::vector<double>> Graphene::Energy_Bands(unsigned int k_points)
 bool Graphene::In_1BZ(const Eigen::Vector3d& kVec)
 {
 	double d = 4.0 * M_PI / 3.0 / a;
-	if(std::fabs(kVec[0]) > sqrt(3.0) / 2.0 * d || std::fabs(kVec[1]) > d)
-		return false;
-	else if(std::fabs(kVec[1]) > d - std::fabs(kVec[0]) / sqrt(3.0))
-		return false;
-	else
+	if(std::fabs(kVec[0]) < sqrt(3.0) / 2.0 * d && std::fabs(kVec[1]) < d - std::fabs(kVec[0]) / sqrt(3.0))
 		return true;
+	else
+		return false;
 }
 
 Eigen::Vector3d Graphene::Find_1BZ_Vector(const Eigen::Vector3d& kVec)
