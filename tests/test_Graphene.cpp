@@ -1,6 +1,10 @@
 #include "gtest/gtest.h"
 
+#include <cmath>
+#include <random>
+
 #include "libphysica/Natural_Units.hpp"
+#include "libphysica/Statistics.hpp"
 
 #include "graphene/Graphene.hpp"
 
@@ -13,7 +17,7 @@ TEST(TestGraphene, TestEnergyDispersionPi)
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	std::vector<std::vector<double>> results = {{-6.5602 * eV, 14.843393 * eV},
 												{-2.6864482 * eV, 3.4822043 * eV},
 												{0.0 * eV, 0.0 * eV}};
@@ -34,7 +38,7 @@ TEST(TestGraphene, TestEnergyDispersionPiAnalytic)
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	// ACT & ASSERT
 	for(auto& lVec : high_symmetry_points)
 	{
@@ -51,7 +55,7 @@ TEST(TestGraphene, TestEnergyDispersionSigma)
 	double aCC										  = 1.42 * Angstrom;
 	double a										  = aCC * sqrt(3.0);
 	std::vector<Eigen::Vector3d> high_symmetry_points = {{0.0, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 0.0, 0.0}, {2.0 * M_PI / sqrt(3.0) / a, 2.0 * M_PI / 3.0 / a, 0.0}};
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	std::vector<std::vector<double>> results = {
 		{-17.833129584352082 * eV, -2.93125 * eV, -2.93125 * eV, 3.08466 * eV, 3.08466 * eV, 31.425824175824184 * eV},
 		{-14.802126408956223 * eV, -11.691743504673768 * eV, -7.06817 * eV, 10.476314847203604 * eV, 12.661549197487779 * eV, 20.1867 * eV},
@@ -74,7 +78,7 @@ TEST(TestGraphene, TestEnergyDispersionSigma)
 TEST(TestGraphene, TestEnergyBands)
 {
 	// ARRANGE
-	Graphene graphene;
+	Graphene graphene("Hydrogenic");
 	int N			 = 100;
 	double tolerance = 1e-22;
 
@@ -87,4 +91,28 @@ TEST(TestGraphene, TestEnergyBands)
 		EXPECT_EQ(entry.size(), 9);
 	for(int i = 1; i < 9; i++)
 		EXPECT_NEAR(energy_bands[0][i], energy_bands[N - 1][i], tolerance);
+}
+
+TEST(TestGraphene, TestBZ)
+{
+	// ARRANGE
+	Graphene graphene("Hydrogenic");
+	std::random_device rd;
+	std::mt19937 PRNG(rd());
+	double kMax = 20. * graphene.b;
+	double tol	= 1e-10;
+	//
+	// ACT & ASSERT
+	for(int i = 0; i < 100; i++)
+	{
+		Eigen::Vector3d k = {libphysica::Sample_Uniform(PRNG, -kMax, kMax), libphysica::Sample_Uniform(PRNG, -kMax, kMax), 0.0};
+		Eigen::Vector3d G = graphene.Find_G_Vector(k);
+		Eigen::Vector3d l = k - G;
+		EXPECT_TRUE(graphene.In_1BZ(l));
+		// Check that coefficients are integer.
+		double m = 1.0 / graphene.b * (G[0] + G[1] / sqrt(3.0));
+		double n = 1.0 / graphene.b * (G[0] - G[1] / sqrt(3.0));
+		EXPECT_NEAR(m, std::round(m), tol);
+		EXPECT_NEAR(n, std::round(n), tol);
+	}
 }

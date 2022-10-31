@@ -30,6 +30,7 @@ target_link_libraries(graphene_library
 	PRIVATE
 	OpenMP::OpenMP_CXX
 	${Boost_LIBRARIES}
+	"${ARB}"
 	PUBLIC
 	Eigen3::Eigen
 	coverage_config

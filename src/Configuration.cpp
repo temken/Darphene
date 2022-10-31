@@ -223,6 +223,16 @@ void Configuration::Import_Graphene_Parameters()
 		std::cerr << "No 'threads' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+	// Graphene - Wavefunctions
+	try
+	{
+		carbon_wavefunctions = config.lookup("carbon_wave_functions").c_str();
+	}
+	catch(const SettingNotFoundException& nfex)
+	{
+		std::cerr << "No 'carbon_wave_functions' setting in configuration file." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 	// Graphene - Work function
 	try
 	{
@@ -291,6 +301,7 @@ void Configuration::Print_Summary(int mpi_rank)
 				  << "\tMC points:\t\t\t" << MC_points << std::endl
 				  << "\tGrid points:\t\t\t" << grid_points << std::endl
 				  << "\tThreads:\t\t\t" << threads << std::endl
+				  << "\tWave functions:\t\t\t" << carbon_wavefunctions << std::endl
 				  << "\tGraphene work function [eV]:\t" << graphene_work_function / eV << std::endl
 				  << "\tTime of day [hr]:\t\t" << time / hr << std::endl;
 		std::cout << SEPARATOR << std::endl;

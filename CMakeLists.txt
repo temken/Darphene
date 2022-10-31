@@ -31,6 +31,10 @@ if(OPENMP_FOUND)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+find_library(ARB
+  NAMES arb libarb flint-arb
+  PATHS /usr/local/lib /usr/lib/ /usr/share/)
+
 include(FetchContent)
 
 # obscura

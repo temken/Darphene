@@ -5,23 +5,90 @@
 #include "libphysica/Integration.hpp"
 #include "libphysica/Utilities.hpp"
 
-#include "graphene/Hydrogenic_Wavefunctions.hpp"
-
 namespace Hochberg_et_al
 {
 using namespace libphysica::natural_units;
 using namespace std::complex_literals;
 
+// Position space (Normalized to 1)
+double Hydrogenic_Wavefunction(const Eigen::Vector3d& position, const std::string& orbital, double Zeff)
+{
+	double r = position.norm();
+	if(orbital == "2s")
+	{
+		double normalization = sqrt(Zeff * Zeff * Zeff / 56.0 / M_PI);
+		return normalization / pow(Bohr_Radius, 1.5) * (1.0 - Zeff * r / Bohr_Radius) * exp(-Zeff * r / 2.0 / Bohr_Radius);
+	}
+	else if(orbital == "2px")
+	{
+		double cos_theta	 = position[2] / r;
+		double sin_theta	 = sqrt(1.0 - cos_theta * cos_theta);
+		double phi			 = atan2(position[1], position[0]);
+		double normalization = sqrt(Zeff * Zeff * Zeff * Zeff * Zeff / 32.0 / M_PI);
+		return normalization / pow(Bohr_Radius, 1.5) * r / Bohr_Radius * sin_theta * cos(phi) * exp(-Zeff * r / 2.0 / Bohr_Radius);
+	}
+	else if(orbital == "2py")
+	{
+		double cos_theta	 = position[2] / r;
+		double sin_theta	 = sqrt(1.0 - cos_theta * cos_theta);
+		double phi			 = atan2(position[1], position[0]);
+		double normalization = sqrt(Zeff * Zeff * Zeff * Zeff * Zeff / 32.0 / M_PI);
+		return normalization / pow(Bohr_Radius, 1.5) * r / Bohr_Radius * sin_theta * sin(phi) * exp(-Zeff * r / 2.0 / Bohr_Radius);
+	}
+	else if(orbital == "2pz")
+	{
+		double cos_theta	 = position[2] / r;
+		double normalization = sqrt(Zeff * Zeff * Zeff * Zeff * Zeff / 32.0 / M_PI);
+		return normalization / pow(Bohr_Radius, 1.5) * r / Bohr_Radius * cos_theta * exp(-Zeff * r / 2.0 / Bohr_Radius);
+	}
+	else
+	{
+		std::cerr << "Error in Hydrogenic_Wavefunction(): Orbital " << orbital << " not recognized." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+}
+
+// Momentum space (Normalized to (2 pi)^3)
+double Hydrogenic_Wavefunction_Momentum(const Eigen::Vector3d& momentum, const std::string& orbital, double Zeff)
+{
+	double k = momentum.norm();
+	if(orbital == "2s")
+	{
+		double normalization = sqrt(8.0 * M_PI * Zeff * Zeff * Zeff * Zeff * Zeff);
+		return normalization * pow(Bohr_Radius, 1.5) * (Bohr_Radius * Bohr_Radius * k * k - Zeff * Zeff / 4.0) / pow(Bohr_Radius * Bohr_Radius * k * k + Zeff * Zeff / 4.0, 3.0);
+	}
+	else if(orbital == "2px")
+	{
+		double normalization = sqrt(8.0 * M_PI * Zeff * Zeff * Zeff * Zeff * Zeff * Zeff * Zeff);
+		return normalization * pow(Bohr_Radius, 1.5) * Bohr_Radius * momentum[0] / pow(Bohr_Radius * Bohr_Radius * k * k + Zeff * Zeff / 4.0, 3.0);
+	}
+	else if(orbital == "2py")
+	{
+		double normalization = sqrt(8.0 * M_PI * Zeff * Zeff * Zeff * Zeff * Zeff * Zeff * Zeff);
+		return normalization * pow(Bohr_Radius, 1.5) * Bohr_Radius * momentum[1] / pow(Bohr_Radius * Bohr_Radius * k * k + Zeff * Zeff / 4.0, 3.0);
+	}
+	else if(orbital == "2pz")
+	{
+		double normalization = sqrt(8.0 * M_PI * Zeff * Zeff * Zeff * Zeff * Zeff * Zeff * Zeff);
+		return normalization * pow(Bohr_Radius, 1.5) * Bohr_Radius * momentum[2] / pow(Bohr_Radius * Bohr_Radius * k * k + Zeff * Zeff / 4.0, 3.0);
+	}
+	else
+	{
+		std::cerr << "Error in Hydrogenic_Wavefunction_Momentum(): Orbital " << orbital << " not recognized." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+}
+
 std::complex<double> Graphene::Bloch_Wavefunction_A(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, const std::string& orbital, double Zeff) const
 {
-	return graphene::Hydrogenic_Wavefunction(rVec, orbital, Zeff);
+	return Hydrogenic_Wavefunction(rVec, orbital, Zeff);
 }
 
 std::complex<double> Graphene::Bloch_Wavefunction_B(const Eigen::Vector3d& rVec, const Eigen::Vector3d& lVec, const std::string& orbital, double Zeff) const
 {
 	std::complex<double> Phi = 0.0;
 	for(auto& R : nearest_neighbors)
-		Phi += exp(1i * lVec.dot(R)) * graphene::Hydrogenic_Wavefunction(rVec - R, orbital, Zeff);
+		Phi += exp(1i * lVec.dot(R)) * Hydrogenic_Wavefunction(rVec - R, orbital, Zeff);
 	return Phi;
 }
 
@@ -253,7 +320,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Pi(const Eigen::Vector3d& k
 	std::complex<double> f	= f_aux(lVec + kVec);
 
 	double norm = 1.0;	 // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
-	return 1.0 / std::sqrt(norm) * (C1 + C2 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
+	return 1.0 / std::sqrt(norm) * (C1 + C2 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
 }
 
 std::complex<double> Graphene::Wavefunction_Momentum_Pi_Analytic(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec) const
@@ -266,7 +333,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Pi_Analytic(const Eigen::Ve
 	double norm = 2.0;	 // This normalization is faulty due to the inaccurate Bloch wave functions.
 	for(int i = 0; i < 3; i++)
 		norm += s * cos(phi + nearest_neighbors[i].dot(lVec));	 // + sPrime * cos(lVec.dot(lattice_vectors[i]));
-	return pow(2.0 * norm, -0.5) * (1.0 + exp(1i * phi) * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
+	return pow(2.0 * norm, -0.5) * (1.0 + exp(1i * phi) * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2pz", Zeff_2pz);
 }
 
 std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d& kVec, const Eigen::Vector3d& lVec, int i) const
@@ -282,7 +349,7 @@ std::complex<double> Graphene::Wavefunction_Momentum_Sigma(const Eigen::Vector3d
 	std::complex<double> f	= f_aux(lVec + kVec);
 
 	double norm = 1.0;	 // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
-	return 1.0 / std::sqrt(norm) * ((C1 + C4 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * graphene::Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
+	return 1.0 / std::sqrt(norm) * ((C1 + C4 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2s", Zeff_2s) + (C2 + C5 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2px", Zeff_2px_2py) + (C3 + C6 * f) * Hydrogenic_Wavefunction_Momentum(kVec, "2py", Zeff_2px_2py));
 }
 
 double Graphene::Material_Response_Function_Hochberg(int band, const Eigen::Vector3d& lVec, const Eigen::Vector3d& kVec)
