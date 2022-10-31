@@ -1,6 +1,10 @@
 #include "gtest/gtest.h"
 
+#include <cmath>
+#include <random>
+
 #include "libphysica/Natural_Units.hpp"
+#include "libphysica/Statistics.hpp"
 
 #include "graphene/Graphene.hpp"
 
@@ -87,4 +91,28 @@ TEST(TestGraphene, TestEnergyBands)
 		EXPECT_EQ(entry.size(), 9);
 	for(int i = 1; i < 9; i++)
 		EXPECT_NEAR(energy_bands[0][i], energy_bands[N - 1][i], tolerance);
+}
+
+TEST(TestGraphene, TestBZ)
+{
+	// ARRANGE
+	Graphene graphene("Hydrogenic");
+	std::random_device rd;
+	std::mt19937 PRNG(rd());
+	double kMax = 20. * graphene.b;
+	double tol	= 1e-10;
+	//
+	// ACT & ASSERT
+	for(int i = 0; i < 10000; i++)
+	{
+		Eigen::Vector3d k = {libphysica::Sample_Uniform(PRNG, -kMax, kMax), libphysica::Sample_Uniform(PRNG, -kMax, kMax), 0.0};
+		Eigen::Vector3d G = graphene.Find_G_Vector(k);
+		Eigen::Vector3d l = k - G;
+		EXPECT_TRUE(graphene.In_1BZ(l));
+		// Check that coefficients are integer.
+		double m = 1.0 / graphene.b * (G[0] + G[1] / sqrt(3.0));
+		double n = 1.0 / graphene.b * (G[0] - G[1] / sqrt(3.0));
+		EXPECT_NEAR(m, std::round(m), tol);
+		EXPECT_NEAR(n, std::round(n), tol);
+	}
 }
