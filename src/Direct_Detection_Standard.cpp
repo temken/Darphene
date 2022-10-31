@@ -88,7 +88,9 @@ double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_d
 
 		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.Material_Response_Function(band, lVec);
 	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
+	double cos_theta_kf_min	   = -1.0;
+	double cos_theta_kf_max	   = 0.0;
+	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, cos_theta_kf_min, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 
 	return std::isnan(result) ? 0.0 : result;
@@ -132,9 +134,10 @@ double R_Total_Standard_Simple(obscura::DM_Particle& DM, obscura::DM_Distributio
 
 		return kf * kf * q * DM_distr.Eta_Function(vMin) * graphene.Material_Response_Function(band, lVec);
 	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, 1.0, 2.0 * M_PI};
-
-	double result = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
+	double cos_theta_kf_min	   = -1.0;
+	double cos_theta_kf_max	   = 0.0;
+	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, cos_theta_kf_min, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, cos_theta_kf_max, 2.0 * M_PI};
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 	return std::isnan(result) ? 0.0 : result;
 }
 
@@ -187,7 +190,9 @@ double dR_dlnE_Standard(double Ee, obscura::DM_Particle& DM, obscura::DM_Distrib
 
 		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * graphene.Material_Response_Function(band, lVec);
 	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
+	double cos_theta_kf_min	   = -1.0;
+	double cos_theta_kf_max	   = 0.0;
+	std::vector<double> region = {qMinGlobal, -1.0, 0.0, cos_theta_kf_min, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 	return std::isnan(result) ? 0.0 : result;
 }
@@ -231,7 +236,9 @@ double dR_dlnE_Standard_Simple(double Ee, obscura::DM_Particle& DM, obscura::DM_
 
 		return q * DM_distr.Eta_Function(vMin) * graphene.Material_Response_Function(band, lVec);
 	};
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, 1.0, 2.0 * M_PI};
+	double cos_theta_kf_min	   = -1.0;
+	double cos_theta_kf_max	   = 0.0;
+	std::vector<double> region = {qMinGlobal, -1.0, 0.0, cos_theta_kf_min, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, cos_theta_kf_max, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 	return std::isnan(result) ? 0.0 : result;
 }
