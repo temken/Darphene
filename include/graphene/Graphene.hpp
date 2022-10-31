@@ -50,7 +50,7 @@ class Graphene
 	std::vector<std::vector<double>> Energy_Bands(unsigned int k_points);
 
 	bool In_1BZ(const Eigen::Vector3d& kVec);
-	Eigen::Vector3d Find_1BZ_Vector(const Eigen::Vector3d& kVec);
+	Eigen::Vector3d Find_G_Vector(const Eigen::Vector3d& kVec);
 
 	double Material_Response_Function(int band, const Eigen::Vector3d& lVec);
 };

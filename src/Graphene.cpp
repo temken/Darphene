@@ -210,40 +210,43 @@ std::vector<std::vector<double>> Graphene::Energy_Bands(unsigned int k_points)
 bool Graphene::In_1BZ(const Eigen::Vector3d& kVec)
 {
 	double d = 4.0 * M_PI / 3.0 / a;
-	if(std::fabs(kVec[0]) < sqrt(3.0) / 2.0 * d && std::fabs(kVec[1]) < d - std::fabs(kVec[0]) / sqrt(3.0))
+	if(std::fabs(kVec[0]) <= 0.5 * b && std::fabs(kVec[1]) < d - std::fabs(kVec[0]) / sqrt(3.0))
 		return true;
 	else
 		return false;
 }
 
-Eigen::Vector3d Graphene::Find_1BZ_Vector(const Eigen::Vector3d& kVec)
+Eigen::Vector3d Graphene::Find_G_Vector(const Eigen::Vector3d& kVec)
 {
+	// For a given k Vector, we find the G vector such that k - G is within the 1BZ.
 	if(In_1BZ(kVec))
-		return kVec;
+		return {0.0, 0.0, 0.0};
 	else
 	{
-		Eigen::Vector3d kVec_1BZ = kVec;
-		kVec_1BZ[0]				 = std::fmod(kVec_1BZ[0], 2.0 * M_PI / sqrt(3.0) / a);
-		kVec_1BZ[1]				 = std::fmod(kVec_1BZ[1], 4.0 * M_PI / 3.0 / a);
-		if(In_1BZ(kVec_1BZ))
-			return kVec_1BZ;
-		else if(kVec_1BZ[0] < 0.0 && kVec_1BZ[1] < 0.0)
-			kVec_1BZ += reciprocal_lattice_vectors[0];
-		else if(kVec_1BZ[0] < 0.0 && kVec_1BZ[1] > 0.0)
-			kVec_1BZ += reciprocal_lattice_vectors[1];
-		else if(kVec_1BZ[0] > 0.0 && kVec_1BZ[1] < 0.0)
-			kVec_1BZ -= reciprocal_lattice_vectors[1];
-		else if(kVec_1BZ[0] > 0.0 && kVec_1BZ[1] > 0.0)
-			kVec_1BZ -= reciprocal_lattice_vectors[0];
-		return kVec_1BZ;
+		for(int mNorm = 0; mNorm < 100; mNorm++)
+			for(int nNorm = 0; nNorm < 100; nNorm++)
+			{
+				std::vector<int> m_list = mNorm == 0 ? std::vector<int>({0}) : std::vector<int>({-mNorm, mNorm});
+				std::vector<int> n_list = nNorm == 0 ? std::vector<int>({0}) : std::vector<int>({-nNorm, nNorm});
+				for(int m : m_list)
+					for(int n : n_list)
+					{
+						Eigen::Vector3d G = m * reciprocal_lattice_vectors[0] + n * reciprocal_lattice_vectors[1];
+						if(In_1BZ(kVec - G))
+							return G;
+					}
+			}
 	}
+	std::cerr << "Error in Graphene::Find_G_Vector(): No G vector found for k = (" << kVec.transpose() / b << ") b" << In_1BZ(kVec) << std::endl;
+	std::exit(EXIT_FAILURE);
 }
 
 double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVec)
 {
-	// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
-	Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
-	kVec = Find_1BZ_Vector(kVec);
+	// Determine the crystal momentum vector k =  l^|| - G^* (in 1BZ)
+	Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+	Eigen::Vector3d G	 = Find_G_Vector(l_parallel);
+	Eigen::Vector3d kVec = l_parallel - G;
 
 	if(band == 0)
 	{
@@ -254,7 +257,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 		for(int i = 0; i < 3; i++)
 			norm += s * cos(phi_l + nearest_neighbors[i].dot(kVec));
 		double N_l_sq = 1.0 / norm;
-		return std::pow(2.0 * M_PI, -3) * N_l_sq * std::norm(phi_2pz) * (1.0 + cos(phi_l + nearest_neighbors[0].dot(kVec + lVec)));
+		return std::pow(2.0 * M_PI, -3) * N_l_sq * std::norm(phi_2pz) * (1.0 + cos(phi_l - nearest_neighbors[0].dot(G)));
 	}
 	else
 	{
@@ -269,7 +272,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 		std::complex<double> C5	 = ges.eigenvectors().col((i))[4];
 		std::complex<double> C6	 = ges.eigenvectors().col((i))[5];
 		double N_l				 = 1.0;	  // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
-		std::complex<double> aux = std::exp(1i * nearest_neighbors[0].dot(kVec + lVec));
+		std::complex<double> aux = std::exp(-1i * nearest_neighbors[0].dot(G));
 		psi						 = N_l * ((C1 + C4 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2s") + (C2 + C5 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2px") + (C3 + C6 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2py"));
 		return std::pow(2.0 * M_PI, -3) * std::norm(psi);
 	}

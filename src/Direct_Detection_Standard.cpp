@@ -74,10 +74,11 @@ double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_d
 		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
 
-		// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
+		// Determine the crystal momentum vector k =  l^|| - G* (in 1BZ)
 		Eigen::Vector3d lVec = k_FinalVec - qVec;
-		Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
-		kVec = graphene.Find_1BZ_Vector(kVec);
+		Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+		Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+		Eigen::Vector3d kVec = l_parallel - G;
 
 		double E_k = graphene.Valence_Band_Energies(kVec, band);
 		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
@@ -120,10 +121,11 @@ double R_Total_Standard_Simple(obscura::DM_Particle& DM, obscura::DM_Distributio
 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
 
-		// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
+		// Determine the crystal momentum vector k =  l^|| - G* (in 1BZ)
 		Eigen::Vector3d lVec = k_FinalVec - qVec;
-		Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
-		kVec = graphene.Find_1BZ_Vector(kVec);
+		Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+		Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+		Eigen::Vector3d kVec = l_parallel - G;
 
 		double E_k	= graphene.Valence_Band_Energies(kVec, band);
 		double vMin = vMinimum_Graphene(mDM, q, E_k, kf, graphene.work_function);
@@ -171,10 +173,11 @@ double dR_dlnE_Standard(double Ee, obscura::DM_Particle& DM, obscura::DM_Distrib
 		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
 
-		// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
+		// Determine the crystal momentum vector k =  l^|| - G* (in 1BZ)
 		Eigen::Vector3d lVec = k_FinalVec - qVec;
-		Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
-		kVec = graphene.Find_1BZ_Vector(kVec);
+		Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+		Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+		Eigen::Vector3d kVec = l_parallel - G;
 
 		double E_k = graphene.Valence_Band_Energies(kVec, band);
 		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
@@ -217,10 +220,11 @@ double dR_dlnE_Standard_Simple(double Ee, obscura::DM_Particle& DM, obscura::DM_
 		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
 		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
 
-		// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
+		// Determine the crystal momentum vector k =  l^|| - G* (in 1BZ)
 		Eigen::Vector3d lVec = k_FinalVec - qVec;
-		Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
-		kVec = graphene.Find_1BZ_Vector(kVec);
+		Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+		Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+		Eigen::Vector3d kVec = l_parallel - G;
 
 		double E_k	= graphene.Valence_Band_Energies(kVec, band);
 		double vMin = vMinimum_Graphene(mDM, q, E_k, kf, graphene.work_function);
@@ -264,10 +268,11 @@ double dR_dcos_Standard(double cos_theta, obscura::DM_Particle& DM, obscura::DM_
 		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
 
-		// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
+		// Determine the crystal momentum vector k =  l^|| - G* (in 1BZ)
 		Eigen::Vector3d lVec = k_FinalVec - qVec;
-		Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
-		kVec = graphene.Find_1BZ_Vector(kVec);
+		Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+		Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+		Eigen::Vector3d kVec = l_parallel - G;
 
 		double E_k = graphene.Valence_Band_Energies(kVec, band);
 		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
@@ -314,10 +319,11 @@ double dR_dcos_dphi_Standard(double cos_theta, double phi, obscura::DM_Particle&
 		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
 		double cos_alpha			 = v_unitvector.dot(qVec) / q;
 
-		// Determine the crystal momentum vector k = G* - l^|| (in 1BZ)
+		// Determine the crystal momentum vector k =  l^|| - G* (in 1BZ)
 		Eigen::Vector3d lVec = k_FinalVec - qVec;
-		Eigen::Vector3d kVec({-lVec[0], -lVec[1], 0.0});
-		kVec = graphene.Find_1BZ_Vector(kVec);
+		Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+		Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+		Eigen::Vector3d kVec = l_parallel - G;
 
 		double E_k = graphene.Valence_Band_Energies(kVec, band);
 		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
