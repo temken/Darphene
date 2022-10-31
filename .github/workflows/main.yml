@@ -47,7 +47,7 @@ jobs:
     # ARB
     - name: Install ARB
       shell: bash
-      run: sudo apt-get update && sudo apt-get install libflint-arb-dev
+      run: sudo apt-get update && sudo apt-get install libflint-dev libflint-arb-dev
     
     # BUILD
     - name: Create Build Environment
@@ -76,12 +76,12 @@ jobs:
       shell: bash
       run: cmake --install .
 
-    # TESTS
-    - name: Test installed executable
-      working-directory: ${{runner.workspace}}/graphene/bin
-      shell: bash
-      # Execute the executable from the /bin/ directory.
-      run: ./graphene config.cfg
+    # # TESTS
+    # - name: Test installed executable
+    #   working-directory: ${{runner.workspace}}/graphene/bin
+    #   shell: bash
+    #   # Execute the executable from the /bin/ directory.
+    #   run: ./graphene config.cfg
 
     - name: Unit tests
       working-directory: ${{runner.workspace}}/build
