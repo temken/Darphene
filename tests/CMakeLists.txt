@@ -1,6 +1,6 @@
-# 0. Test executable
-add_test(NAME test_Exectuable COMMAND graphene config.cfg
-	WORKING_DIRECTORY ${BIN_DIR})
+# # 0. Test executable
+# add_test(NAME test_Exectuable COMMAND graphene config.cfg
+# WORKING_DIRECTORY ${BIN_DIR})
 
 # 1. Test all modules
 file(GLOB TESTFILES "*.cpp")
