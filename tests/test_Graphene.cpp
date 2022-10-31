@@ -103,7 +103,7 @@ TEST(TestGraphene, TestBZ)
 	double tol	= 1e-10;
 	//
 	// ACT & ASSERT
-	for(int i = 0; i < 10000; i++)
+	for(int i = 0; i < 100; i++)
 	{
 		Eigen::Vector3d k = {libphysica::Sample_Uniform(PRNG, -kMax, kMax), libphysica::Sample_Uniform(PRNG, -kMax, kMax), 0.0};
 		Eigen::Vector3d G = graphene.Find_G_Vector(k);
