@@ -34,6 +34,9 @@ class Graphene
 
 	Carbon_Wavefunctions* carbon_wavefunctions = {nullptr};
 
+	std::vector<double> normalization_corrections;
+	void Compute_Normalization_Corrections();
+
   public:
 	// Graphene lattice geometry
 	double aCC, a, b, work_function, N_cell;

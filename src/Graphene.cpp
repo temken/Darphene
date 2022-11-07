@@ -2,9 +2,11 @@
 
 #include <algorithm>
 
+#include "libphysica/Integration.hpp"
 #include "libphysica/Utilities.hpp"
 
 #include "graphene/Carbon_Wavefunctions.hpp"
+#include "graphene/Direct_Detection_Standard.hpp"
 
 namespace graphene
 {
@@ -101,6 +103,21 @@ Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> Graphene::EigenSoluti
 	return Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd>(H, S, compute_eigenvectors);
 }
 
+void Graphene::Compute_Normalization_Corrections()
+{
+	normalization_corrections = {1.0, 1.0, 1.0, 1.0};
+	double kMax				  = 50.0 * keV;
+	for(int band = 0; band < 4; band++)
+	{
+		std::function<double(double, double, double)> integrand = [this, band](double l, double cos_theta, double phi) {
+			Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+			return l * l * Material_Response_Function(band, lVec);
+		};
+		double norm						= libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre");
+		normalization_corrections[band] = 1.0 / norm;
+	}
+}
+
 Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 {
 	aCC			  = 1.42 * Angstrom;
@@ -154,6 +171,10 @@ Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 		std::cerr << "Error in Graphene::Graphene(): Unknown wavefunction type " << wavefunctions << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+
+	// Normalization correction
+	normalization_corrections = {1.0, 1.0, 1.0, 1.0};
+	Compute_Normalization_Corrections();
 }
 
 std::vector<double> Graphene::Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const
@@ -255,9 +276,9 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 		std::complex<double> phi_2pz = carbon_wavefunctions->Wavefunction_Momentum(lVec, "2pz");
 		double norm					 = 1.0;
 		for(int i = 0; i < 3; i++)
-			norm += s * cos(phi_l + nearest_neighbors[i].dot(kVec));
+			norm += s * cos(phi_l + nearest_neighbors[i].dot(kVec));   // + sPrime * cos(kVec.dot(lattice_vectors[i]));
 		double N_l_sq = 1.0 / norm;
-		return std::pow(2.0 * M_PI, -3) * N_l_sq * std::norm(phi_2pz) * (1.0 + cos(phi_l - nearest_neighbors[0].dot(G)));
+		return normalization_corrections[band] * std::pow(2.0 * M_PI, -3) * N_l_sq * std::norm(phi_2pz) * (1.0 + cos(phi_l - nearest_neighbors[0].dot(G)));
 	}
 	else
 	{
@@ -274,7 +295,7 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 		double N_l				 = 1.0;	  // GeneralizedSelfAdjointEigenSolver sets the eigenvectors such that C^* S C = 1
 		std::complex<double> aux = std::exp(-1i * nearest_neighbors[0].dot(G));
 		psi						 = N_l * ((C1 + C4 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2s") + (C2 + C5 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2px") + (C3 + C6 * aux) * carbon_wavefunctions->Wavefunction_Momentum(lVec, "2py"));
-		return std::pow(2.0 * M_PI, -3) * std::norm(psi);
+		return normalization_corrections[band] * std::pow(2.0 * M_PI, -3) * std::norm(psi);
 	}
 }
 
