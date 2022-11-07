@@ -30,7 +30,7 @@ class Configuration : public obscura::Configuration
 	DM_Particle_NREFT* DM_NREFT;
 	double graphene_work_function, time;
 	std::string run_modus, carbon_wavefunctions;
-	unsigned int MC_points, grid_points, threads;
+	unsigned int MC_points, grid_points;
 
 	explicit Configuration(std::string cfg_filename, int MPI_rank = 0);
 

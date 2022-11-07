@@ -24,11 +24,6 @@ jobs:
     - name: Install lcov
       run: sudo apt-get install lcov
     
-    # OPENMP
-    - name: Install openmp
-      shell: bash
-      run: sudo apt-get update && sudo apt-get install -yq libomp-dev   
-    
     # CODECOV
     - name: Install codecov
       shell: bash

@@ -28,7 +28,6 @@ target_compile_options(graphene_library PUBLIC -Wall -pedantic)
 
 target_link_libraries(graphene_library
 	PRIVATE
-	OpenMP::OpenMP_CXX
 	${Boost_LIBRARIES}
 	"${ARB}"
 	PUBLIC

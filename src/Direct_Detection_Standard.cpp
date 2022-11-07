@@ -391,14 +391,13 @@ double dR_dcos_dphi_Standard(double cos_theta, double phi, obscura::DM_Particle&
 }
 
 // 3. Tabulation functions
-std::vector<std::vector<double>> Tabulate_dR_dlnE_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points, int threads)
+std::vector<std::vector<double>> Tabulate_dR_dlnE_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
 {
 	double E_min			   = 0.1 * eV;
 	double v_max			   = DM_distr.Maximum_DM_Speed();
 	double E_max			   = 0.99 * DM.mass / 2.0 * v_max * v_max;
 	std::vector<double> E_kist = libphysica::Log_Space(E_min, E_max, points);
 	std::vector<std::vector<double>> spectrum;
-#pragma omp parallel for schedule(dynamic) num_threads(threads)
 	for(auto& E_er : E_kist)
 	{
 		std::vector<double> row = {E_er};
@@ -415,13 +414,12 @@ std::vector<std::vector<double>> Tabulate_dR_dlnE_Standard(int points, obscura::
 	return spectrum;
 }
 
-std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points, int threads)
+std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	auto cos_k_list = libphysica::Linear_Space(-1.0, 1.0, points);
 	auto phi_k_list = libphysica::Linear_Space(0.0, 2.0 * M_PI, points);
 
 	std::vector<std::vector<double>> spectrum;
-#pragma omp parallel for schedule(dynamic) num_threads(threads) collapse(2)
 	for(auto& cos_theta : cos_k_list)
 		for(auto& phi : phi_k_list)
 			spectrum.push_back({cos_theta, phi, dR_dcos_dphi_Standard(cos_theta, phi, DM, DM_distr, graphene, MC_points)});
@@ -429,13 +427,12 @@ std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int points, obsc
 	return spectrum;
 }
 
-std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points, int threads)
+std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	// Total rate over the course of a day
 	std::vector<double> t_list = libphysica::Linear_Space(0.0, 24.0, points);
 	std::vector<std::vector<double>> daily_modulation_list;
 	double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Get_Observer_Velocity().Norm();
-#pragma omp parallel for schedule(dynamic) num_threads(threads)
 	for(auto& t : t_list)
 	{
 		dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
