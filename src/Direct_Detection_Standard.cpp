@@ -1,6 +1,6 @@
 #include "graphene/Direct_Detection_Standard.hpp"
 
-#include <omp.h>
+#include <mpi.h>
 
 #include "libphysica/Integration.hpp"
 #include "libphysica/Natural_Units.hpp"

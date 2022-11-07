@@ -29,6 +29,10 @@ jobs:
       shell: bash
       run: sudo pip install codecov
       
+    # MPI
+    - name: Install MPI
+      run: sudo apt-get install openmpi-bin libopenmpi-dev
+
     # EIGEN
     - name: Install eigen
       shell: bash

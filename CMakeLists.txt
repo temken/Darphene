@@ -20,7 +20,11 @@ set(TESTS_DIR ${PROJECT_SOURCE_DIR}/tests)
 set(EXTERNAL_DIR ${PROJECT_SOURCE_DIR}/external)
 
 # External projects
+find_package(MPI REQUIRED)
+include_directories(${MPI_INCLUDE_PATH})
+
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
 find_package(Boost 1.65 REQUIRED)
 
 find_library(ARB

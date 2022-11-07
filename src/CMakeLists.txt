@@ -31,6 +31,7 @@ target_link_libraries(graphene_library
 	${Boost_LIBRARIES}
 	"${ARB}"
 	PUBLIC
+	${MPI_CXX_LIBRARIES}
 	Eigen3::Eigen
 	coverage_config
 	libobscura
