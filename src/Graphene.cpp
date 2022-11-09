@@ -258,7 +258,7 @@ Eigen::Vector3d Graphene::Find_G_Vector(const Eigen::Vector3d& kVec)
 					}
 			}
 	}
-	std::cerr << "Error in Graphene::Find_G_Vector(): No G vector found for k = (" << kVec.transpose() / b << ") b" << In_1BZ(kVec) << std::endl;
+	std::cerr << "Error in Graphene::Find_G_Vector(): No G vector found for k = (" << kVec.transpose() / b << ") b" << std::endl;
 	std::exit(EXIT_FAILURE);
 }
 

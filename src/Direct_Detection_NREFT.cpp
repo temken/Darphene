@@ -3,6 +3,7 @@
 #include <mpi.h>
 
 #include "libphysica/Integration.hpp"
+#include "libphysica/List_Manipulations.hpp"
 #include "libphysica/Natural_Units.hpp"
 #include "libphysica/Statistics.hpp"
 #include "libphysica/Utilities.hpp"
@@ -308,19 +309,44 @@ std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Part
 
 std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
+	// MPI
+	int mpi_processes, mpi_rank;
+	MPI_Comm_size(MPI_COMM_WORLD, &mpi_processes);
+	MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
+	// Save original observer velocity
+	libphysica::Vector observer_velocity = dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Get_Observer_Velocity();
+	double vEarth						 = observer_velocity.Norm();
+
 	// Total rate over the course of a day
 	std::vector<double> t_list = libphysica::Linear_Space(0.0, 24.0, points);
-	std::vector<std::vector<double>> daily_modulation_list;
-	double vEarth = dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Get_Observer_Velocity().Norm();
-	int counter	  = 0;
-	for(auto& t : t_list)
+	std::vector<double> local_rates;
+	std::vector<int> index_list = libphysica::Workload_Distribution(mpi_processes, points);
+	int counter					= 0;
+	for(int i = index_list[mpi_rank]; i < index_list[mpi_rank + 1]; i++)
 	{
-		libphysica::Print_Progress_Bar(1.0 * counter++ / points);
+		// Set observer velocity at given time t.
+		double t = t_list[i];
 		dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
+
 		double R = R_Total_NREFT(DM, DM_distr, graphene, MC_points);
-		daily_modulation_list.push_back({t, R});
+		local_rates.push_back(R);
+		libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1], mpi_rank);
 	}
-	libphysica::Print_Progress_Bar(1.0);
+
+	// Gather all rates from the MPI processes.
+	std::vector<double> global_rates(points);
+	std::vector<int> recvcounts(mpi_processes);
+	for(int i = 0; i < mpi_processes; i++)
+		recvcounts[i] = index_list[i + 1] - index_list[i];
+	std::vector<int> displs(mpi_processes);
+	for(int i = 0; i < mpi_processes; i++)
+		displs[i] = index_list[i];
+	MPI_Allgatherv(local_rates.data(), local_rates.size(), MPI_DOUBLE, global_rates.data(), recvcounts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
+
+	std::vector<std::vector<double>> daily_modulation_list = libphysica::Transpose_Lists(t_list, global_rates);
+
+	libphysica::Print_Progress_Bar(1.0, mpi_rank);
 	return daily_modulation_list;
 }
 

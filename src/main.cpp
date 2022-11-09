@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstring>	 // for strlen
 #include <iostream>
+#include <mpi.h>
 #include <random>
 
 #include "libphysica/Integration.hpp"
@@ -26,57 +27,84 @@ using namespace graphene;
 
 int main(int argc, char* argv[])
 {
+	// MPI initialization
+	MPI_Init(NULL, NULL);
+	int mpi_processes, mpi_rank;
+	MPI_Comm_size(MPI_COMM_WORLD, &mpi_processes);
+	MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
 	// Initial terminal output
 	auto time_start	  = std::chrono::system_clock::now();
 	auto time_start_t = std::chrono::system_clock::to_time_t(time_start);
 	auto* ctime_start = ctime(&time_start_t);
 	if(ctime_start[std::strlen(ctime_start) - 1] == '\n')
 		ctime_start[std::strlen(ctime_start) - 1] = '\0';
-	std::cout << "[Started on " << ctime_start << "]" << std::endl;
-	std::cout << PROJECT_NAME << "-" << PROJECT_VERSION << "\tgit:" << GIT_BRANCH << "/" << GIT_COMMIT_HASH << std::endl
-			  << std::endl;
+	if(mpi_rank == 0)
+	{
+		std::cout << "[Started on " << ctime_start << "]" << std::endl;
+		std::cout << PROJECT_NAME << "-" << PROJECT_VERSION << "\tgit:" << GIT_BRANCH << "/" << GIT_COMMIT_HASH << std::endl
+				  << std::endl
+				  << "MPI processes:\t" << mpi_processes << std::endl;
+	}
 	////////////////////////////////////////////////////////////////////////
 
 	Configuration cfg(argv[1]);
 	Graphene graphene(cfg.carbon_wavefunctions, cfg.graphene_work_function);
-	cfg.Print_Summary();
+	cfg.Print_Summary(mpi_rank);
 	std::string results_path = TOP_LEVEL_DIR "results/" + cfg.ID + "/";
 	double rate_unit		 = 1.0 / gram / year;
 
+	MPI_Barrier(MPI_COMM_WORLD);
 	if(cfg.run_modus == "Energy-Spectrum" || cfg.run_modus == "All")
 	{
-		std::cout << "\nTabulate dR/dlnE:" << std::endl;
-		auto spectrum_nreft	  = Tabulate_dR_dlnE_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
-		std::string file_path = results_path + "dR_dlnE.txt";
-		libphysica::Export_Table(file_path, spectrum_nreft, {eV, rate_unit, rate_unit, rate_unit, rate_unit, rate_unit});
-		std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
+		if(mpi_rank == 0)
+			std::cout << "\nTabulate dR/dlnE:" << std::endl;
+		auto spectrum_nreft = Tabulate_dR_dlnE_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
+		if(mpi_rank == 0)
+		{
+			std::string file_path = results_path + "dR_dlnE.txt";
+			libphysica::Export_Table(file_path, spectrum_nreft, {eV, rate_unit, rate_unit, rate_unit, rate_unit, rate_unit});
+			std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
+		}
 	}
 	if(cfg.run_modus == "Total-Rate" || cfg.run_modus == "All")
 	{
-		std::cout << "\nCompute total rate R:" << std::endl;
-		double R			  = R_Total_NREFT(*cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
-		std::string file_path = results_path + "Total_Rate.txt";
-		std::ofstream f(file_path);
-		f << "R = " << In_Units(R, rate_unit) << " /gr / year" << std::endl;
-		std::cout << "R = " << In_Units(R, rate_unit) << " / gr / year" << std::endl;
-		f.close();
-		std::cout << "\nDone. Total rate saved to " << file_path << "." << std::endl;
+		if(mpi_rank == 0)
+			std::cout << "\nCompute total rate R:" << std::endl;
+		double R = R_Total_NREFT(*cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
+		if(mpi_rank == 0)
+		{
+			std::string file_path = results_path + "Total_Rate.txt";
+			std::ofstream f(file_path);
+			f << "R = " << In_Units(R, rate_unit) << " /gr / year" << std::endl;
+			std::cout << "R = " << In_Units(R, rate_unit) << " / gr / year" << std::endl;
+			f.close();
+			std::cout << "\nDone. Total rate saved to " << file_path << "." << std::endl;
+		}
 	}
 	if(cfg.run_modus == "Directional-Spectrum" || cfg.run_modus == "All")
 	{
-		std::cout << "\nTabulate dR/(dcos dphi):" << std::endl;
-		auto spectrum_nreft	  = Tabulate_dR_dcos_dphi_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
-		std::string file_path = results_path + "dR_dcos_dphi.txt";
-		libphysica::Export_Table(file_path, spectrum_nreft, {1.0, 1.0, rate_unit});
-		std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
+		if(mpi_rank == 0)
+			std::cout << "\nTabulate dR/(dcos dphi):" << std::endl;
+		auto spectrum_nreft = Tabulate_dR_dcos_dphi_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
+		if(mpi_rank == 0)
+		{
+			std::string file_path = results_path + "dR_dcos_dphi.txt";
+			libphysica::Export_Table(file_path, spectrum_nreft, {1.0, 1.0, rate_unit});
+			std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
+		}
 	}
 	if(cfg.run_modus == "Daily-Modulation" || cfg.run_modus == "All")
 	{
-		std::cout << "\nCalculate daily modulation:" << std::endl;
-		auto daily_nreft	  = Daily_Modulation_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
-		std::string file_path = results_path + "Daily_Modulation.txt";
-		libphysica::Export_Table(file_path, daily_nreft, {1.0, rate_unit});
-		std::cout << "\nDone. Table saved to " << file_path << "." << std::endl;
+		if(mpi_rank == 0)
+			std::cout << "\nCalculate daily modulation:" << std::endl;
+		auto daily_nreft = Daily_Modulation_NREFT(cfg.grid_points, *cfg.DM_NREFT, *cfg.DM_distr, graphene, cfg.MC_points);
+		if(mpi_rank == 0)
+		{
+			std::string file_path = results_path + "Daily_Modulation.txt";
+			libphysica::Export_Table(file_path, daily_nreft, {1.0, rate_unit}, "# t[h]\tR[1/gr/year]");
+			std::cout << "\nDone. Table saved to " << file_path << "." << std::endl;
+		}
 	}
 	else if(cfg.run_modus == "Custom")
 	{
@@ -146,86 +174,90 @@ int main(int argc, char* argv[])
 		// 	}
 		// }
 
-		// Tabulate the response function
-		auto l_list = libphysica::Linear_Space(0.01 * keV, 25 * keV, 100);
-		std::vector<std::vector<double>> response_function;
+		// // Tabulate the response function
+		// auto l_list = libphysica::Linear_Space(0.01 * keV, 25 * keV, 100);
+		// std::vector<std::vector<double>> response_function;
 
-		// 1. lPerpendicular
-		for(auto& l : l_list)
-		{
-			std::cout << "l = " << l / keV << " keV" << std::endl;
-			std::vector<double> row = {l};
-			Eigen::Vector3d lVec({0, 0, l});
-			double W = 0.0;
-			for(int band = 0; band < 4; band++)
-			{
+		// // 1. lPerpendicular
+		// for(auto& l : l_list)
+		// {
+		// 	std::cout << "l = " << l / keV << " keV" << std::endl;
+		// 	std::vector<double> row = {l};
+		// 	Eigen::Vector3d lVec({0, 0, l});
+		// 	double W = 0.0;
+		// 	for(int band = 0; band < 4; band++)
+		// 	{
 
-				double w_band = graphene.Material_Response_Function(band, lVec);
-				W += w_band;
-				row.push_back(w_band);
-			}
-			row.push_back(W);
-			response_function.push_back(row);
-		}
-		libphysica::Export_Table(results_path + "Response_Function_lPerp_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
-		// 2. lParallel (average)
-		response_function.clear();
-		for(auto& l : l_list)
-		{
-			std::cout << "l = " << l / keV << " keV" << std::endl;
-			std::vector<double> row = {l};
-			double W				= 0.0;
-			for(int band = 0; band < 4; band++)
-			{
-				std::function<double(double)> integrand = [&graphene, l, band](double phi) {
-					Eigen::Vector3d lVec = Spherical_Coordinates(l, M_PI / 2.0, phi);
-					return graphene.Material_Response_Function(band, lVec);
-				};
-				double W_band = 1.0 / 2.0 / M_PI * libphysica::Integrate(integrand, 0.0, 2 * M_PI, "Gauss-Kronrod");
-				W += W_band;
-				row.push_back(W_band);
-			}
-			row.push_back(W);
-			response_function.push_back(row);
-		}
-		libphysica::Export_Table(results_path + "Response_Function_lParallel_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		// 		double w_band = graphene.Material_Response_Function(band, lVec);
+		// 		W += w_band;
+		// 		row.push_back(w_band);
+		// 	}
+		// 	row.push_back(W);
+		// 	response_function.push_back(row);
+		// }
+		// libphysica::Export_Table(results_path + "Response_Function_lPerp_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		// // 2. lParallel (average)
+		// response_function.clear();
+		// for(auto& l : l_list)
+		// {
+		// 	std::cout << "l = " << l / keV << " keV" << std::endl;
+		// 	std::vector<double> row = {l};
+		// 	double W				= 0.0;
+		// 	for(int band = 0; band < 4; band++)
+		// 	{
+		// 		std::function<double(double)> integrand = [&graphene, l, band](double phi) {
+		// 			Eigen::Vector3d lVec = Spherical_Coordinates(l, M_PI / 2.0, phi);
+		// 			return graphene.Material_Response_Function(band, lVec);
+		// 		};
+		// 		double W_band = 1.0 / 2.0 / M_PI * libphysica::Integrate(integrand, 0.0, 2 * M_PI, "Gauss-Kronrod");
+		// 		W += W_band;
+		// 		row.push_back(W_band);
+		// 	}
+		// 	row.push_back(W);
+		// 	response_function.push_back(row);
+		// }
+		// libphysica::Export_Table(results_path + "Response_Function_lParallel_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
 
-		// 2. lNorm
-		std::ofstream f;
-		f.open(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt");
-		response_function.clear();
-		for(auto& l : l_list)
-		{
-			std::cout << "l = " << l / keV << " keV" << std::endl;
-			std::vector<double> row = {l};
-			double W				= 0.0;
-			for(int band = 0; band < 4; band++)
-			{
-				std::function<double(double, double)> integrand = [&graphene, l, band](double cos_theta, double phi) {
-					Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-					return graphene.Material_Response_Function(band, lVec);
-				};
-				double W_band = l * l * libphysica::Integrate_2D(integrand, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre", 250);
-				W += W_band;
-				row.push_back(W_band);
-			}
-			row.push_back(W);
-			f << row[0] / keV << "\t" << row[1] * eV << "\t" << row[2] * eV << "\t" << row[3] * eV << "\t" << row[4] * eV << "\t" << row[5] * eV << std::endl;
-			response_function.push_back(row);
-		}
-		f.close();
+		// // 2. lNorm
+		// std::ofstream f;
+		// f.open(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt");
+		// response_function.clear();
+		// for(auto& l : l_list)
+		// {
+		// 	std::cout << "l = " << l / keV << " keV" << std::endl;
+		// 	std::vector<double> row = {l};
+		// 	double W				= 0.0;
+		// 	for(int band = 0; band < 4; band++)
+		// 	{
+		// 		std::function<double(double, double)> integrand = [&graphene, l, band](double cos_theta, double phi) {
+		// 			Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+		// 			return graphene.Material_Response_Function(band, lVec);
+		// 		};
+		// 		double W_band = l * l * libphysica::Integrate_2D(integrand, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre", 250);
+		// 		W += W_band;
+		// 		row.push_back(W_band);
+		// 	}
+		// 	row.push_back(W);
+		// 	f << row[0] / keV << "\t" << row[1] * eV << "\t" << row[2] * eV << "\t" << row[3] * eV << "\t" << row[4] * eV << "\t" << row[5] * eV << std::endl;
+		// 	response_function.push_back(row);
+		// }
+		// f.close();
 
-		std::vector<std::vector<double>> interpolation_list;
-		for(auto& row : response_function)
-			interpolation_list.push_back({row[0], row[5]});
-		libphysica::Interpolation W(interpolation_list);
-		std::cout << "Integral = " << W.Integrate(l_list[0], l_list[l_list.size() - 1]) << std::endl;
-		// libphysica::Export_Table(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV}, "#l [keV]\tW_pi [eV^-1]\tW_sigma1 [eV^-1]\tW_sigma2 [eV^-1]\tW_sigma3 [eV^-1]\tW_tot [eV^-1]");
+		// std::vector<std::vector<double>> interpolation_list;
+		// for(auto& row : response_function)
+		// 	interpolation_list.push_back({row[0], row[5]});
+		// libphysica::Interpolation W(interpolation_list);
+		// std::cout << "Integral = " << W.Integrate(l_list[0], l_list[l_list.size() - 1]) << std::endl;
+		// // libphysica::Export_Table(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV}, "#l [keV]\tW_pi [eV^-1]\tW_sigma1 [eV^-1]\tW_sigma2 [eV^-1]\tW_sigma3 [eV^-1]\tW_tot [eV^-1]");
 	}
+
 	////////////////////////////////////////////////////////////////////////
 	// Final terminal output
+	MPI_Barrier(MPI_COMM_WORLD);
 	auto time_end		 = std::chrono::system_clock::now();
 	double durationTotal = 1e-6 * std::chrono::duration_cast<std::chrono::microseconds>(time_end - time_start).count();
-	std::cout << "\n[Finished in " << libphysica::Time_Display(durationTotal) << "]\a" << std::endl;
+	if(mpi_rank == 0)
+		std::cout << "\n[Finished in " << libphysica::Time_Display(durationTotal) << "]\a" << std::endl;
+	MPI_Finalize();
 	return 0;
 }

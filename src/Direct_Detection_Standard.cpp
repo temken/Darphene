@@ -17,7 +17,10 @@ using namespace libphysica::natural_units;
 // 0. Auxiliary functions
 Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi)
 {
-	return Eigen::Vector3d(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta));
+	if(r == 0)
+		return Eigen::Vector3d(0, 0, 0);
+	else
+		return Eigen::Vector3d(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta));
 }
 
 libphysica::Vector Earth_Velocity(double t, double v_earth)
