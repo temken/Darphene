@@ -339,9 +339,8 @@ std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_
 	std::vector<int> recvcounts(mpi_processes);
 	for(int i = 0; i < mpi_processes; i++)
 		recvcounts[i] = index_list[i + 1] - index_list[i];
-	std::vector<int> displs(mpi_processes);
-	for(int i = 0; i < mpi_processes; i++)
-		displs[i] = index_list[i];
+	std::vector<int> displs = libphysica::Sub_List(index_list, 0, mpi_processes);
+
 	MPI_Allgatherv(local_rates.data(), local_rates.size(), MPI_DOUBLE, global_rates.data(), recvcounts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
 
 	std::vector<std::vector<double>> daily_modulation_list = libphysica::Transpose_Lists(t_list, global_rates);

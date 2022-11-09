@@ -177,6 +177,30 @@ Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 	Compute_Normalization_Corrections();
 }
 
+double Graphene::Overlap_Integral(const std::string& parameter)
+{
+	std::function<double(libphysica::Vector)> integrand = [this, parameter](libphysica::Vector xVec) {
+		Eigen::Vector3d xVec_eigen({xVec[0], xVec[1], xVec[2]});
+		if(parameter == "s" || parameter == "Spi")
+			return carbon_wavefunctions->Wavefunction_Position(xVec_eigen, "2pz") * carbon_wavefunctions->Wavefunction_Position(xVec_eigen - nearest_neighbors[0], "2pz");
+		else if(parameter == "sPrime")
+			return carbon_wavefunctions->Wavefunction_Position(xVec_eigen, "2pz") * carbon_wavefunctions->Wavefunction_Position(xVec_eigen - lattice_vectors[0], "2pz");
+		else if(parameter == "Sss")
+			return carbon_wavefunctions->Wavefunction_Position(xVec_eigen, "2s") * carbon_wavefunctions->Wavefunction_Position(xVec_eigen - nearest_neighbors[0], "2s");
+		else if(parameter == "Ssigma")
+			return -carbon_wavefunctions->Wavefunction_Position(xVec_eigen, "2px") * carbon_wavefunctions->Wavefunction_Position(xVec_eigen - nearest_neighbors[0], "2px");
+		else if(parameter == "Ssp")
+			return carbon_wavefunctions->Wavefunction_Position(xVec_eigen, "2s") * carbon_wavefunctions->Wavefunction_Position(xVec_eigen - nearest_neighbors[0], "2px");
+		else
+		{
+			std::cerr << "Error in Graphene::Wavefunction_Overlap(): Unknown parameter " << parameter << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+	};
+	double rMax = 100.0 * Bohr_Radius;
+	return libphysica::Integrate_3D(integrand, 0, rMax, -1.0, 1.0, 0.0, 2.0 * M_PI, "Gauss-Kronrod");
+}
+
 std::vector<double> Graphene::Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const
 {
 	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> ges = EigenSolution_Pi(kVec, false);

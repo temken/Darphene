@@ -45,6 +45,8 @@ class Graphene
 
 	Graphene(const std::string& wavefunctions, double workfunction = 4.3 * libphysica::natural_units::eV);
 
+	double Overlap_Integral(const std::string& parameter);
+
 	std::vector<double> Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const;
 	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& kVec) const;
 	std::vector<double> Energy_Dispersion_Sigma(const Eigen::Vector3d& kVec) const;
