@@ -13,6 +13,30 @@
 using namespace graphene;
 using namespace libphysica::natural_units;
 
+TEST(TestGraphene, TestOverlapIntegralsHydrogenic)
+{
+	// ARRANGE
+	Graphene graphene("Hydrogenic");
+	std::vector<std::string> overlap_parameters = {"s", "sPrime", "Sss", "Ssigma", "Ssp"};
+	std::vector<double> results					= {0.129, 0.00866, 0.212, 0.146, 0.159931};
+	double tol									= 1.0e-3;
+	// ACT & ASSERT
+	for(unsigned int i = 0; i < overlap_parameters.size(); i++)
+		EXPECT_NEAR(graphene.Overlap_Integral(overlap_parameters[i]), results[i], tol);
+}
+
+// TEST(TestGraphene, TestOverlapIntegralsRHF)
+// {
+// 	// ARRANGE
+// 	Graphene graphene("RHF");
+// 	std::vector<std::string> overlap_parameters = {"s", "sPrime", "Sss", "Ssigma", "Ssp"};
+// 	std::vector<double> results					= {0.129, 0.00866, 0.212, 0.146, 0.159931};
+// 	double tol									= 1.0e-3;
+// 	// ACT & ASSERT
+// 	for(unsigned int i = 0; i < overlap_parameters.size(); i++)
+// 		EXPECT_NEAR(graphene.Overlap_Integral(overlap_parameters[i]), results[i], tol);
+// }
+
 TEST(TestGraphene, TestEnergyDispersionPi)
 {
 	// ARRANGE
