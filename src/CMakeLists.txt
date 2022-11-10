@@ -1,60 +1,47 @@
 # OPTION A: Build an executable and a static library
-	# Executable
-	add_executable(executable
-		main.cpp)
+# Executable
+add_executable(graphene
+	main.cpp)
 
-	target_compile_options(executable PUBLIC -Wall -pedantic)
+target_compile_options(graphene PUBLIC -Wall -pedantic)
 
-	target_link_libraries(executable
-		PUBLIC
-			coverage_config
-			module_library)
+target_link_libraries(graphene
+	PUBLIC
+	coverage_config
+	graphene_library)
 
-	target_include_directories(executable
-		PRIVATE
-			${GENERATED_DIR} )
+target_include_directories(graphene
+	PRIVATE
+	${GENERATED_DIR})
 
-	install(TARGETS executable DESTINATION ${BIN_DIR})
+install(TARGETS graphene DESTINATION ${BIN_DIR})
 
-	# Static library
-	add_library(module_library STATIC
-	    module.cpp)
+# Static library
+file(GLOB FILES "*.cpp")
+list(REMOVE_ITEM FILES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+add_library(graphene_library STATIC
+	${FILES})
 
-	set_target_properties(module_library PROPERTIES PREFIX "")
+set_target_properties(graphene_library PROPERTIES PREFIX "")
 
-	target_compile_options(module_library PUBLIC -Wall -pedantic)
+target_compile_options(graphene_library PUBLIC -Wall -pedantic)
 
-	target_link_libraries(module_library
-		PUBLIC
-			coverage_config
-			libobscura
-			libphysica)
+target_link_libraries(graphene_library
+	PRIVATE
+	${Boost_LIBRARIES}
+	"${ARB}"
+	PUBLIC
+	${MPI_CXX_LIBRARIES}
+	Eigen3::Eigen
+	coverage_config
+	libobscura
+	libphysica)
 
-	target_include_directories(module_library
-		PRIVATE
-			${GENERATED_DIR}
-		PUBLIC
-			${CMAKE_CURRENT_SOURCE_DIR}
-			${INCLUDE_DIR})
+target_include_directories(graphene_library
+	PRIVATE
+	${GENERATED_DIR}
+	PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${INCLUDE_DIR})
 
-	install(TARGETS module_library DESTINATION ${LIB_DIR})
-
-#####################################################################
-# # OPTION B: Build only an executable.
-# 	# Executable
-# 	add_executable(executable
-# 		main.cpp
-# 		module.cpp)
-
-# 	target_compile_options(executable PUBLIC -Wall -pedantic)
-
-# 	target_link_libraries(executable
-# 		PUBLIC
-# 			coverage_config
-# 			libobscura)
-
-# 	target_include_directories(executable
-# 		PRIVATE
-# 			${GENERATED_DIR} )
-
-# 	install(TARGETS executable DESTINATION ${BIN_DIR})
+install(TARGETS graphene_library DESTINATION ${LIB_DIR})

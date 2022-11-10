@@ -1,41 +1,28 @@
-# Option A: If a static library is built. (see src/CMakeLists.txt)
-add_executable(tests
-	test_module.cpp)
+# # 0. Test executable
+# add_test(NAME test_Exectuable COMMAND graphene config.cfg
+# WORKING_DIRECTORY ${BIN_DIR})
 
-target_link_libraries(tests 
-	PRIVATE
-		module_library
-		gtest_main ) #contains the main function
+# 1. Test all modules
+file(GLOB TESTFILES "*.cpp")
 
-target_include_directories(tests
-	PRIVATE
-		${GENERATED_DIR} )
+foreach(TESTFILE ${TESTFILES})
+	get_filename_component(TESTNAME ${TESTFILE} NAME_WLE)
+	get_filename_component(FILENAME ${TESTFILE} NAME)
 
-target_compile_options(tests PUBLIC -Wall -pedantic)
+	add_executable(${TESTNAME} ${FILENAME})
 
-install(TARGETS tests DESTINATION ${TESTS_DIR})
+	target_link_libraries(${TESTNAME}
+		PRIVATE
+		graphene_library
+		gtest_main # contains the main function
+	)
 
-add_test(NAME all_tests COMMAND tests
-	WORKING_DIRECTORY ${TESTS_DIR} )
+	target_include_directories(${TESTNAME} PRIVATE ${GENERATED_DIR})
 
-#####################################################################
-# # Option B: If no static library is built.(see src/CMakeLists.txt)
-# add_executable(tests
-# 	test_module.cpp
-# 	${SRC_DIR}/module.cpp)
+	target_compile_options(${TESTNAME} PUBLIC -Wall -pedantic)
 
-# target_link_libraries(tests
-# 	PUBLIC
-# 		coverage_config 
-# 	PRIVATE
-# 		gtest_main	#contains the main function
-# 		libobscura )
+	install(TARGETS ${TESTNAME} DESTINATION ${TESTS_DIR})
 
-# target_include_directories(tests PRIVATE ${GENERATED_DIR} )
-
-# target_compile_options(tests PUBLIC -Wall -pedantic)
-
-# install(TARGETS tests DESTINATION ${TESTS_DIR})
-
-# add_test(NAME all_tests COMMAND tests
-# 	WORKING_DIRECTORY ${TESTS_DIR})
+	add_test(NAME ${TESTNAME} COMMAND ${TESTNAME}
+		WORKING_DIRECTORY ${TESTS_DIR})
+endforeach()

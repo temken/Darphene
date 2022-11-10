@@ -2,11 +2,13 @@
 /lib/
 /build/
 /external/
+/results/
 
 *.DS_Store
 
 *.DS_Store
 .depend
+*.nb
 
 # Ignore test executable
 /tests/tests
