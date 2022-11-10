@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 		if(mpi_rank == 0)
 		{
 			std::string file_path = results_path + "dR_dcos_dphi.txt";
-			libphysica::Export_Table(file_path, spectrum_nreft, {1.0, 1.0, rate_unit});
+			libphysica::Export_Table(file_path, spectrum_nreft, {1.0, 1.0, rate_unit}, "# cos_theta\tphi [rad]\tdR/(dcos dphi) [1/yr/gr]");
 			std::cout << "\nDone. Tabulated spectrum saved to " << file_path << "." << std::endl;
 		}
 	}
@@ -108,6 +108,9 @@ int main(int argc, char* argv[])
 	}
 	else if(cfg.run_modus == "Custom")
 	{
+		// for(auto overlap : {"s", "sPrime", "Sss", "Ssigma", "Ssp"})
+		// 	std::cout << overlap << "\t" << graphene.Overlap_Integral(overlap) << std::endl;
+
 		// // 1. DM model and mass
 		// // std::vector<double> DM_masses = libphysica::Log_Space(mMin, 100.0 * MeV, 10);
 		// std::vector<int> DM_masses = {2, 5, 10, 20, 50, 100};
@@ -118,7 +121,8 @@ int main(int argc, char* argv[])
 		// 	for(auto& inter : interactions)
 		// 		for(auto& mDM : DM_masses)
 		// 		{
-		// 			std::cout << "Operator " << op << "\tInteraction " << inter << "\tDM mass = " << mDM << " MeV" << std::endl;
+		// 			if(mpi_rank == 0)
+		// 				std::cout << "Operator " << op << "\tInteraction " << inter << "\tDM mass = " << mDM << " MeV" << std::endl;
 		// 			DM_Particle_NREFT DM(mDM * MeV);
 		// 			if(inter == "C")
 		// 				DM.Set_Coupling(op, 1.0, "Contact");
@@ -129,7 +133,8 @@ int main(int argc, char* argv[])
 		// 			if(libphysica::File_Exists(file_path) == false)
 		// 			{
 		// 				std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
-		// 				libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 				if(mpi_rank == 0)
+		// 					libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
 		// 			}
 		// 		}
 
@@ -142,13 +147,15 @@ int main(int argc, char* argv[])
 		// 	if(libphysica::File_Exists(file_path) == false)
 		// 	{
 		// 		std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
-		// 		libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 		if(mpi_rank == 0)
+		// 			libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
 		// 	}
 		// }
 
 		// for(auto& mDM : DM_masses)
 		// {
-		// 	std::cout << "Magnetic dipole with mDM = " << mDM << " MeV" << std::endl;
+		// 	if(mpi_rank == 0)
+		// 		std::cout << "Magnetic dipole with mDM = " << mDM << " MeV" << std::endl;
 		// 	DM_Particle_NREFT DM = DM_Magnetic_Dipole(mDM * MeV, 1.0);
 
 		// 	// 2. Compute the daily modulation
@@ -156,13 +163,15 @@ int main(int argc, char* argv[])
 		// 	if(libphysica::File_Exists(file_path) == false)
 		// 	{
 		// 		std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
-		// 		libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 		if(mpi_rank == 0)
+		// 			libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
 		// 	}
 		// }
 
 		// for(auto& mDM : DM_masses)
 		// {
-		// 	std::cout << "Anapole with mDM = " << mDM << " MeV" << std::endl;
+		// 	if(mpi_rank == 0)
+		// 		std::cout << "Anapole with mDM = " << mDM << " MeV" << std::endl;
 		// 	DM_Particle_NREFT DM = DM_Anapole(mDM * MeV, 1.0);
 
 		// 	// 2. Compute the daily modulation
@@ -170,7 +179,8 @@ int main(int argc, char* argv[])
 		// 	if(libphysica::File_Exists(file_path) == false)
 		// 	{
 		// 		std::vector<std::vector<double>> daily_modulation = Daily_Modulation_NREFT(25, DM, *cfg.DM_distr, graphene, cfg.MC_points);
-		// 		libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
+		// 		if(mpi_rank == 0)
+		// 			libphysica::Export_Table(file_path, daily_modulation, {1.0, 1.0 / gram / year}, "#Time [h]\tRate [1/gr/year]");
 		// 	}
 		// }
 
@@ -181,7 +191,8 @@ int main(int argc, char* argv[])
 		// // 1. lPerpendicular
 		// for(auto& l : l_list)
 		// {
-		// 	std::cout << "l = " << l / keV << " keV" << std::endl;
+		// 	if(mpi_rank == 0)
+		// 		std::cout << "l = " << l / keV << " keV" << std::endl;
 		// 	std::vector<double> row = {l};
 		// 	Eigen::Vector3d lVec({0, 0, l});
 		// 	double W = 0.0;
@@ -195,12 +206,15 @@ int main(int argc, char* argv[])
 		// 	row.push_back(W);
 		// 	response_function.push_back(row);
 		// }
-		// libphysica::Export_Table(results_path + "Response_Function_lPerp_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		// if(mpi_rank == 0)
+		// 	libphysica::Export_Table(results_path + "Response_Function_lPerp_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+
 		// // 2. lParallel (average)
 		// response_function.clear();
 		// for(auto& l : l_list)
 		// {
-		// 	std::cout << "l = " << l / keV << " keV" << std::endl;
+		// 	if(mpi_rank == 0)
+		// 		std::cout << "l = " << l / keV << " keV" << std::endl;
 		// 	std::vector<double> row = {l};
 		// 	double W				= 0.0;
 		// 	for(int band = 0; band < 4; band++)
@@ -216,15 +230,18 @@ int main(int argc, char* argv[])
 		// 	row.push_back(W);
 		// 	response_function.push_back(row);
 		// }
-		// libphysica::Export_Table(results_path + "Response_Function_lParallel_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
+		// if(mpi_rank == 0)
+		// 	libphysica::Export_Table(results_path + "Response_Function_lParallel_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV, 1.0 / eV / eV / eV}, "#l [keV]\tW_pi [eV^-3]\tW_sigma1 [eV^-3]\tW_sigma2 [eV^-3]\tW_sigma3 [eV^-3]\tW_tot [eV^-3]");
 
 		// // 2. lNorm
 		// std::ofstream f;
-		// f.open(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt");
+		// if(mpi_rank == 0)
+		// 	f.open(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt");
 		// response_function.clear();
 		// for(auto& l : l_list)
 		// {
-		// 	std::cout << "l = " << l / keV << " keV" << std::endl;
+		// 	if(mpi_rank == 0)
+		// 		std::cout << "l = " << l / keV << " keV" << std::endl;
 		// 	std::vector<double> row = {l};
 		// 	double W				= 0.0;
 		// 	for(int band = 0; band < 4; band++)
@@ -238,17 +255,37 @@ int main(int argc, char* argv[])
 		// 		row.push_back(W_band);
 		// 	}
 		// 	row.push_back(W);
-		// 	f << row[0] / keV << "\t" << row[1] * eV << "\t" << row[2] * eV << "\t" << row[3] * eV << "\t" << row[4] * eV << "\t" << row[5] * eV << std::endl;
+		// 	if(mpi_rank == 0)
+		// 		f << row[0] / keV << "\t" << row[1] * eV << "\t" << row[2] * eV << "\t" << row[3] * eV << "\t" << row[4] * eV << "\t" << row[5] * eV << std::endl;
 		// 	response_function.push_back(row);
 		// }
-		// f.close();
+		// if(mpi_rank == 0)
+		// 	f.close();
 
 		// std::vector<std::vector<double>> interpolation_list;
 		// for(auto& row : response_function)
 		// 	interpolation_list.push_back({row[0], row[5]});
 		// libphysica::Interpolation W(interpolation_list);
-		// std::cout << "Integral = " << W.Integrate(l_list[0], l_list[l_list.size() - 1]) << std::endl;
-		// // libphysica::Export_Table(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV}, "#l [keV]\tW_pi [eV^-1]\tW_sigma1 [eV^-1]\tW_sigma2 [eV^-1]\tW_sigma3 [eV^-1]\tW_tot [eV^-1]");
+		// if(mpi_rank == 0)
+		// 	std::cout << "Integral = " << W.Integrate(l_list[0], l_list[l_list.size() - 1]) << std::endl;
+		// if(mpi_rank == 0)
+		// 	libphysica::Export_Table(results_path + "Response_Function_lNorm_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV, 1.0 / eV}, "#l [keV]\tW_pi [eV^-1]\tW_sigma1 [eV^-1]\tW_sigma2 [eV^-1]\tW_sigma3 [eV^-1]\tW_tot [eV^-1]");
+
+		// Tabulate W as a function of lx and ly.
+		double lMax				   = graphene.b;
+		std::vector<double> l_list = libphysica::Linear_Space(-lMax, lMax, 400);
+		std::vector<std::vector<double>> response_function;
+		if(mpi_rank == 0)
+			std::cout << "Tabulating W(lx, ly)..." << std::endl;
+		for(auto& lx : l_list)
+			for(auto& ly : l_list)
+			{
+				Eigen::Vector3d lVec = {lx, ly, 0.0};
+				double W			 = graphene.Material_Response_Function(lVec);
+				response_function.push_back({lx, ly, W});
+			}
+		if(mpi_rank == 0)
+			libphysica::Export_Table(results_path + "Response_Function_lx_ly_" + cfg.carbon_wavefunctions + ".txt", response_function, {keV, keV, 1.0 / eV / eV / eV}, "#lx [keV]\tly [eV]\tW [eV^-3]");
 	}
 
 	////////////////////////////////////////////////////////////////////////
