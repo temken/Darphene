@@ -58,6 +58,7 @@ class Graphene
 	Eigen::Vector3d Find_G_Vector(const Eigen::Vector3d& kVec);
 
 	double Material_Response_Function(int band, const Eigen::Vector3d& lVec);
+	double Material_Response_Function(const Eigen::Vector3d& lVec);
 };
 }	// namespace graphene
 

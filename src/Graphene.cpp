@@ -323,4 +323,12 @@ double Graphene::Material_Response_Function(int band, const Eigen::Vector3d& lVe
 	}
 }
 
+double Graphene::Material_Response_Function(const Eigen::Vector3d& lVec)
+{
+	double W = 0.0;
+	for(int band = 0; band < 4; band++)
+		W += Material_Response_Function(band, lVec);
+	return W;
+}
+
 }	// namespace graphene
