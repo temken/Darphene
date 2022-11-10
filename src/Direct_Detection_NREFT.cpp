@@ -265,29 +265,43 @@ double dR_dcos_dphi_NREFT(double cos_theta, double phi, DM_Particle_NREFT& DM, o
 // 3. Tabulation functions
 std::vector<std::vector<double>> Tabulate_dR_dlnE_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
+	// MPI
+	int mpi_processes, mpi_rank;
+	MPI_Comm_size(MPI_COMM_WORLD, &mpi_processes);
+	MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
 	double E_min			   = 0.1 * eV;
 	double v_max			   = DM_distr.Maximum_DM_Speed();
 	double E_max			   = 0.99 * DM.mass / 2.0 * v_max * v_max;
-	std::vector<double> E_kist = libphysica::Log_Space(E_min, E_max, points);
-	std::vector<std::vector<double>> spectrum;
-	int counter = 0;
-	for(auto& E_er : E_kist)
-	{
-		std::vector<double> row = {E_er};
-		double dRdlnE			= 0.0;
-		for(int band = 0; band < 4; band++)
-		{
-			double band_contribution = dR_dlnE_NREFT(E_er, DM, DM_distr, graphene, band, MC_points);
-			row.push_back(band_contribution);
-			dRdlnE += band_contribution;
-		}
-		row.push_back(dRdlnE);
-		spectrum.push_back(row);
-		libphysica::Print_Progress_Bar(1.0 * counter++ / points);
-	}
-	libphysica::Print_Progress_Bar(1.0);
+	std::vector<double> E_list = libphysica::Log_Space(E_min, E_max, points);
+	std::vector<std::vector<double>> local_dRdE(4);
+	std::vector<int> index_list = libphysica::Workload_Distribution(mpi_processes, points);
 
-	return spectrum;
+	int counter = 0;
+	for(int i = index_list[mpi_rank]; i < index_list[mpi_rank + 1]; i++)
+	{
+		for(int band = 0; band < 4; band++)
+			local_dRdE[band].push_back(dR_dlnE_NREFT(E_list[i], DM, DM_distr, graphene, band, MC_points));
+		libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1], mpi_rank);
+	}
+
+	// MPI reductions
+	std::vector<std::vector<double>> global_dRdE(4, std::vector<double>(points, 0.0));
+	std::vector<int> recvcounts(mpi_processes);
+	for(int i = 0; i < mpi_processes; i++)
+		recvcounts[i] = index_list[i + 1] - index_list[i];
+	std::vector<int> displs = libphysica::Sub_List(index_list, 0, mpi_processes);
+	for(int band = 0; band < 4; band++)
+		MPI_Allgatherv(local_dRdE[band].data(), local_dRdE[band].size(), MPI_DOUBLE, global_dRdE[band].data(), recvcounts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
+
+	// Compute total dRdE and combine all lists into one.
+	std::vector<double> dRdE_total(points, 0.0);
+	for(int i = 0; i < points; i++)
+		for(int band = 0; band < 4; band++)
+			dRdE_total[i] += global_dRdE[band][i];
+	std::vector<std::vector<double>> dRdE = libphysica::Transpose_Lists(std::vector<std::vector<double>>({E_list, global_dRdE[0], global_dRdE[1], global_dRdE[2], global_dRdE[3], dRdE_total}));
+	libphysica::Print_Progress_Bar(1.0, mpi_rank);
+	return dRdE;
 }
 
 std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
