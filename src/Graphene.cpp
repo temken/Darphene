@@ -105,17 +105,24 @@ Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> Graphene::EigenSoluti
 
 void Graphene::Compute_Normalization_Corrections()
 {
-	normalization_corrections = {1.0, 1.0, 1.0, 1.0};
-	double kMax				  = 50.0 * keV;
-	for(int band = 0; band < 4; band++)
-	{
-		std::function<double(double, double, double)> integrand = [this, band](double l, double cos_theta, double phi) {
-			Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-			return l * l * Material_Response_Function(band, lVec);
-		};
-		double norm						= libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre");
-		normalization_corrections[band] = 1.0 / norm;
-	}
+	// normalization_corrections = {1.0, 1.0, 1.0, 1.0};
+	// double kMax				  = 50.0 * keV;
+	// for(int band = 0; band < 4; band++)
+	// {
+	// 	std::function<double(double, double, double)> integrand = [this, band](double l, double cos_theta, double phi) {
+	// 		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+	// 		return l * l * Material_Response_Function(band, lVec);
+	// 	};
+	// 	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 100000);
+	// 	std::cout << "Band " << band << " normalization correction: " << 1.0 / norm << std::endl;
+	// 	normalization_corrections[band] = 1.0 / norm;
+	// }
+
+	// To speed up the initial phase of the program, we use the following precomputed values:
+	if(carbon_wavefunctions->name == "RHF")
+		normalization_corrections = {1.04069, 1.09564, 1.31206, 1.28451};
+	else if(carbon_wavefunctions->name == "Hydrogenic")
+		normalization_corrections = {1.22877, 1.26341, 1.64182, 1.26803};
 }
 
 Graphene::Graphene(const std::string& wavefunctions, double workfunction)
@@ -165,7 +172,13 @@ Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 		carbon_wavefunctions = new Hydrogenic(Zeff_2s, Zeff_2px_2py, Zeff_2pz);
 	}
 	else if(wavefunctions == "Roothaan-Hartree-Fock" || wavefunctions == "RHF")
+	{
+		// double alpha_2s		 = 1.3704;
+		// double alpha_2px_2py = 1.9608;
+		// double alpha_2pz	 = 1.4659;
+		// carbon_wavefunctions = new Roothaan_Hartree_Fock(alpha_2s, alpha_2px_2py, alpha_2pz);
 		carbon_wavefunctions = new Roothaan_Hartree_Fock();
+	}
 	else
 	{
 		std::cerr << "Error in Graphene::Graphene(): Unknown wavefunction type " << wavefunctions << std::endl;
@@ -198,7 +211,7 @@ double Graphene::Overlap_Integral(const std::string& parameter)
 		}
 	};
 	double rMax = 100.0 * Bohr_Radius;
-	return libphysica::Integrate_3D(integrand, 0, rMax, -1.0, 1.0, 0.0, 2.0 * M_PI, "Gauss-Kronrod");
+	return libphysica::Integrate_3D(integrand, 0, rMax, -1.0, 1.0, 0.0, 2.0 * M_PI, "Vegas", 100000);
 }
 
 std::vector<double> Graphene::Energy_Dispersion_Pi(const Eigen::Vector3d& kVec) const
@@ -230,6 +243,20 @@ double Graphene::Valence_Band_Energies(const Eigen::Vector3d& kVec, unsigned int
 	else
 	{
 		std::cerr << "Error in Graphene::Valence_Band_Energies(): energy band " << energy_band << "is not a valence band." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+}
+
+double Graphene::Lowest_Binding_Energy(int band)
+{
+	if(band >= 0 && band < 4)
+	{
+		std::vector<double> energies = {Valence_Band_Energies(high_symmetry_point_G, band), Valence_Band_Energies(high_symmetry_point_M, band), Valence_Band_Energies(high_symmetry_point_K, band)};
+		return *std::max_element(std::begin(energies), std::end(energies));
+	}
+	else
+	{
+		std::cerr << "Error in Graphene::Lowest_Binding_Energy(): Unknown band " << band << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -268,8 +295,8 @@ Eigen::Vector3d Graphene::Find_G_Vector(const Eigen::Vector3d& kVec)
 		return {0.0, 0.0, 0.0};
 	else
 	{
-		for(int mNorm = 0; mNorm < 100; mNorm++)
-			for(int nNorm = 0; nNorm < 100; nNorm++)
+		for(int mNorm = 0; mNorm < 200; mNorm++)
+			for(int nNorm = 0; nNorm < 200; nNorm++)
 			{
 				std::vector<int> m_list = mNorm == 0 ? std::vector<int>({0}) : std::vector<int>({-mNorm, mNorm});
 				std::vector<int> n_list = nNorm == 0 ? std::vector<int>({0}) : std::vector<int>({-nNorm, nNorm});

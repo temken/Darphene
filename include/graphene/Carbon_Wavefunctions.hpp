@@ -14,6 +14,7 @@ class Carbon_Wavefunctions
 {
   protected:
   public:
+	std::string name;
 	Carbon_Wavefunctions() {};
 
 	// Position space wavefunctions
@@ -35,7 +36,7 @@ class Hydrogenic : public Carbon_Wavefunctions
 
   public:
 	Hydrogenic(double Z2s, double Z2pxpy, double Z2pz)
-	: Zeff_2s(Z2s), Zeff_2pxpy(Z2pxpy), Zeff_2pz(Z2pz) {};
+	: Zeff_2s(Z2s), Zeff_2pxpy(Z2pxpy), Zeff_2pz(Z2pz) { name = "Hydrogenic"; };
 
 	// Position space wavefunctions
 	virtual double Wavefunction_Position(const Eigen::Vector3d& xVec, const std::string& orbital) override;
@@ -45,17 +46,24 @@ class Hydrogenic : public Carbon_Wavefunctions
 };
 
 // 3. Roothaan-Hartree-Fock wavefunctions
+extern std::complex<double> Hypergeometric_2F1(double a, double b, double c, double z);
+extern double Slate_Type_Orbital_Position(double r, double Z, double n);
+extern std::complex<double> Slate_Type_Orbital_Momentum(double k, double Z, double n, int l);
+
 class Roothaan_Hartree_Fock : public Carbon_Wavefunctions
 {
   protected:
 	std::vector<std::vector<double>> C_nlj, Z_lj, n_lj;
-	void Import_RHF_Coefficients();
-
-	double Radial_Wavefunction_Position(double r, const std::string& orbital) const;
-	std::complex<double> Radial_Wavefunction_Momentum(double p, const std::string& orbital) const;
+	double alpha_2s, alpha_2pxpy, alpha_2pz;
 
   public:
-	Roothaan_Hartree_Fock();
+	void Import_RHF_Coefficients();
+
+	double Radial_Wavefunction_Position(double r, const std::string& orbital, double alpha) const;
+	std::complex<double> Radial_Wavefunction_Momentum(double p, const std::string& orbital, double alpha) const;
+
+  public:
+	Roothaan_Hartree_Fock(double a2s = 1.0, double a2pxpy = 1.0, double a2pz = 1.0);
 
 	// Position space wavefunctions
 	virtual double Wavefunction_Position(const Eigen::Vector3d& xVec, const std::string& orbital) override;

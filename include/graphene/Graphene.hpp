@@ -51,6 +51,7 @@ class Graphene
 	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& kVec) const;
 	std::vector<double> Energy_Dispersion_Sigma(const Eigen::Vector3d& kVec) const;
 	double Valence_Band_Energies(const Eigen::Vector3d& kVec, unsigned int energy_band);
+	double Lowest_Binding_Energy(int band);
 
 	std::vector<std::vector<double>> Energy_Bands(unsigned int k_points);
 
