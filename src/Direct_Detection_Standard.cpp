@@ -23,6 +23,27 @@ Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi)
 		return Eigen::Vector3d(r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta));
 }
 
+Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi, const Eigen::Vector3d& axis)
+{
+	Eigen::Vector3d ev = axis.normalized();
+	if(ev[2] == 1.0 || axis.norm() == 0.0)
+		return Spherical_Coordinates(r, theta, phi);
+	else
+	{
+		double aux = sqrt(1.0 - pow(ev[2], 2.0));
+
+		double cos_theta = cos(theta);
+		double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+		double cos_phi	 = cos(phi);
+		double sin_phi	 = sin(phi);
+
+		Eigen::Vector3d unit_vector({cos_theta * ev[0] + sin_theta / aux * (ev[0] * ev[2] * cos_phi - ev[1] * sin_phi),
+									 cos_theta * ev[1] + sin_theta / aux * (ev[1] * ev[2] * cos_phi + ev[0] * sin_phi),
+									 cos_theta * ev[2] - aux * cos_phi * sin_theta});
+		return r * unit_vector;
+	}
+}
+
 libphysica::Vector Earth_Velocity(double t, double v_earth)
 {
 	double alpha = 42.0 * deg;

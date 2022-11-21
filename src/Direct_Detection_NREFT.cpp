@@ -21,18 +21,71 @@ using namespace libphysica::natural_units;
 // 1.1 Total rate per band
 double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
 {
-	// 1. Prefactor
-	double mDM		 = DM.mass;
-	double prefactor = 1.0 / pow(2.0 * M_PI, 2) * DM_distr.DM_density / mDM * graphene.N_cell / 8.0 / mDM / mDM / mElectron / mElectron;
 
-	double vMax	 = DM_distr.Maximum_DM_Speed();
-	double kfMin = 0.0;
-	double kfMax = sqrt(mElectron * mDM) * vMax;
+	// Parameter ranges
+	double mDM	= DM.mass;
+	double E_b	= graphene.Lowest_Binding_Energy(band);
+	double vMin = std::sqrt(2.0 * (graphene.work_function - E_b) / mDM);
+	double vMax = DM_distr.Maximum_DM_Speed();
+	if(vMax < vMin)
+		return 0.0;
+	double kfMinGlobal = 0.0;
+	double kfMaxGlobal = sqrt(mElectron * mDM) * vMax;
+	double qMinGlobal  = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+	double qMaxGlobal  = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
 
-	double qMinGlobal = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
-	double qMaxGlobal = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+	// // NEW INTEGRATION METHOD
+	// double prefactor = 1.0 / 32.0 / pow(M_PI, 2) * DM_distr.DM_density / mDM * graphene.N_cell / mDM / mDM / mElectron / mElectron;
+	// // Order of integrand arguments: v, phi_v,  xi, cos_theta_q, phi_q, kf, cos_theta_kf, phi_kf
+	// std::function<double(const std::vector<double>&, const double)> integrand = [&DM, &DM_distr, &graphene, band, mDM](const std::vector<double>& x, const double wgt) {
+	// 	double vDM			= x[0];
+	// 	double phi_v		= x[1];
+	// 	double xi			= x[2];
+	// 	double cos_theta_q	= x[3];
+	// 	double phi_q		= x[4];
+	// 	double kf			= x[5];
+	// 	double cos_theta_kf = x[6];
+	// 	double phi_kf		= x[7];
+
+	// 	// 1. Calculate cos_alpha
+	// 	// 1.1 kF vector
+	// 	Eigen::Vector3d kfVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
+	// 	// 1.2 q Vector
+	// 	double qMin			 = mDM * vDM - sqrt(mDM * mDM * vDM * vDM - 2.0 * mDM * graphene.work_function);
+	// 	double qMax			 = mDM * vDM + sqrt(mDM * mDM * vDM * vDM - 2.0 * mDM * graphene.work_function);
+	// 	double q			 = qMin + (qMax - qMin) * xi;
+	// 	Eigen::Vector3d qVec = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
+
+	// 	// 1.3 Calculate kVec ("initial" momentum of the electron)
+	// 	Eigen::Vector3d lVec = kfVec - qVec;
+	// 	Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+	// 	Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+	// 	Eigen::Vector3d kVec = l_parallel - G;
+
+	// 	// 1.4 Calculate band energy
+	// 	double E_i = graphene.Valence_Band_Energies(kVec, band);
+
+	// 	// 1.5 Calculate cos_alpha
+	// 	double cos_alpha = (kf * kf / 2.0 / mElectron - E_i + q * q / 2.0 / mDM + graphene.work_function) / q / vDM;
+	// 	if(cos_alpha < -1.0 || cos_alpha > 1.0)
+	// 		return 0.0;
+
+	// 	// 2. vDM vector
+	// 	Eigen::Vector3d vDMVec_eigen = Spherical_Coordinates(vDM, acos(cos_alpha), phi_v, qVec);
+	// 	libphysica::Vector vDMVec_libphysica({vDMVec_eigen[0], vDMVec_eigen[1], vDMVec_eigen[2]});
+
+	// 	// 3. Evaluate integrand
+	// 	return (qMax - qMin) * kf * kf * q * vDM * DM_distr.PDF_Velocity(vDMVec_libphysica) * DM.Response_Function(qVec, vDMVec_eigen, kfVec) * graphene.Material_Response_Function(band, lVec);
+	// };
+	// double cos_theta_kf_min	   = -1.0;
+	// double cos_theta_kf_max	   = 0.0;
+	// std::vector<double> region = {vMin, 0.0, 0.0, -1.0, 0.0, kfMinGlobal, cos_theta_kf_min, 0.0, vMax, 2.0 * M_PI, 1.0, 1.0, 2.0 * M_PI, kfMaxGlobal, cos_theta_kf_max, 2.0 * M_PI};
+	// double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
+	// return std::isnan(result) ? 0.0 : result;
 
 	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
+	double prefactor = 1.0 / pow(2.0 * M_PI, 2) * DM_distr.DM_density / mDM * graphene.N_cell / 8.0 / mDM / mDM / mElectron / mElectron;
+
 	std::function<double(const std::vector<double>&, const double)> integrand = [&DM, &DM_distr, &graphene, band, mDM, vMax](const std::vector<double>& x, const double wgt) {
 		double q			= x[0];
 		double cos_theta_q	= x[1];
@@ -67,7 +120,7 @@ double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, 
 	};
 	double cos_theta_kf_min	   = -1.0;
 	double cos_theta_kf_max	   = 0.0;
-	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMin, cos_theta_kf_min, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMax, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI};
+	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMinGlobal, cos_theta_kf_min, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMaxGlobal, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 	return std::isnan(result) ? 0.0 : result;
 }

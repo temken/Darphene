@@ -10,6 +10,7 @@ namespace graphene
 {
 // 0. Auxiliary functions
 extern Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi);
+extern Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi, const Eigen::Vector3d& axis);
 extern libphysica::Vector Earth_Velocity(double t, double v_earth);
 extern double vMinimum_Graphene(double mDM, double q, double energy_crystal, double final_momentum, double work_function);
 
