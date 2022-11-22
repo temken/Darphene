@@ -105,24 +105,24 @@ Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXcd> Graphene::EigenSoluti
 
 void Graphene::Compute_Normalization_Corrections()
 {
-	normalization_corrections = {1.0, 1.0, 1.0, 1.0};
-	double kMax				  = 50.0 * keV;
-	for(int band = 0; band < 4; band++)
-	{
-		std::function<double(double, double, double)> integrand = [this, band](double l, double cos_theta, double phi) {
-			Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-			return l * l * Material_Response_Function(band, lVec);
-		};
-		double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 100000);
-		// std::cout << "Band " << band << " normalization correction: " << 1.0 / norm << std::endl;
-		normalization_corrections[band] = 1.0 / norm;
-	}
+	// normalization_corrections = {1.0, 1.0, 1.0, 1.0};
+	// double kMax				  = 50.0 * keV;
+	// for(int band = 0; band < 4; band++)
+	// {
+	// 	std::function<double(double, double, double)> integrand = [this, band](double l, double cos_theta, double phi) {
+	// 		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+	// 		return l * l * Material_Response_Function(band, lVec);
+	// 	};
+	// 	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 10000);
+	// 	std::cout << "Band " << band << " normalization correction: " << 1.0 / norm << std::endl;
+	// 	normalization_corrections[band] = 1.0 / norm;
+	// }
 
-	// // To speed up the initial phase of the program, we can use the following precomputed values:
-	// if(carbon_wavefunctions->name == "RHF")
-	// 	normalization_corrections = {1.04069, 1.09564, 1.31206, 1.28451};
-	// else if(carbon_wavefunctions->name == "Hydrogenic")
-	// 	normalization_corrections = {1.22877, 1.26341, 1.64182, 1.26803};
+	// To speed up the initial phase of the program, we can use the following precomputed values:
+	if(carbon_wavefunctions->name == "RHF")
+		normalization_corrections = {0.836391, 0.666966, 0.898456, 1.03111};
+	else if(carbon_wavefunctions->name == "Hydrogenic")
+		normalization_corrections = {1.00272, 1.08723, 1.28128, 1.03154};
 }
 
 Graphene::Graphene(const std::string& wavefunctions, double workfunction)
