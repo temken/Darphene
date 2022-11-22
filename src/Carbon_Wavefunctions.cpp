@@ -193,28 +193,28 @@ void Roothaan_Hartree_Fock::Import_RHF_Coefficients()
 	}
 }
 
-double Roothaan_Hartree_Fock::Radial_Wavefunction_Position(double r, const std::string& orbital, double alpha) const
+double Roothaan_Hartree_Fock::Radial_Wavefunction_Position(double r, const std::string& orbital) const
 {
 	int i		= orbital == "2s" ? 0 : 1;
 	double R_nl = 0.0;
 	for(unsigned int j = 0; j < C_nlj[i].size(); j++)
-		R_nl += C_nlj[i][j] * Slate_Type_Orbital_Position(r, alpha * Z_lj[i][j], n_lj[i][j]);
+		R_nl += C_nlj[i][j] * Slate_Type_Orbital_Position(r, Z_lj[i][j], n_lj[i][j]);
 	return R_nl;
 }
 
-std::complex<double> Roothaan_Hartree_Fock::Radial_Wavefunction_Momentum(double p, const std::string& orbital, double alpha) const
+std::complex<double> Roothaan_Hartree_Fock::Radial_Wavefunction_Momentum(double p, const std::string& orbital) const
 {
 	using namespace std::complex_literals;
 	int i					  = orbital == "2s" ? 0 : 1;
 	int l					  = orbital == "2s" ? 0 : 1;
 	std::complex<double> R_nl = 0.0;
 	for(unsigned int j = 0; j < C_nlj[i].size(); j++)
-		R_nl += C_nlj[i][j] * Slate_Type_Orbital_Momentum(p, alpha * Z_lj[i][j], n_lj[i][j], l);
+		R_nl += C_nlj[i][j] * Slate_Type_Orbital_Momentum(p, Z_lj[i][j], n_lj[i][j], l);
 	return R_nl;
 }
 
-Roothaan_Hartree_Fock::Roothaan_Hartree_Fock(double a2s, double a2pxpy, double a2pz)
-: C_nlj({{}, {}}), Z_lj({{}, {}}), n_lj({{}, {}}), alpha_2s(a2s), alpha_2pxpy(a2pxpy), alpha_2pz(a2pz)
+Roothaan_Hartree_Fock::Roothaan_Hartree_Fock()
+: C_nlj({{}, {}}), Z_lj({{}, {}}), n_lj({{}, {}})
 {
 	name = "RHF";
 	Import_RHF_Coefficients();
@@ -224,13 +224,13 @@ double Roothaan_Hartree_Fock::Wavefunction_Position(const Eigen::Vector3d& xVec,
 {
 	double r = xVec.norm();
 	if(orbital == "2s")
-		return 1.0 / sqrt(4.0 * M_PI) * Radial_Wavefunction_Position(r, orbital, alpha_2s);
+		return 1.0 / sqrt(4.0 * M_PI) * Radial_Wavefunction_Position(r, orbital);
 	else if(orbital == "2px")
-		return sqrt(3.0 / 4.0 / M_PI) * xVec[0] / r * Radial_Wavefunction_Position(r, orbital, alpha_2pxpy);
+		return sqrt(3.0 / 4.0 / M_PI) * xVec[0] / r * Radial_Wavefunction_Position(r, orbital);
 	else if(orbital == "2py")
-		return sqrt(3.0 / 4.0 / M_PI) * xVec[1] / r * Radial_Wavefunction_Position(r, orbital, alpha_2pxpy);
+		return sqrt(3.0 / 4.0 / M_PI) * xVec[1] / r * Radial_Wavefunction_Position(r, orbital);
 	else if(orbital == "2pz")
-		return sqrt(3.0 / 4.0 / M_PI) * xVec[2] / r * Radial_Wavefunction_Position(r, orbital, alpha_2pz);
+		return sqrt(3.0 / 4.0 / M_PI) * xVec[2] / r * Radial_Wavefunction_Position(r, orbital);
 	else
 	{
 		std::cout << "Error in Roothaan_Hartree_Fock::Wavefunction_Position(): Orbital " << orbital << " not recognized." << std::endl;
@@ -242,13 +242,13 @@ std::complex<double> Roothaan_Hartree_Fock::Wavefunction_Momentum(const Eigen::V
 {
 	double k = kVec.norm();
 	if(orbital == "2s")
-		return 1.0 / sqrt(4.0 * M_PI) * Radial_Wavefunction_Momentum(kVec.norm(), orbital, alpha_2s);
+		return 1.0 / sqrt(4.0 * M_PI) * Radial_Wavefunction_Momentum(kVec.norm(), orbital);
 	else if(orbital == "2px")
-		return sqrt(3.0 / 4.0 / M_PI) * kVec[0] / k * Radial_Wavefunction_Momentum(k, orbital, alpha_2pxpy);
+		return sqrt(3.0 / 4.0 / M_PI) * kVec[0] / k * Radial_Wavefunction_Momentum(k, orbital);
 	else if(orbital == "2py")
-		return sqrt(3.0 / 4.0 / M_PI) * kVec[1] / k * Radial_Wavefunction_Momentum(k, orbital, alpha_2pxpy);
+		return sqrt(3.0 / 4.0 / M_PI) * kVec[1] / k * Radial_Wavefunction_Momentum(k, orbital);
 	else if(orbital == "2pz")
-		return sqrt(3.0 / 4.0 / M_PI) * kVec[2] / k * Radial_Wavefunction_Momentum(k, orbital, alpha_2pz);
+		return sqrt(3.0 / 4.0 / M_PI) * kVec[2] / k * Radial_Wavefunction_Momentum(k, orbital);
 	else
 	{
 		std::cout << "Error in Roothaan_Hartree_Fock::Wavefunction_Momentum(): Orbital " << orbital << " not recognized." << std::endl;

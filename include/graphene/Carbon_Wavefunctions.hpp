@@ -54,16 +54,15 @@ class Roothaan_Hartree_Fock : public Carbon_Wavefunctions
 {
   protected:
 	std::vector<std::vector<double>> C_nlj, Z_lj, n_lj;
-	double alpha_2s, alpha_2pxpy, alpha_2pz;
 
   public:
 	void Import_RHF_Coefficients();
 
-	double Radial_Wavefunction_Position(double r, const std::string& orbital, double alpha) const;
-	std::complex<double> Radial_Wavefunction_Momentum(double p, const std::string& orbital, double alpha) const;
+	double Radial_Wavefunction_Position(double r, const std::string& orbital) const;
+	std::complex<double> Radial_Wavefunction_Momentum(double p, const std::string& orbital) const;
 
   public:
-	Roothaan_Hartree_Fock(double a2s = 1.0, double a2pxpy = 1.0, double a2pz = 1.0);
+	Roothaan_Hartree_Fock();
 
 	// Position space wavefunctions
 	virtual double Wavefunction_Position(const Eigen::Vector3d& xVec, const std::string& orbital) override;
