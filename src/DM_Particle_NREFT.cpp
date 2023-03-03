@@ -39,9 +39,9 @@ void DM_Form_Factor::Print_Summary(int rank) const
 
 double DM_Form_Factor::operator()(double q)
 {
-	if(form_factor_type == "Contact")
+	if(form_factor_type == "Contact" || form_factor_type == "C")
 		return 1.0;
-	else if(form_factor_type == "Long-Range")
+	else if(form_factor_type == "Long-Range" || form_factor_type == "L")
 		return qRef * qRef / q / q;
 	else if(form_factor_type == "General")
 		return (qRef * qRef + m_Mediator * m_Mediator) / (q * q + m_Mediator * m_Mediator);
