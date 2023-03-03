@@ -289,8 +289,8 @@ Eigen::Vector3d Graphene::Find_G_Vector(const Eigen::Vector3d& kVec)
 		return {0.0, 0.0, 0.0};
 	else
 	{
-		for(int mNorm = 0; mNorm < 200; mNorm++)
-			for(int nNorm = 0; nNorm < 200; nNorm++)
+		for(int mNorm = 0; mNorm < 500; mNorm++)
+			for(int nNorm = 0; nNorm < 500; nNorm++)
 			{
 				std::vector<int> m_list = mNorm == 0 ? std::vector<int>({0}) : std::vector<int>({-mNorm, mNorm});
 				std::vector<int> n_list = nNorm == 0 ? std::vector<int>({0}) : std::vector<int>({-nNorm, nNorm});
