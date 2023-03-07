@@ -12,10 +12,13 @@
 
 #include "graphene/Direct_Detection_Standard.hpp"
 
-namespace graphene
+namespace DarPhene
 {
 
 using namespace libphysica::natural_units;
+
+double cos_theta_kf_min = -1.0;
+double cos_theta_kf_max = +1.0;
 
 // 1. Rates and spectra for a single band
 // 1.1 Total rate per band
@@ -77,8 +80,6 @@ double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, 
 	// 	// 3. Evaluate integrand
 	// 	return (qMax - qMin) * kf * kf * q * vDM * DM_distr.PDF_Velocity(vDMVec_libphysica) * DM.Response_Function(qVec, vDMVec_eigen, kfVec) * graphene.Material_Response_Function(band, lVec);
 	// };
-	// double cos_theta_kf_min	   = -1.0;
-	// double cos_theta_kf_max	   = 0.0;
 	// std::vector<double> region = {vMin, 0.0, 0.0, -1.0, 0.0, kfMinGlobal, cos_theta_kf_min, 0.0, vMax, 2.0 * M_PI, 1.0, 1.0, 2.0 * M_PI, kfMaxGlobal, cos_theta_kf_max, 2.0 * M_PI};
 	// double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 	// return std::isnan(result) ? 0.0 : result;
@@ -118,10 +119,68 @@ double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, 
 
 		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Response_Function(qVec, vVec_eigen, k_FinalVec) * graphene.Material_Response_Function(band, lVec);
 	};
-	double cos_theta_kf_min	   = -1.0;
-	double cos_theta_kf_max	   = 0.0;
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMinGlobal, cos_theta_kf_min, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMaxGlobal, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Monte-Carlo");
+	return std::isnan(result) ? 0.0 : result;
+}
+
+double R_Average_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
+{
+	// Parameter ranges
+	double mDM	= DM.mass;
+	double E_b	= graphene.Lowest_Binding_Energy(band);
+	double vMin = std::sqrt(2.0 * (graphene.work_function - E_b) / mDM);
+	double vMax = DM_distr.Maximum_DM_Speed();
+	if(vMax < vMin)
+		return 0.0;
+	double kfMinGlobal = 0.0;
+	double kfMaxGlobal = sqrt(mElectron * mDM) * vMax;
+	double qMinGlobal  = mDM * vMax - sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+	double qMaxGlobal  = mDM * vMax + sqrt(mDM * mDM * vMax * vMax - 2.0 * mDM * graphene.work_function);
+
+	libphysica::Vector observer_velocity = dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Get_Observer_Velocity();
+	double vEarth						 = observer_velocity.Norm();
+	double t_max						 = 24.0;
+	double prefactor					 = 1.0 / t_max / pow(2.0 * M_PI, 2) * DM_distr.DM_density / mDM * graphene.N_cell / 8.0 / mDM / mDM / mElectron / mElectron;
+
+	// Order of integrand arguments: q, cos_theta_q, phi_q, cos_theta_kf, phi_kf
+	std::function<double(const std::vector<double>&, const double)> integrand = [&DM, &DM_distr, &graphene, band, mDM, vMax, vEarth](const std::vector<double>& x, const double wgt) {
+		double q			= x[0];
+		double cos_theta_q	= x[1];
+		double phi_q		= x[2];
+		double kf			= x[3];
+		double cos_theta_kf = x[4];
+		double phi_kf		= x[5];
+		double cos_theta_v	= x[6];
+		double phi_v		= x[7];
+		double t			= x[8];
+
+		dynamic_cast<obscura::Standard_Halo_Model*>(&DM_distr)->Set_Observer_Velocity(Earth_Velocity(t * hr, vEarth));
+
+		Eigen::Vector3d qVec	   = Spherical_Coordinates(q, acos(cos_theta_q), phi_q);
+		Eigen::Vector3d k_FinalVec = Spherical_Coordinates(kf, acos(cos_theta_kf), phi_kf);
+
+		// Determine the angle between vVec and qVec
+		Eigen::Vector3d v_unitvector = Spherical_Coordinates(1.0, acos(cos_theta_v), phi_v);
+		double cos_alpha			 = v_unitvector.dot(qVec) / q;
+
+		// Determine the crystal momentum vector k =  l^|| - G* (in 1BZ)
+		Eigen::Vector3d lVec = k_FinalVec - qVec;
+		Eigen::Vector3d l_parallel({lVec[0], lVec[1], 0.0});
+		Eigen::Vector3d G	 = graphene.Find_G_Vector(l_parallel);
+		Eigen::Vector3d kVec = l_parallel - G;
+
+		double E_k = graphene.Valence_Band_Energies(kVec, band);
+		double v   = (kf * kf / (2.0 * mElectron) - E_k + graphene.work_function + q * q / 2.0 / mDM) / (q * cos_alpha);
+		if(v > vMax || v < 0.0)
+			return 0.0;
+		libphysica::Vector vVec({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
+		Eigen::Vector3d vVec_eigen({v * v_unitvector[0], v * v_unitvector[1], v * v_unitvector[2]});
+
+		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Response_Function(qVec, vVec_eigen, k_FinalVec) * graphene.Material_Response_Function(band, lVec);
+	};
+	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMinGlobal, cos_theta_kf_min, 0.0, -1.0, 0.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMaxGlobal, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI, t_max};
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Monte-Carlo");
 	return std::isnan(result) ? 0.0 : result;
 }
 
@@ -174,8 +233,6 @@ double dR_dlnE_NREFT(double Ee, DM_Particle_NREFT& DM, obscura::DM_Distribution&
 
 		return q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Response_Function(qVec, vVec_eigen, k_FinalVec) * graphene.Material_Response_Function(band, lVec);
 	};
-	double cos_theta_kf_min	   = -1.0;
-	double cos_theta_kf_max	   = 0.0;
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, cos_theta_kf_min, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI};
 	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 	return std::isnan(result) ? 0.0 : result;
@@ -287,6 +344,14 @@ double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, 
 	double rTot = 0.0;
 	for(int band = 0; band < 4; band++)
 		rTot += R_Total_NREFT(DM, DM_distr, graphene, band, MC_points);
+	return rTot;
+}
+
+double R_Average_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
+{
+	double rTot = 0.0;
+	for(int band = 0; band < 4; band++)
+		rTot += R_Average_NREFT(DM, DM_distr, graphene, band, MC_points);
 	return rTot;
 }
 
@@ -443,4 +508,4 @@ std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_
 	return daily_modulation_list;
 }
 
-}	// namespace graphene
+}	// namespace DarPhene

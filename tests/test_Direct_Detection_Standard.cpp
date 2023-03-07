@@ -4,7 +4,7 @@
 
 #include "graphene/Direct_Detection_Standard.hpp"
 
-using namespace graphene;
+using namespace DarPhene;
 using namespace libphysica::natural_units;
 
 // TEST(TestDirectDetectionStandard, TestDefaultConstructor)

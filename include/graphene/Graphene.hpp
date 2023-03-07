@@ -10,7 +10,7 @@
 
 #include "Carbon_Wavefunctions.hpp"
 
-namespace graphene
+namespace DarPhene
 {
 
 class Graphene
@@ -61,6 +61,6 @@ class Graphene
 	double Material_Response_Function(int band, const Eigen::Vector3d& lVec);
 	double Material_Response_Function(const Eigen::Vector3d& lVec);
 };
-}	// namespace graphene
+}	// namespace DarPhene
 
 #endif

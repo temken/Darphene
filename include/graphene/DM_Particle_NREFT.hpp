@@ -5,7 +5,7 @@
 
 #include "obscura/DM_Particle.hpp"
 
-namespace graphene
+namespace DarPhene
 {
 
 // 1. Small class for different kind of DM form factors that encapsulate additional q-dependences in the amplitude
@@ -55,6 +55,6 @@ extern DM_Particle_NREFT DM_Electric_Dipole(double mDM, double g_over_lambda);
 extern DM_Particle_NREFT DM_Magnetic_Dipole(double mDM, double g_over_lambda);
 extern DM_Particle_NREFT DM_Anapole(double mDM, double g_over_lambda_2);
 
-}	// namespace graphene
+}	// namespace DarPhene
 
 #endif

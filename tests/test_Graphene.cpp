@@ -10,7 +10,7 @@
 #include "graphene/Direct_Detection_Standard.hpp"
 #include "graphene/Graphene.hpp"
 
-using namespace graphene;
+using namespace DarPhene;
 using namespace libphysica::natural_units;
 
 TEST(TestGraphene, TestOverlapIntegralsHydrogenic)

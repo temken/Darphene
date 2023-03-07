@@ -10,7 +10,7 @@
 #include "graphene/Direct_Detection_Standard.hpp"
 #include "version.hpp"
 
-namespace graphene
+namespace DarPhene
 {
 using namespace libconfig;
 using namespace libphysica::natural_units;
@@ -298,4 +298,4 @@ void Configuration::Print_Summary(int mpi_rank)
 	}
 }
 
-}	// namespace graphene
+}	// namespace DarPhene

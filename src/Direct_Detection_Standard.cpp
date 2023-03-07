@@ -9,7 +9,7 @@
 
 #include "obscura/DM_Halo_Models.hpp"
 
-namespace graphene
+namespace DarPhene
 {
 
 using namespace libphysica::natural_units;
@@ -466,4 +466,4 @@ std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::
 	return daily_modulation_list;
 }
 
-}	// namespace graphene
+}	// namespace DarPhene
