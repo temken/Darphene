@@ -47,8 +47,19 @@ int main(int argc, char* argv[])
 				  << LOGO << std::endl
 				  << "MPI processes:\t" << mpi_processes << std::endl;
 	}
+	if(argc != 2)
+	{
+		if(mpi_rank == 0)
+			std::cout << "\n\033[1;31mError\033[0m in DarPhene: A config file is required.\n\tCorrect usages:" << std::endl
+					  << "\t>" << argv[0] << " <config_file>" << std::endl
+					  << "\tor" << std::endl
+					  << "\t>mpirun -n 2 " << argv[0] << " <config_file>" << std::endl
+					  << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 	////////////////////////////////////////////////////////////////////////
 
+	// Read configuration file
 	Configuration cfg(argv[1]);
 	Graphene graphene(cfg.carbon_wavefunctions, cfg.graphene_work_function);
 	cfg.Print_Summary(mpi_rank);
@@ -56,6 +67,8 @@ int main(int argc, char* argv[])
 	double rate_unit		 = 1.0 / gram / year;
 
 	MPI_Barrier(MPI_COMM_WORLD);
+
+	// Run modes:
 	if(cfg.run_modus == "Energy-Spectrum" || cfg.run_modus == "All")
 	{
 		if(mpi_rank == 0)
@@ -122,8 +135,8 @@ int main(int argc, char* argv[])
 		// std::string file_path = results_path + "Graphene_Band_Structure.txt";
 		// libphysica::Export_Table(file_path, band_structure, {keV, eV, eV, eV, eV, eV, eV, eV, eV}, "# k [keV]\tE_pi1 [eV]\tE_pi2 [eV]\tE_sigma11 [eV]\tE_sigma12 [eV]\tE_sigma21 [eV]\tE_sigma22 [eV]\tE_sigma31 [eV]\tE_sigma32 [eV]");
 
-		// // 2. Tabulate the response function
-		// auto l_list = libphysica::Linear_Space(0.01 * keV, 10 * keV, 450);
+		// 2. Tabulate the response function
+		// auto l_list = libphysica::Linear_Space(0.01 * keV, 10 * keV, 100);
 		// std::vector<std::vector<double>> response_function;
 
 		// // 2.1. lPerpendicular
@@ -174,7 +187,7 @@ int main(int argc, char* argv[])
 		// // 2.3 lNorm
 		// std::ofstream f;
 		// if(mpi_rank == 0)
-		// 	f.open(results_path + "Response_Function_lNorm_15eV_2.txt");
+		// 	f.open(results_path + "Response_Function_lNorm_total_Vegas.txt");
 		// response_function.clear();
 		// for(auto& l : l_list)
 		// {
@@ -182,16 +195,17 @@ int main(int argc, char* argv[])
 		// 		std::cout << "l = " << l / keV << " keV" << std::endl;
 		// 	std::vector<double> row = {l};
 		// 	double W				= 0.0;
-		// 	for(int band = 0; band < 4; band++)
-		// 	{
-		// 		std::function<double(double, double)> integrand = [&graphene, l, band](double cos_theta, double phi) {
-		// 			Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-		// 			return graphene.Material_Response_Function(band, lVec);
-		// 		};
-		// 		double W_band = l * l * libphysica::Integrate_2D(integrand, -1.0, 1.0, 0.0, 2 * M_PI, "Gauss-Legendre", 250);
-		// 		W += W_band;
-		// 		// row.push_back(W_band);
-		// 	}
+		// 	// for(int band = 0; band < 4; band++)
+		// 	// {
+		// 	std::function<double(double, double)> integrand = [&graphene, l](double cos_theta, double phi) {
+		// 		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+		// 		// return graphene.Material_Response_Function(band, lVec);
+		// 		return graphene.Material_Response_Function(lVec);
+		// 	};
+		// 	double W_band = l * l * libphysica::Integrate_2D(integrand, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 2000);
+		// 	W += W_band;
+		// 	// row.push_back(W_band);
+		// 	// }
 		// 	row.push_back(W);
 		// 	if(mpi_rank == 0)
 		// 		f << row[0] / keV << "\t" << row[1] * eV << std::endl;	 //<< "\t" << row[2] * eV << "\t" << row[3] * eV << "\t" << row[4] * eV << "\t" << row[5] * eV << std::endl;
@@ -254,11 +268,11 @@ int main(int argc, char* argv[])
 		// 	libphysica::Export_Table(results_path + "Response_Function_lx_ly_lz.txt", response_function, {keV, keV, keV, std::pow(keV, -3), std::pow(keV, -3), std::pow(keV, -3), std::pow(keV, -3), std::pow(keV, -3)}, "#lx [keV]\tly [keV]\tlz [keV]\tW_pi [keV^-3]\tW_s1 [keV^-3]\tW_s2 [keV^-3]\tW_s3 [keV^-3]\tW [keV^-3]");
 
 		// // 2.6 Tabulate W as a function of l and theta and integrate over phi.
-		// l_list			= libphysica::Linear_Space(1.0 * keV, 10 * keV, 100);
-		// auto theta_list = libphysica::Linear_Space(0.0, 0.5 * M_PI, 100);
+		// l_list			= libphysica::Linear_Space(1.0 * keV, 10 * keV, 150);
+		// auto theta_list = libphysica::Linear_Space(0.0, 0.5 * M_PI, 150);
 		// std::ofstream f;
 		// if(mpi_rank == 0)
-		// 	f.open(results_path + "Response_Function_l_theta_20eV.txt");
+		// 	f.open(results_path + "Response_Function_l_theta_5eV.txt");
 		// response_function.clear();
 		// for(auto& l : l_list)
 		// {
@@ -269,19 +283,21 @@ int main(int argc, char* argv[])
 
 		// 		std::vector<double> row = {l, theta};
 		// 		double W				= 0.0;
-		// 		for(int band = 0; band < 4; band++)
-		// 		{
-		// 			std::function<double(double)> integrand = [&graphene, l, theta, band](double phi) {
-		// 				Eigen::Vector3d lVec = Spherical_Coordinates(l, theta, phi);
-		// 				return graphene.Material_Response_Function(band, lVec);
-		// 			};
-		// 			double W_band = l * l * libphysica::Integrate(integrand, 0.0, 2 * M_PI, "Gauss-Kronrod");
-		// 			W += W_band;
-		// 			row.push_back(W_band);
-		// 		}
+		// 		// for(int band = 0; band < 4; band++)
+		// 		// {
+		// 		std::function<double(double)> integrand = [&graphene, l, theta](double phi) {
+		// 			Eigen::Vector3d lVec = Spherical_Coordinates(l, theta, phi);
+		// 			// return graphene.Material_Response_Function(band, lVec);
+		// 			return graphene.Material_Response_Function(lVec);
+		// 		};
+		// 		double W_band = l * l * libphysica::Integrate(integrand, 0.0, 2 * M_PI, "Gauss-Kronrod");
+		// 		W += W_band;
+		// 		// row.push_back(W_band);
+		// 		// }
 		// 		row.push_back(W);
 		// 		if(mpi_rank == 0)
-		// 			f << row[0] / keV << "\t" << row[1] / deg << "\t" << row[2] * eV << "\t" << row[3] * eV << "\t" << row[4] * eV << "\t" << row[5] * eV << "\t" << row[6] * eV << std::endl;
+		// 			// f << row[0] / keV << "\t" << row[1] / deg << "\t" << row[2] * eV << "\t" << row[3] * eV << "\t" << row[4] * eV << "\t" << row[5] * eV << "\t" << row[6] * eV << std::endl;
+		// 			f << row[0] / keV << "\t" << row[1] / deg << "\t" << row[2] * eV << std::endl;
 		// 		response_function.push_back(row);
 		// 	}
 		// }
@@ -315,46 +331,46 @@ int main(int argc, char* argv[])
 		// 			// }
 		// 		}
 
-		// std::vector<double> DM_masses		  = libphysica::Log_Space(2.0 * MeV, 100.0 * MeV, 10);
-		std::vector<double> DM_masses		  = {1.425229299235770242e+00 * MeV, 1.658889390466721236e+00 * MeV, 2.000000000000000000e+00 * MeV, 2.247412567913343651e+00 * MeV, 2.615865999184929347e+00 * MeV, 3.044725754134705475e+00 * MeV, 3.543895184531499432e+00 * MeV, 4.124901253221343822e+00 * MeV, 5.000000000000000000e+00 * MeV, 5.588289955415879362e+00 * MeV, 6.504465578178933782e+00 * MeV, 7.570844175097216855e+00 * MeV, 8.812050864853802068e+00 * MeV, 1.000000000000000000e+01 * MeV, 1.193829677649106813e+01 * MeV, 1.389552816054473894e+01 * MeV, 1.617363904378025197e+01 * MeV, 2.000000000000000000e+01 * MeV, 2.191155110447665066e+01 * MeV, 2.550385378365185574e+01 * MeV, 2.968509872790354365e+01 * MeV, 3.455184043794348980e+01 * MeV, 4.021646310129752067e+01 * MeV, 5.000000000000000000e+01 * MeV, 5.448403319129700151e+01 * MeV, 6.341645141546277387e+01 * MeV, 7.381330042160217886e+01 * MeV, 8.591466721206701607e+01 * MeV, 1.000000000000000000e+02 * MeV};
-		std::vector<int> operators			  = {3};	 //= {1, 3};
-		std::vector<std::string> interactions = {"C"};	 //{"C", "L"};
-		// int tot								  = DM_masses.size() * operators.size() * interactions.size();
-		// int i								  = 0;
-		for(auto& op : operators)
-			for(auto& inter : interactions)
-			{
-				std::ofstream f;
-				f.open(results_path + "Average_Rate_Mass_O" + std::to_string(op) + inter + ".txt", std::ios_base::app);
-				if(mpi_rank == 0)
-					f << std::endl;
-				// for(int j = DM_masses.size() - 1; j >= 0; j--)
-				for(int j = 10; j >= 0; j--)
-				{
-					double mDM = DM_masses[j];
-					if(mpi_rank == 0)
-						std::cout << j << ")\tmDM = " << mDM / MeV << " MeV" << std::endl;
-					DM_Particle_NREFT DM(mDM);
-					DM.Set_Coupling(op, 1.0, inter);
-					std::vector<std::vector<double>> daily_nreft = Daily_Modulation_NREFT(cfg.grid_points, DM, *cfg.DM_distr, graphene, cfg.MC_points);
-					double average								 = 0.0;
-					for(int k = 0; k < daily_nreft.size(); k++)
-						average += daily_nreft[k][1];
-					average /= daily_nreft.size();
-					if(mpi_rank == 0)
-					{
-						std::cout << "\nAverage rate = " << average / rate_unit << " /gr/year" << std::endl;
-						f << mDM / MeV << "\t" << average / rate_unit << std::endl;
-						std::string file_path = results_path + "Daily_Modulation_O" + std::to_string(op) + inter + "_m=" + std::to_string(libphysica::Round(mDM / MeV)) + ".txt";
-						libphysica::Export_Table(file_path, daily_nreft, {1.0, rate_unit}, "# t[h]\tR[1/gr/year]");
-						std::cout << "\nDone. Table saved to " << file_path << "." << std::endl;
-					}
-					// double rate = R_Average_NREFT(DM, *cfg.DM_distr, graphene, cfg.MC_points);
-					// f << mDM / MeV << "\t" << In_Units(rate, rate_unit) << std::endl;
-					// std::cout << ++i << "/" << tot << "\t" << op << "\t" << inter << "\t" << mDM / MeV << "\t" << In_Units(rate, rate_unit) << std::endl;
-				}
-				f.close();
-			}
+		// // std::vector<double> DM_masses		  = libphysica::Log_Space(2.0 * MeV, 100.0 * MeV, 10);
+		// std::vector<double> DM_masses		  = {1.425229299235770242e+00 * MeV, 1.658889390466721236e+00 * MeV, 2.000000000000000000e+00 * MeV, 2.247412567913343651e+00 * MeV, 2.615865999184929347e+00 * MeV, 3.044725754134705475e+00 * MeV, 3.543895184531499432e+00 * MeV, 4.124901253221343822e+00 * MeV, 5.000000000000000000e+00 * MeV, 5.588289955415879362e+00 * MeV, 6.504465578178933782e+00 * MeV, 7.570844175097216855e+00 * MeV, 8.812050864853802068e+00 * MeV, 1.000000000000000000e+01 * MeV, 1.193829677649106813e+01 * MeV, 1.389552816054473894e+01 * MeV, 1.617363904378025197e+01 * MeV, 2.000000000000000000e+01 * MeV, 2.191155110447665066e+01 * MeV, 2.550385378365185574e+01 * MeV, 2.968509872790354365e+01 * MeV, 3.455184043794348980e+01 * MeV, 4.021646310129752067e+01 * MeV, 5.000000000000000000e+01 * MeV, 5.448403319129700151e+01 * MeV, 6.341645141546277387e+01 * MeV, 7.381330042160217886e+01 * MeV, 8.591466721206701607e+01 * MeV, 1.000000000000000000e+02 * MeV};
+		// std::vector<int> operators			  = {3};	 //= {1, 3};
+		// std::vector<std::string> interactions = {"C"};	 //{"C", "L"};
+		// // int tot								  = DM_masses.size() * operators.size() * interactions.size();
+		// // int i								  = 0;
+		// for(auto& op : operators)
+		// 	for(auto& inter : interactions)
+		// 	{
+		// 		std::ofstream f;
+		// 		f.open(results_path + "Average_Rate_Mass_O" + std::to_string(op) + inter + ".txt", std::ios_base::app);
+		// 		if(mpi_rank == 0)
+		// 			f << std::endl;
+		// 		// for(int j = DM_masses.size() - 1; j >= 0; j--)
+		// 		for(int j = 0; j >= 0; j--)
+		// 		{
+		// 			double mDM = DM_masses[j];
+		// 			if(mpi_rank == 0)
+		// 				std::cout << j << ")\tmDM = " << mDM / MeV << " MeV" << std::endl;
+		// 			DM_Particle_NREFT DM(mDM);
+		// 			DM.Set_Coupling(op, 1.0, inter);
+		// 			std::vector<std::vector<double>> daily_nreft = Daily_Modulation_NREFT(cfg.grid_points, DM, *cfg.DM_distr, graphene, cfg.MC_points);
+		// 			double average								 = 0.0;
+		// 			for(int k = 0; k < daily_nreft.size(); k++)
+		// 				average += daily_nreft[k][1];
+		// 			average /= daily_nreft.size();
+		// 			if(mpi_rank == 0)
+		// 			{
+		// 				std::cout << "\nAverage rate = " << average / rate_unit << " /gr/year" << std::endl;
+		// 				f << mDM / MeV << "\t" << average / rate_unit << std::endl;
+		// 				std::string file_path = results_path + "Daily_Modulation_O" + std::to_string(op) + inter + "_m=" + std::to_string(libphysica::Round(mDM / MeV)) + ".txt";
+		// 				libphysica::Export_Table(file_path, daily_nreft, {1.0, rate_unit}, "# t[h]\tR[1/gr/year]");
+		// 				std::cout << "\nDone. Table saved to " << file_path << "." << std::endl;
+		// 			}
+		// 			// double rate = R_Average_NREFT(DM, *cfg.DM_distr, graphene, cfg.MC_points);
+		// 			// f << mDM / MeV << "\t" << In_Units(rate, rate_unit) << std::endl;
+		// 			// std::cout << ++i << "/" << tot << "\t" << op << "\t" << inter << "\t" << mDM / MeV << "\t" << In_Units(rate, rate_unit) << std::endl;
+		// 		}
+		// 		f.close();
+		// 	}
 	}
 	else
 	{

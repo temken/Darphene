@@ -73,7 +73,7 @@ void Configuration::Construct_DM_Particle()
 		Configuration::Construct_DM_Particle_Anapole(DM_mass);
 	else
 	{
-		std::cerr << "Error in graphene::Configuration::Construct_DM_Particle(): 'DM_interaction' setting " << DM_interaction << " in configuration file not recognized." << std::endl;
+		std::cerr << "\033[1;31mError\033[0m in graphene::Configuration::Construct_DM_Particle(): 'DM_interaction' setting " << DM_interaction << " in configuration file not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT->Set_Spin(DM_spin);
@@ -92,7 +92,7 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in DaMaSCUS_SUN::Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_form_factor' setting in configuration file." << std::endl;
+		std::cerr << "\033[1;31mError\033[0m in DaMaSCUS_SUN::Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_form_factor' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	if(DM_form_factor == "General")
@@ -104,7 +104,7 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 		}
 		catch(const SettingNotFoundException& nfex)
 		{
-			std::cerr << "Error in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_mediator_mass' setting in configuration file." << std::endl;
+			std::cerr << "\033[1;31mError\033[0m in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_mediator_mass' setting in configuration file." << std::endl;
 			std::exit(EXIT_FAILURE);
 		}
 	}
@@ -116,7 +116,7 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_cross_section_electron' setting in configuration file." << std::endl;
+		std::cerr << "\033[1;31mError\033[0m in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_cross_section_electron' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Dark_Photon(mDM, DM_cross_section_electron, DM_form_factor, DM_mediator_mass));
@@ -147,7 +147,7 @@ void Configuration::Construct_DM_Particle_Electric_Dipole(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Electric_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
+		std::cerr << "\033[1;31mError\033[0m in Configuration::Construct_DM_Particle_Electric_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Electric_Dipole(mDM, DM_coupling));
@@ -162,7 +162,7 @@ void Configuration::Construct_DM_Particle_Magnetic_Dipole(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Magnetic_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
+		std::cerr << "\033[1;31mError\033[0m in Configuration::Construct_DM_Particle_Magnetic_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Magnetic_Dipole(mDM, DM_coupling));
@@ -177,7 +177,7 @@ void Configuration::Construct_DM_Particle_Anapole(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Anapole(): No 'DM_coupling' setting in configuration file." << std::endl;
+		std::cerr << "\033[1;31mError\033[0m in Configuration::Construct_DM_Particle_Anapole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Anapole(mDM, DM_coupling));
