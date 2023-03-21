@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	if(argc != 2)
 	{
 		if(mpi_rank == 0)
-			std::cout << "\n\033[1;31mError\033[0m in DarPhene: A config file is required.\n\tCorrect usages:" << std::endl
+			std::cout << libphysica::Formatted_String("Error", "Red", true) << " in DarPhene: A config file is required.\n\tCorrect usages:" << std::endl
 					  << "\t>" << argv[0] << " <config_file>" << std::endl
 					  << "\tor" << std::endl
 					  << "\t>mpirun -n 2 " << argv[0] << " <config_file>" << std::endl
@@ -383,7 +383,7 @@ int main(int argc, char* argv[])
 	auto time_end		 = std::chrono::system_clock::now();
 	double durationTotal = 1e-6 * std::chrono::duration_cast<std::chrono::microseconds>(time_end - time_start).count();
 	if(mpi_rank == 0)
-		std::cout << "\n[Finished in " << libphysica::Time_Display(durationTotal) << "]\a" << std::endl;
+		std::cout << libphysica::Formatted_String("\n[Finished in " + libphysica::Time_Display(durationTotal) + "]\a", "Green", true) << std::endl;
 	MPI_Finalize();
 	return 0;
 }
