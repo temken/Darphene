@@ -50,79 +50,23 @@ Before we can install *Darphene*, we need to make sure that a few dependencies a
 - [MPI](https://www.mpi-forum.org/): The tabulation of DM observables is accelerated via parallelization using MPI.
 - [obscura](https://github.com/temken/obscura): Automatically downloaded to */external/*, compiled, and linked by *CMake*.
 
-
-<details><summary>Installation of arb</summary>
-<p>
-
-On Macs, it can be on installed using [homebrew](https://brew.sh/)
+On macOS, the dependencies can be installed using [homebrew](https://brew.sh/).
 
 ```
->brew install arb
+>brew install arb boost cmake eigen libconfig open-mpi
 ```
 
-or alternatively on Linux with APT:
-
-```
->sudo apt-get install arb
-```
-
-</p>
-</details>
-
-<details><summary>Installation of boost</summary>
-<p>
-
-On Macs, it can be on installed using [homebrew](https://brew.sh/)
-
-```
->brew install boost
-```
-
-or alternatively with APT:
-
-```
->sudo apt-get install libboost-all-dev
-```
-
-</p>
-</details>
-
-<details><summary>Installation of eigen</summary>
-<p>
-
-On Macs, it can be on installed using [homebrew](https://brew.sh/)
-
-```
->brew install eigen
-```
-
-or alternatively on Linux with APT:
-
-```
->sudo apt-get install libeigen3-dev
-```
-
-</p>
-</details>
-
-<details><summary>Installation of libconfig</summary>
-<p>
-This installation is optional, since `libphysica` will install it automatically, if it is not available.
-
-On Macs, it can be on installed using [homebrew](https://brew.sh/)
-
-```
->brew install libconfig
-```
-
-or using APT on Linux machines
+On Linux machines, we can use APT:
 
 ```
 >sudo apt-get update -y
->sudo apt-get install -y libconfig-dev
+>sudo apt-get install -y arb libboost-all-dev libeigen3-dev libconfig-dev openmpi-bin openmpi-doc libopenmpi-dev
 ```
 
-Alternatively, it can be built from the source files via
+<details><summary>Notes on libconfig</summary>
+<p>
+
+The installation of `libconfig` is optional, since `libphysica` will install it automatically, if it is not available. Alternatively, it can be built from the source files via
 
 ```
 >wget https://hyperrealm.github.io/libconfig/dist/libconfig-1.7.2.tar.gz
@@ -133,32 +77,13 @@ Alternatively, it can be built from the source files via
 >sudo make install
 >popd
 ```
-
-</p>
-</details>
-
-<details><summary>Installation of MPI</summary>
-<p>
-
-On Macs, it can be on installed using [homebrew](https://brew.sh/)
-
-```
->brew install open-mpi
-```
-
-or alternatively on Linux with APT:
-
-```
->sudo apt-get install openmpi-bin openmpi-doc libopenmpi-dev
-```
-
 </p>
 </details>
 
 </p>
 </details>
 
-<details><summary>2. Downlad & Installation</summary>
+<details><summary>2. Download & Installation</summary>
 <p>
 The *Darphene* source code can be downloaded by cloning this git repository:
 
@@ -203,7 +128,7 @@ where *N* is the number of desired MPI processes.
 
 ## Version History
 
-- xx.xx.20xx: Release of version 0.1.0
+- 27.03.2023: Release of version 0.1.0
 
 ## Everything else
 
