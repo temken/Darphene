@@ -16,11 +16,6 @@
 
 ## General notes
 
-- build with [CMake](https://cmake.org/)
-- continuous integration with [Github Actions](https://github.com/actions)
-- unit testing with [googletest](https://github.com/google/googletest)
-- code coverage with [codecov](https://codecov.io/).
-- imports the static library [obscura](https://github.com/temken/obscura) and thereby also [libphysica](https://github.com/temken/libphysica)
 
 <details><summary>Repository content</summary>
 <p>
@@ -46,17 +41,38 @@ The included folders are:
 
 Before we can install *Darphene*, we need to make sure that a few dependencies are taken care of.
 
-- [arb]():
+- [arb](https://arblib.org/): For the evaluation of hypergeometric functions.
 - [boost](https://www.boost.org/): For numerical integration (used by *libphysica*).
 - [CMake](https://cmake.org/): *Darphene* as well as the libraries *libphysica* and *obscura* are built with CMake.
-- [eigen]():
+- [eigen](https://eigen.tuxfamily.org): For the numerical procedure to find eigenvalues and eigenvectors of the generalized eigen problem.
 - [libconfig](https://github.com/hyperrealm/libconfig): For the configuration files, *Darphene* uses the *libconfig* library (required version at least 1.6). This will be installed by *libphysica*, if it is not already installed.
 - [libphysica](https://github.com/temken/libphysica): Automatically downloaded to */external/obscura/external/*, compiled, and linked by *CMake*.
+- [MPI](https://www.mpi-forum.org/): The tabulation of DM observables is accelerated via parallelization using MPI.
 - [obscura](https://github.com/temken/obscura): Automatically downloaded to */external/*, compiled, and linked by *CMake*.
 
 
+<details><summary>Installation of arb</summary>
+<p>
+
+On Macs, it can be on installed using [homebrew](https://brew.sh/)
+
+```
+>brew install arb
+```
+
+or alternatively on Linux with APT:
+
+```
+>sudo apt-get install arb
+```
+
+</p>
+</details>
+
 <details><summary>Installation of boost</summary>
 <p>
+
+On Macs, it can be on installed using [homebrew](https://brew.sh/)
 
 ```
 >brew install boost
@@ -66,6 +82,24 @@ or alternatively with APT:
 
 ```
 >sudo apt-get install libboost-all-dev
+```
+
+</p>
+</details>
+
+<details><summary>Installation of eigen</summary>
+<p>
+
+On Macs, it can be on installed using [homebrew](https://brew.sh/)
+
+```
+>brew install eigen
+```
+
+or alternatively on Linux with APT:
+
+```
+>sudo apt-get install libeigen3-dev
 ```
 
 </p>
@@ -103,6 +137,24 @@ Alternatively, it can be built from the source files via
 </p>
 </details>
 
+<details><summary>Installation of MPI</summary>
+<p>
+
+On Macs, it can be on installed using [homebrew](https://brew.sh/)
+
+```
+>brew install open-mpi
+```
+
+or alternatively on Linux with APT:
+
+```
+>sudo apt-get install openmpi-bin openmpi-doc libopenmpi-dev
+```
+
+</p>
+</details>
+
 </p>
 </details>
 
@@ -135,8 +187,16 @@ If everything worked well, there should be the executable *Darphene* in the */bi
 Once *Darphene* is installed, it can run by running the following command from the */bin/* folder:
 
 ```
->./Darphene config.cfg
+>./Darphene Darphene.cfg
 ```
+
+Alternative, one can use MPI to speed up calculations.
+
+```
+>mpirun -n N Darphene Darphene.cfg
+```
+
+where *N* is the number of desired MPI processes.
 
 </p>
 </details>
