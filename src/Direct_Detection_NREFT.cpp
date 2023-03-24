@@ -12,7 +12,7 @@
 
 #include "graphene/Direct_Detection_Standard.hpp"
 
-namespace DarPhene
+namespace Darphene
 {
 
 using namespace libphysica::natural_units;
@@ -508,4 +508,4 @@ std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_
 	return daily_modulation_list;
 }
 
-}	// namespace DarPhene
+}	// namespace Darphene

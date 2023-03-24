@@ -12,7 +12,7 @@
 
 #include "version.hpp"
 
-namespace DarPhene
+namespace Darphene
 {
 using namespace libphysica::natural_units;
 
@@ -256,4 +256,4 @@ std::complex<double> Roothaan_Hartree_Fock::Wavefunction_Momentum(const Eigen::V
 	}
 }
 
-}	// namespace DarPhene
+}	// namespace Darphene

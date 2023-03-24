@@ -6,7 +6,7 @@
 
 #include "graphene/Graphene.hpp"
 
-namespace DarPhene
+namespace Darphene
 {
 // 0. Auxiliary functions
 extern Eigen::Vector3d Spherical_Coordinates(double r, double theta, double phi);
@@ -39,6 +39,6 @@ extern std::vector<std::vector<double>> Tabulate_dR_dlnE_Standard(int points, ob
 extern std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
 extern std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
 
-}	// namespace DarPhene
+}	// namespace Darphene
 
 #endif

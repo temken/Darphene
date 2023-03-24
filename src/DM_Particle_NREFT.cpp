@@ -4,7 +4,7 @@
 #include "libphysica/Special_Functions.hpp"
 #include "libphysica/Utilities.hpp"
 
-namespace DarPhene
+namespace Darphene
 {
 
 using namespace libphysica::natural_units;
@@ -195,4 +195,4 @@ DM_Particle_NREFT DM_Anapole(double mDM, double g_over_lambda_2)
 	return DM;
 }
 
-}	// namespace DarPhene
+}	// namespace Darphene

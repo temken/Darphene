@@ -6,7 +6,7 @@
 #include "graphene/DM_Particle_NREFT.hpp"
 #include "graphene/Graphene.hpp"
 
-namespace DarPhene
+namespace Darphene
 {
 
 // 1. Rates and spectra for a single band
@@ -36,6 +36,6 @@ extern std::vector<std::vector<double>> Tabulate_dR_dlnE_NREFT(int points, DM_Pa
 extern std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
 extern std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points);
 
-}	// namespace DarPhene
+}	// namespace Darphene
 
 #endif

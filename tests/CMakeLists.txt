@@ -1,5 +1,5 @@
 # # 0. Test executable
-# add_test(NAME test_Exectuable COMMAND DarPhene config.cfg
+# add_test(NAME test_Exectuable COMMAND Darphene config.cfg
 # WORKING_DIRECTORY ${BIN_DIR})
 
 # 1. Test all modules
@@ -13,7 +13,7 @@ foreach(TESTFILE ${TESTFILES})
 
 	target_link_libraries(${TESTNAME}
 		PRIVATE
-		DarPhene_library
+		Darphene_library
 		gtest_main # contains the main function
 	)
 

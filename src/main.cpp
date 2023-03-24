@@ -24,7 +24,7 @@
 #include "version.hpp"
 
 using namespace libphysica::natural_units;
-using namespace DarPhene;
+using namespace Darphene;
 
 int main(int argc, char* argv[])
 {
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	if(argc != 2)
 	{
 		if(mpi_rank == 0)
-			std::cout << libphysica::Formatted_String("Error", "Red", true) << " in DarPhene: A config file is required.\n\tCorrect usages:" << std::endl
+			std::cout << libphysica::Formatted_String("Error", "Red", true) << " in Darphene: A config file is required.\n\tCorrect usages:" << std::endl
 					  << "\t>" << argv[0] << " <config_file>" << std::endl
 					  << "\tor" << std::endl
 					  << "\t>mpirun -n 2 " << argv[0] << " <config_file>" << std::endl

@@ -8,7 +8,7 @@
 #include "graphene/Carbon_Wavefunctions.hpp"
 #include "graphene/Direct_Detection_Standard.hpp"
 
-namespace DarPhene
+namespace Darphene
 {
 using namespace libphysica::natural_units;
 using namespace std::complex_literals;
@@ -352,4 +352,4 @@ double Graphene::Material_Response_Function(const Eigen::Vector3d& lVec)
 	return W;
 }
 
-}	// namespace DarPhene
+}	// namespace Darphene

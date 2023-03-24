@@ -1,8 +1,8 @@
-[![Build Status](https://github.com/temken/DarPhene/workflows/Build%20Status/badge.svg)](https://github.com/temken/DarPhene/actions)
-[![codecov](https://codecov.io/gh/temken/DarPhene/branch/main/graph/badge.svg)](https://codecov.io/gh/temken/template_cpp_cmake_obscura)
+[![Build Status](https://github.com/temken/Darphene/workflows/Build%20Status/badge.svg)](https://github.com/temken/Darphene/actions)
+[![codecov](https://codecov.io/gh/temken/Darphene/branch/main/graph/badge.svg)](https://codecov.io/gh/temken/template_cpp_cmake_obscura)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-# DarPhene - Modelling general dark matter - electron interactions in graphene targets
+# Darphene - Modelling general dark matter - electron interactions in graphene targets
 
 [![DOI](https://zenodo.org/badge/xxx.svg)](https://zenodo.org/badge/latestdoi/xxx)
 [![arXiv](https://img.shields.io/badge/arXiv-2303.xxxxx-B31B1B.svg)](https://arxiv.org/abs/2303.xxxxx)
@@ -10,7 +10,7 @@
 
 <img width="500" src="https://user-images.githubusercontent.com/29034913/226606944-eed845e7-a14c-4880-a78c-bf959bf8b430.png">
 
-*DarPhene* performs calculation to using the [tight-binding approximation](https://en.wikipedia.org/wiki/Tight_binding). Details on the physics can be found in [the corresponding publication](https://arxiv.org/abs/2303.XXXXX).
+*Darphene* performs calculation to using the [tight-binding approximation](https://en.wikipedia.org/wiki/Tight_binding). Details on the physics can be found in [the corresponding publication](https://arxiv.org/abs/2303.XXXXX).
 
 <img width="250" src="https://user-images.githubusercontent.com/29034913/226607786-762d3a59-88d8-4927-bd16-eb2a577391d2.png">
 
@@ -30,9 +30,9 @@ The included folders are:
 - *bin/*: This folder contains the executable after successful installation together with the configuration files.
 - *data/*: Contains additional data necessary for the simulations, e.g. the solar model tables.
 - *external/*: This folder will only be created and filled during the build with CMake and will contain the [obscura](https://github.com/temken/obscura) library necessary for all direct detection computations.
-- *include/*: All header files of DarPhene can be found here.
-- *results/*: Each run of DarPhene generates result files in a dedicated sub-folder named after the run's simulation ID string, which is specified in the configuration file.
-- *src/*: Here you find the source code of DarPhene.
+- *include/*: All header files of Darphene can be found here.
+- *results/*: Each run of Darphene generates result files in a dedicated sub-folder named after the run's simulation ID string, which is specified in the configuration file.
+- *src/*: Here you find the source code of Darphene.
 - *tests/*: All code and executable files of the unit tests are stored here.
 
 </p>
@@ -44,13 +44,13 @@ The included folders are:
 <details><summary>1. Dependencies</summary>
 <p>
 
-Before we can install *DarPhene*, we need to make sure that a few dependencies are taken care of.
+Before we can install *Darphene*, we need to make sure that a few dependencies are taken care of.
 
 - [arb]():
 - [boost](https://www.boost.org/): For numerical integration (used by *libphysica*).
-- [CMake](https://cmake.org/): *DarPhene* as well as the libraries *libphysica* and *obscura* are built with CMake.
+- [CMake](https://cmake.org/): *Darphene* as well as the libraries *libphysica* and *obscura* are built with CMake.
 - [eigen]():
-- [libconfig](https://github.com/hyperrealm/libconfig): For the configuration files, *DarPhene* uses the *libconfig* library (required version at least 1.6). This will be installed by *libphysica*, if it is not already installed.
+- [libconfig](https://github.com/hyperrealm/libconfig): For the configuration files, *Darphene* uses the *libconfig* library (required version at least 1.6). This will be installed by *libphysica*, if it is not already installed.
 - [libphysica](https://github.com/temken/libphysica): Automatically downloaded to */external/obscura/external/*, compiled, and linked by *CMake*.
 - [obscura](https://github.com/temken/obscura): Automatically downloaded to */external/*, compiled, and linked by *CMake*.
 
@@ -108,11 +108,11 @@ Alternatively, it can be built from the source files via
 
 <details><summary>2. Downlad & Installation</summary>
 <p>
-The *DarPhene* source code can be downloaded by cloning this git repository:
+The *Darphene* source code can be downloaded by cloning this git repository:
 
 ```
->git clone https://github.com/temken/DarPhene.git 
->cd DarPhene
+>git clone https://github.com/temken/Darphene.git 
+>cd Darphene
 ```
 
 The code is compiled and the executable is created using CMake.
@@ -125,17 +125,17 @@ The code is compiled and the executable is created using CMake.
 >cmake --install .
 ```
 
-If everything worked well, there should be the executable *DarPhene* in the */bin/* folder.
+If everything worked well, there should be the executable *Darphene* in the */bin/* folder.
 
 </p>
 </details>
 
 <details><summary>3. Usage</summary>
 <p>
-Once *DarPhene* is installed, it can run by running the following command from the */bin/* folder:
+Once *Darphene* is installed, it can run by running the following command from the */bin/* folder:
 
 ```
->./DarPhene config.cfg
+>./Darphene config.cfg
 ```
 
 </p>
@@ -147,26 +147,26 @@ Once *DarPhene* is installed, it can run by running the following command from t
 
 ## Everything else
 
-<details><summary>Citing DarPhene</summary>
+<details><summary>Citing Darphene</summary>
 <p>
 
 If you decide to use this code, please cite the latest archived version,
 
-> Emken, T., 2023, DarPhene [Code, v0.1.0], [[DOI:10.5281/zenodo.xxxxxxx]](https://doi.org/10.5281/zenodo.xxxxxxx)
+> Emken, T., 2023, Darphene [Code, v0.1.0], [[DOI:10.5281/zenodo.xxxxxxx]](https://doi.org/10.5281/zenodo.xxxxxxx)
 
 <details><summary>BibTeX entry</summary>
 <p>
 
 ```
-@software{DarPhene,
+@software{Darphene,
   author = {Emken, Timon},
-  title = {{DarPhene [Code, v0.1.0]}},
+  title = {{Darphene [Code, v0.1.0]}},
   year         = {2023},
   publisher    = {Zenodo},
   version      = {v0.1.0},
   doi          = {DOI:10.5281/zenodo.xxxxxxx},
   url          = {https://doi.org/10.5281/zenodo.xxxxxxx},
-  howpublished={The code can be found under \url{https://github.com/temken/DarPhene}. Version 0.1.0 is archived as \href{https://doi.org/10.5281/zenodo.xxxxxxx}{DOI:10.5281/zenodo.xxxxxxx}}
+  howpublished={The code can be found under \url{https://github.com/temken/Darphene}. Version 0.1.0 is archived as \href{https://doi.org/10.5281/zenodo.xxxxxxx}{DOI:10.5281/zenodo.xxxxxxx}}
 }
 ```
 </p>
@@ -182,9 +182,9 @@ As well as the original publication,
 <details><summary>Author & Contact</summary>
 <p>
 
-The author of *DarPhene* is Timon Emken.
+The author of *Darphene* is Timon Emken.
 
-For questions, bug reports or other suggestions please open an [issue](https://github.com/temken/DarPhene/issues).
+For questions, bug reports or other suggestions please open an [issue](https://github.com/temken/Darphene/issues).
 </p>
 </details>
 

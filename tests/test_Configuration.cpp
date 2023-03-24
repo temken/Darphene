@@ -4,7 +4,7 @@
 
 #include "graphene/Configuration.hpp"
 
-using namespace DarPhene;
+using namespace Darphene;
 using namespace libphysica::natural_units;
 
 // TEST(TestDMFormFactor, TestDefaultConstructor)

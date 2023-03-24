@@ -6,7 +6,7 @@
 #include "graphene/DM_Particle_NREFT.hpp"
 #include "graphene/Graphene.hpp"
 
-namespace DarPhene
+namespace Darphene
 {
 // 1. Configuration class for input file, which extends the obscura::Configuration class.
 
@@ -37,6 +37,6 @@ class Configuration : public obscura::Configuration
 	void Print_Summary(int mpi_rank = 0) override;
 };
 
-}	// namespace DarPhene
+}	// namespace Darphene
 
 #endif

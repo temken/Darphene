@@ -4,7 +4,7 @@
 
 #include "graphene/DM_Particle_NREFT.hpp"
 
-using namespace DarPhene;
+using namespace Darphene;
 using namespace libphysica::natural_units;
 
 TEST(TestDMFormFactor, TestDefaultConstructor)

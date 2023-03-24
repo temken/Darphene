@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace DarPhene
+namespace Darphene
 {
 
 // 1. Base class for atomic wavefunctions of carbon
@@ -71,6 +71,6 @@ class Roothaan_Hartree_Fock : public Carbon_Wavefunctions
 	virtual std::complex<double> Wavefunction_Momentum(const Eigen::Vector3d& kVec, const std::string& orbital) override;
 };
 
-}	// namespace DarPhene
+}	// namespace Darphene
 
 #endif
