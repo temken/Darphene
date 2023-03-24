@@ -28,7 +28,7 @@ Eigen::Vector3d Graphene::Path_1BZ(double k) const
 		return {2.0 * M_PI / sqrt(3.0) / a, k - 2.0 / 3.0 * M_PI * (2.0 + sqrt(3.0)) / a, 0.0};
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Graphene::Path_1BZ(): Momentum k = " << k << " out of bound." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Path_1BZ(): Momentum k = " << k << " out of bound." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -175,7 +175,7 @@ Graphene::Graphene(const std::string& wavefunctions, double workfunction)
 		carbon_wavefunctions = new Roothaan_Hartree_Fock();
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Graphene::Graphene(): Unknown wavefunction type " << wavefunctions << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Graphene(): Unknown wavefunction type " << wavefunctions << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -200,7 +200,7 @@ double Graphene::Overlap_Integral(const std::string& parameter)
 			return carbon_wavefunctions->Wavefunction_Position(xVec_eigen, "2s") * carbon_wavefunctions->Wavefunction_Position(xVec_eigen - nearest_neighbors[0], "2px");
 		else
 		{
-			std::cerr << "\033[1;31mError\033[0m in Graphene::Wavefunction_Overlap(): Unknown parameter " << parameter << std::endl;
+			std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Wavefunction_Overlap(): Unknown parameter " << parameter << std::endl;
 			std::exit(EXIT_FAILURE);
 		}
 	};
@@ -236,7 +236,7 @@ double Graphene::Valence_Band_Energies(const Eigen::Vector3d& kVec, unsigned int
 		return Energy_Dispersion_Sigma(kVec)[energy_band - 1];
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Graphene::Valence_Band_Energies(): energy band " << energy_band << "is not a valence band." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Valence_Band_Energies(): energy band " << energy_band << "is not a valence band." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -250,7 +250,7 @@ double Graphene::Lowest_Binding_Energy(int band)
 	}
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Graphene::Lowest_Binding_Energy(): Unknown band " << band << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Lowest_Binding_Energy(): Unknown band " << band << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -303,7 +303,7 @@ Eigen::Vector3d Graphene::Find_G_Vector(const Eigen::Vector3d& kVec)
 					}
 			}
 	}
-	std::cerr << "\033[1;31mError\033[0m in Graphene::Find_G_Vector(): No G vector found for k = (" << kVec.transpose() / b << ") b" << std::endl;
+	std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Find_G_Vector(): No G vector found for k = (" << kVec.transpose() / b << ") b" << std::endl;
 	std::exit(EXIT_FAILURE);
 }
 

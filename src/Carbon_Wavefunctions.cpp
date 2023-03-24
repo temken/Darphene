@@ -9,6 +9,7 @@
 
 #include "libphysica/Integration.hpp"
 #include "libphysica/Natural_Units.hpp"
+#include "libphysica/Utilities.hpp"
 
 #include "version.hpp"
 
@@ -71,7 +72,7 @@ double Hydrogenic::Wavefunction_Position(const Eigen::Vector3d& xVec, const std:
 	}
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Hydrogenic::Wavefunction_Position(): Unknown orbital " << orbital << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Hydrogenic::Wavefunction_Position(): Unknown orbital " << orbital << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -102,7 +103,7 @@ std::complex<double> Hydrogenic::Wavefunction_Momentum(const Eigen::Vector3d& kV
 	}
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Hydrogenic::Wavefunction_Position(): Unknown orbital " << orbital << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Hydrogenic::Wavefunction_Position(): Unknown orbital " << orbital << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -233,7 +234,7 @@ double Roothaan_Hartree_Fock::Wavefunction_Position(const Eigen::Vector3d& xVec,
 		return sqrt(3.0 / 4.0 / M_PI) * xVec[2] / r * Radial_Wavefunction_Position(r, orbital);
 	else
 	{
-		std::cout << "\033[1;31mError\033[0m in Roothaan_Hartree_Fock::Wavefunction_Position(): Orbital " << orbital << " not recognized." << std::endl;
+		std::cout << libphysica::Formatted_String("Error", "Red", true) << " in Roothaan_Hartree_Fock::Wavefunction_Position(): Orbital " << orbital << " not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -251,7 +252,7 @@ std::complex<double> Roothaan_Hartree_Fock::Wavefunction_Momentum(const Eigen::V
 		return sqrt(3.0 / 4.0 / M_PI) * kVec[2] / k * Radial_Wavefunction_Momentum(k, orbital);
 	else
 	{
-		std::cout << "\033[1;31mError\033[0m in Roothaan_Hartree_Fock::Wavefunction_Momentum(): Orbital " << orbital << " not recognized." << std::endl;
+		std::cout << libphysica::Formatted_String("Error", "Red", true) << " in Roothaan_Hartree_Fock::Wavefunction_Momentum(): Orbital " << orbital << " not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }

@@ -49,7 +49,7 @@ double DM_Form_Factor::operator()(double q)
 		return std::pow(q / qRef, q_power);
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in DM_Form_Factor::operator(): Form factor " << form_factor_type << " not implemented." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in DM_Form_Factor::operator(): Form factor " << form_factor_type << " not implemented." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -78,7 +78,7 @@ void DM_Particle_NREFT::Set_Coupling(int index, double value, const std::string&
 {
 	if(index < 1 || index > 15 || index == 2)
 	{
-		std::cerr << "\033[1;31mError\033[0m in DM_Particle_NREFT::Set_Coupling: Operator " << index << " is undefined." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in DM_Particle_NREFT::Set_Coupling: Operator " << index << " is undefined." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	couplings[index - 1]	   = value;

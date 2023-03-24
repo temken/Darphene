@@ -43,7 +43,7 @@ double Hydrogenic_Wavefunction(const Eigen::Vector3d& position, const std::strin
 	}
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Hydrogenic_Wavefunction(): Orbital " << orbital << " not recognized." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Hydrogenic_Wavefunction(): Orbital " << orbital << " not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -74,7 +74,7 @@ double Hydrogenic_Wavefunction_Momentum(const Eigen::Vector3d& momentum, const s
 	}
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Hydrogenic_Wavefunction_Momentum(): Orbital " << orbital << " not recognized." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Hydrogenic_Wavefunction_Momentum(): Orbital " << orbital << " not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -107,7 +107,7 @@ Eigen::Vector3d Graphene::Path_1BZ(double k) const
 		return {2.0 * M_PI / sqrt(3.0) / a, k - 2.0 / 3.0 * M_PI * (2.0 + sqrt(3.0)) / a, 0.0};
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Graphene::Path_1BZ(): Momentum k = " << k << " out of bound." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Path_1BZ(): Momentum k = " << k << " out of bound." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -251,7 +251,7 @@ double Graphene::Valence_Band_Energies(const Eigen::Vector3d& lVec, unsigned int
 		return Energy_Dispersion_Sigma(lVec)[energy_band - 1];
 	else
 	{
-		std::cerr << "\033[1;31mError\033[0m in Graphene::Valence_Band_Energies(): energy band " << energy_band << "is not a valence band." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Graphene::Valence_Band_Energies(): energy band " << energy_band << "is not a valence band." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
