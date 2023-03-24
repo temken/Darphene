@@ -8,7 +8,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2303.xxxxx-B31B1B.svg)](https://arxiv.org/abs/2303.xxxxx)
 
 
-<img width="500" src="https://user-images.githubusercontent.com/29034913/226606944-eed845e7-a14c-4880-a78c-bf959bf8b430.png">
+<img width="500" src="https://user-images.githubusercontent.com/29034913/227547647-9d2825dd-9cfd-4fde-9573-04d6c885a99f.png">
 
 *Darphene* performs calculation to using the [tight-binding approximation](https://en.wikipedia.org/wiki/Tight_binding). Details on the physics can be found in [the corresponding publication](https://arxiv.org/abs/2303.XXXXX).
 
