@@ -37,7 +37,7 @@ void DM_Form_Factor::Print_Summary(int rank) const
 	}
 }
 
-double DM_Form_Factor::operator()(double q)
+double DM_Form_Factor::operator()(double q) const
 {
 	if(form_factor_type == "Contact" || form_factor_type == "C")
 		return 1.0;
@@ -97,7 +97,20 @@ void DM_Particle_NREFT::Reset_All_Couplings()
 	DM_form_factors = std::vector<DM_Form_Factor>(15);
 }
 
-double DM_Particle_NREFT::Response_Function(const Eigen::Vector3d& qVec, const Eigen::Vector3d& velDM, const Eigen::Vector3d& kPrime)
+double DM_Particle_NREFT::Sigma_Electron() const
+{
+	double qRef = aEM * mElectron;
+	double vRef = 1.0e-3;
+	Eigen::Vector3d qVec({qRef / sqrt(3.0), qRef / sqrt(3.0), qRef / sqrt(3.0)});
+	Eigen::Vector3d vVec({vRef / sqrt(3.0), vRef / sqrt(3.0), vRef / sqrt(3.0)});
+	Eigen::Vector3d kPrime({0.0, 0.0, 0.0});
+	double Rfree = Response_Function(qVec, vVec, kPrime);
+	double mu	 = libphysica::Reduced_Mass(mass, mElectron);
+	double sigma = Rfree * mu * mu / 16.0 / M_PI / mass / mass / mElectron / mElectron;
+	return sigma;
+}
+
+double DM_Particle_NREFT::Response_Function(const Eigen::Vector3d& qVec, const Eigen::Vector3d& velDM, const Eigen::Vector3d& kPrime) const
 {
 	// Kinematic quantities
 	double q				  = qVec.norm();

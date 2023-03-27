@@ -23,7 +23,7 @@ class DM_Form_Factor
 
 	void Print_Summary(int rank = 0) const;
 
-	double operator()(double q);
+	double operator()(double q) const;
 };
 
 // 2. Class for the DM particle interacting with electrons via effective operators O_i
@@ -44,7 +44,9 @@ class DM_Particle_NREFT : public obscura::DM_Particle
 	void Set_Cross_Section(int index, double sigma, const std::string& form_factor = "Contact", double param = 0.0);
 	void Reset_All_Couplings();
 
-	double Response_Function(const Eigen::Vector3d& qVec, const Eigen::Vector3d& velDM, const Eigen::Vector3d& kPrime);
+	virtual double Sigma_Electron() const override;
+
+	double Response_Function(const Eigen::Vector3d& qVec, const Eigen::Vector3d& velDM, const Eigen::Vector3d& kPrime) const;
 
 	virtual void Print_Summary(int rank = 0) const override;
 };

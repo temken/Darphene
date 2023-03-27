@@ -30,11 +30,11 @@ TEST(TestDMFormFactor, TestFormFactors)
 
 	// ACT && ASSERT
 	std::vector<DM_Form_Factor> DM_Form_Factors = {};
-	for(int i = 0; i < form_factor_types.size(); i++)
+	for(unsigned int i = 0; i < form_factor_types.size(); i++)
 		DM_Form_Factors.push_back(DM_Form_Factor(form_factor_types[i], param));
 
 	// ASSERT
-	for(int i = 0; i < form_factor_types.size(); i++)
+	for(unsigned int i = 0; i < form_factor_types.size(); i++)
 		EXPECT_FLOAT_EQ(DM_Form_Factors[i](q), results[i]);
 }
 

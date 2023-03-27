@@ -251,7 +251,7 @@ void Configuration::Import_Graphene_Parameters()
 	try
 	{
 		exposure = config.lookup("exposure");
-		time *= gram * year;
+		exposure *= gram * year;
 		constraints_certainty = config.lookup("constraints_certainty");
 	}
 	catch(const SettingNotFoundException& nfex)

@@ -53,7 +53,7 @@ TEST(TestConfiguration, TestConstructorDarkPhoton)
 	EXPECT_FLOAT_EQ(cfg.graphene_work_function, 4.3 * eV);
 	EXPECT_FLOAT_EQ(cfg.time, 6.0 * hr);
 	EXPECT_FLOAT_EQ(cfg.DM_NREFT->mass, 0.1 * GeV);
-	// EXPECT_FLOAT_EQ(cfg.DM_NREFT->Sigma_Electron(), 1.0e-37 * cm * cm);
+	EXPECT_FLOAT_EQ(cfg.DM_NREFT->Sigma_Electron(), 1.0e-37 * cm * cm);
 }
 
 TEST(TestConfiguration, TestConstructorElectricDipole)
