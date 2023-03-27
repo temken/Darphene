@@ -468,8 +468,8 @@ std::vector<std::vector<double>> Daily_Modulation_Standard(int points, const obs
 
 // 4. DM detector class
 
-DM_Detector_Graphene::DM_Detector_Graphene(std::string& label, double exposure)
-: obscura::DM_Detector(label, exposure, "Electrons")
+DM_Detector_Graphene::DM_Detector_Graphene(const std::string& label, double exposure, Graphene& graph)
+: obscura::DM_Detector(label, exposure, "Electrons"), graphene(graph)
 {
 }
 

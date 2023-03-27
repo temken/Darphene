@@ -301,6 +301,20 @@ int main(int argc, char* argv[])
 			std::cout << "\nDone. Tabulated response function saved to \n\t" << file_path << "." << std::endl;
 		}
 	}
+	else if(cfg.run_modus == "Exclusion-Limit")
+	{
+		if(mpi_rank == 0)
+			std::cout << "\nCompute exclusion limit for standard SI interactions:" << std::endl;
+		DM_Detector_Graphene detector("Graphene-Detector", cfg.exposure, graphene);
+		auto DM_masses		 = libphysica::Log_Space(cfg.constraints_mass_min, cfg.constraints_mass_max, cfg.constraints_masses);
+		auto exclusion_limit = detector.Upper_Limit_Curve(*cfg.DM, *cfg.DM_distr, DM_masses, cfg.constraints_certainty);
+		if(mpi_rank == 0)
+		{
+			std::string file_path = results_path + "Exclusion_Limit.txt";
+			libphysica::Export_Table(file_path, exclusion_limit, {MeV, cm * cm}, "#m_DM [MeV]\t#sigma_e_SI [cm^2]");
+			std::cout << "\nDone. Exclusion limit saved to \n\t" << file_path << "." << std::endl;
+		}
+	}
 	else if(cfg.run_modus == "Custom")
 	{
 	}

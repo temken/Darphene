@@ -247,6 +247,31 @@ void Configuration::Import_Graphene_Parameters()
 		std::cerr << "No 'time' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+	// Exclusion limit parameters
+	try
+	{
+		exposure = config.lookup("exposure");
+		time *= gram * year;
+		constraints_certainty = config.lookup("constraints_certainty");
+	}
+	catch(const SettingNotFoundException& nfex)
+	{
+		std::cerr << "No 'exposure' or 'constraints_certainty' setting in configuration file." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+	try
+	{
+		constraints_mass_min = config.lookup("constraints_mass_min");
+		constraints_mass_min *= MeV;
+		constraints_mass_max = config.lookup("constraints_mass_max");
+		constraints_mass_max *= MeV;
+		constraints_masses = config.lookup("constraints_masses");
+	}
+	catch(const SettingNotFoundException& nfex)
+	{
+		std::cerr << "No 'constraints_mass_min', 'constraints_mass_max', or 'constraints_masses' setting in configuration file." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 }
 
 Configuration::Configuration(std::string cfg_filename, int MPI_rank)
@@ -295,6 +320,13 @@ void Configuration::Print_Summary(int mpi_rank)
 				  << "\tWave functions:\t\t\t" << carbon_wavefunctions << std::endl
 				  << "\tGraphene work function [eV]:\t" << graphene_work_function / eV << std::endl
 				  << "\tTime of day [hr]:\t\t" << time / hr << std::endl;
+		if(run_modus == "Exclusion-Limit")
+			std::cout << "Exclusion limit options" << std::endl
+					  << "\tExposure [g*yr]:\t\t" << exposure / (gram * year) << std::endl
+					  << "\tConstraints certainty:\t\t" << constraints_certainty << std::endl
+					  << "\tConstraints mass min [MeV]:\t" << constraints_mass_min / MeV << std::endl
+					  << "\tConstraints mass max [MeV]:\t" << constraints_mass_max / MeV << std::endl
+					  << "\tConstraints masses:\t\t" << constraints_masses << std::endl;
 		std::cout << SEPARATOR << std::endl;
 	}
 }

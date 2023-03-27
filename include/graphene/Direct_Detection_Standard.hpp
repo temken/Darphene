@@ -47,7 +47,7 @@ class DM_Detector_Graphene : public obscura::DM_Detector
 	Graphene graphene;
 
   public:
-	DM_Detector_Graphene(std::string& label, double exposure);
+	DM_Detector_Graphene(const std::string& label, double exposure, Graphene& graph);
 
 	virtual double Maximum_Energy_Deposit(obscura::DM_Particle& DM, const obscura::DM_Distribution& DM_distr) const override;
 	virtual double Minimum_DM_Speed(obscura::DM_Particle& DM) const override;

@@ -31,6 +31,9 @@ class Configuration : public obscura::Configuration
 	double graphene_work_function, time;
 	std::string run_modus, carbon_wavefunctions;
 	unsigned int MC_points, grid_points;
+	// For constraints
+	double exposure, constraints_certainty, constraints_mass_min, constraints_mass_max;
+	unsigned int constraints_masses;
 
 	explicit Configuration(std::string cfg_filename, int MPI_rank = 0);
 
