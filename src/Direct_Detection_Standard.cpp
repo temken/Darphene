@@ -497,13 +497,13 @@ double DM_Detector_Graphene::Minimum_DM_Mass(obscura::DM_Particle& DM, const obs
 double DM_Detector_Graphene::dRdE(double E, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr)
 {
 	int MC_points = 10000;
-	return 1.0 / E * dR_dlnE_Standard(E, DM, DM_distr, graphene, "Full", MC_points);
+	return flat_efficiency * 1.0 / E * dR_dlnE_Standard(E, DM, DM_distr, graphene, "Full", MC_points);
 }
 
 double DM_Detector_Graphene::DM_Signals_Total(const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr)
 {
 	int MC_points = 10000;
-	return R_Total_Standard(DM, DM_distr, graphene, "Full", MC_points);
+	return flat_efficiency * exposure * R_Total_Standard(DM, DM_distr, graphene, "Full", MC_points);
 }
 
 }	// namespace Darphene
