@@ -3,6 +3,7 @@
 #include "libphysica/Natural_Units.hpp"
 
 #include "Darphene/Configuration.hpp"
+#include "version.hpp"
 
 using namespace Darphene;
 using namespace libphysica::natural_units;
@@ -11,7 +12,7 @@ TEST(TestConfiguration, TestConstructorNREFT)
 {
 	// ARRANGE
 	// ACT
-	Configuration cfg(".test_config_NREFT.cfg");
+	Configuration cfg(TOP_LEVEL_DIR "tests/.test_config_NREFT.cfg");
 
 	// ASSERT
 	EXPECT_EQ(cfg.run_modus, "Custom");
@@ -27,7 +28,7 @@ TEST(TestConfiguration, TestConstructorAnapole)
 {
 	// ARRANGE
 	// ACT
-	Configuration cfg(".test_config_Anapole.cfg");
+	Configuration cfg(TOP_LEVEL_DIR "tests/.test_config_Anapole.cfg");
 
 	// ASSERT
 	EXPECT_EQ(cfg.run_modus, "Custom");
@@ -43,7 +44,7 @@ TEST(TestConfiguration, TestConstructorDarkPhoton)
 {
 	// ARRANGE
 	// ACT
-	Configuration cfg(".test_config_Dark_Photon.cfg");
+	Configuration cfg(TOP_LEVEL_DIR "tests/.test_config_Dark_Photon.cfg");
 
 	// ASSERT
 	EXPECT_EQ(cfg.run_modus, "Custom");
@@ -60,7 +61,7 @@ TEST(TestConfiguration, TestConstructorElectricDipole)
 {
 	// ARRANGE
 	// ACT
-	Configuration cfg(".test_config_Electric_Dipole.cfg");
+	Configuration cfg(TOP_LEVEL_DIR "tests/.test_config_Electric_Dipole.cfg");
 
 	// ASSERT
 	EXPECT_EQ(cfg.run_modus, "Custom");
@@ -76,7 +77,7 @@ TEST(TestConfiguration, TestConstructorMagneticDipole)
 {
 	// ARRANGE
 	// ACT
-	Configuration cfg(".test_config_Magnetic_Dipole.cfg");
+	Configuration cfg(TOP_LEVEL_DIR "tests/.test_config_Magnetic_Dipole.cfg");
 
 	// ASSERT
 	EXPECT_EQ(cfg.run_modus, "Custom");
