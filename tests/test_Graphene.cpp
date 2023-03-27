@@ -143,57 +143,57 @@ TEST(TestGraphene, TestBZ)
 	}
 }
 
-// TEST(TestGraphene, TestResponseFunctionNormalizationHydrogenic)
-// {
-// 	// ARRANGE
-// 	double tol = 0.01;
-// 	Graphene graphene("Hydrogenic");
-// 	std::function<double(double, double, double)> integrand = [&graphene](double l, double cos_theta, double phi) {
-// 		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-// 		double W			 = 0.0;
-// 		for(int band = 0; band < 4; band++)
-// 			W += graphene.Material_Response_Function(band, lVec);
-// 		return l * l * W;
-// 	};
-// 	double kMax = 50.0 * keV;
-// 	// ACT
-// 	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 10000);
-// 	// ASSERT
-// 	ASSERT_NEAR(norm, 4.0, tol);
-// }
+TEST(TestGraphene, TestResponseFunctionNormalizationHydrogenic)
+{
+	// ARRANGE
+	double tol = 0.01;
+	Graphene graphene("Hydrogenic");
+	std::function<double(double, double, double)> integrand = [&graphene](double l, double cos_theta, double phi) {
+		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+		double W			 = 0.0;
+		for(int band = 0; band < 4; band++)
+			W += graphene.Material_Response_Function(band, lVec);
+		return l * l * W;
+	};
+	double kMax = 50.0 * keV;
+	// ACT
+	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 10000);
+	// ASSERT
+	ASSERT_NEAR(norm, 4.0, tol);
+}
 
-// TEST(TestGraphene, TestResponseFunctionNormalizationHydrogenic2)
-// {
-// 	// ARRANGE
-// 	double tol = 0.01;
-// 	Graphene graphene("Hydrogenic");
-// 	std::function<double(double, double, double)> integrand = [&graphene](double l, double cos_theta, double phi) {
-// 		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-// 		double W			 = graphene.Material_Response_Function(lVec);
-// 		return l * l * W;
-// 	};
-// 	double kMax = 50.0 * keV;
-// 	// ACT
-// 	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 10000);
-// 	// ASSERT
-// 	ASSERT_NEAR(norm, 4.0, tol);
-// }
+TEST(TestGraphene, TestResponseFunctionNormalizationHydrogenic2)
+{
+	// ARRANGE
+	double tol = 0.01;
+	Graphene graphene("Hydrogenic");
+	std::function<double(double, double, double)> integrand = [&graphene](double l, double cos_theta, double phi) {
+		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+		double W			 = graphene.Material_Response_Function(lVec);
+		return l * l * W;
+	};
+	double kMax = 50.0 * keV;
+	// ACT
+	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 10000);
+	// ASSERT
+	ASSERT_NEAR(norm, 4.0, tol);
+}
 
-// TEST(TestGraphene, TestResponseFunctionNormalizationRHF)
-// {
-// 	// ARRANGE
-// 	double tol = 0.1;
-// 	Graphene graphene("RHF");
-// 	std::function<double(double, double, double)> integrand = [&graphene](double l, double cos_theta, double phi) {
-// 		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
-// 		double W			 = 0.0;
-// 		for(int band = 0; band < 4; band++)
-// 			W += graphene.Material_Response_Function(band, lVec);
-// 		return l * l * W;
-// 	};
-// 	double kMax = 50.0 * keV;
-// 	// ACT
-// 	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 10000);
-// 	// ASSERT
-// 	ASSERT_NEAR(norm, 4.0, tol);
-// }
+TEST(TestGraphene, TestResponseFunctionNormalizationRHF)
+{
+	// ARRANGE
+	double tol = 0.1;
+	Graphene graphene("RHF");
+	std::function<double(double, double, double)> integrand = [&graphene](double l, double cos_theta, double phi) {
+		Eigen::Vector3d lVec = Spherical_Coordinates(l, acos(cos_theta), phi);
+		double W			 = 0.0;
+		for(int band = 0; band < 4; band++)
+			W += graphene.Material_Response_Function(band, lVec);
+		return l * l * W;
+	};
+	double kMax = 50.0 * keV;
+	// ACT
+	double norm = libphysica::Integrate_3D(integrand, 0, kMax, -1.0, 1.0, 0.0, 2 * M_PI, "Vegas", 10000);
+	// ASSERT
+	ASSERT_NEAR(norm, 4.0, tol);
+}
