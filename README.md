@@ -4,7 +4,7 @@
 
 # Darphene - Modelling general dark matter - electron interactions in graphene targets
 
-[![DOI](https://zenodo.org/badge/xxx.svg)](https://zenodo.org/badge/latestdoi/xxx)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7774374.svg)](https://doi.org/10.5281/zenodo.7774374)
 [![arXiv](https://img.shields.io/badge/arXiv-2303.xxxxx-B31B1B.svg)](https://arxiv.org/abs/2303.xxxxx)
 
 
@@ -141,7 +141,7 @@ where *N* is the number of desired MPI processes.
 
 If you decide to use this code, please cite the latest archived version,
 
-> Emken, T., 2023, Darphene [Code, v0.1.0], [[DOI:10.5281/zenodo.xxxxxxx]](https://doi.org/10.5281/zenodo.xxxxxxx)
+> Emken, T., 2023, Darphene [Code, v0.1.0], [[DOI:10.5281/zenodo.7774374]](https://doi.org/10.5281/zenodo.7774374)
 
 <details><summary>BibTeX entry</summary>
 <p>
@@ -153,9 +153,9 @@ If you decide to use this code, please cite the latest archived version,
   year         = {2023},
   publisher    = {Zenodo},
   version      = {v0.1.0},
-  doi          = {DOI:10.5281/zenodo.xxxxxxx},
-  url          = {https://doi.org/10.5281/zenodo.xxxxxxx},
-  howpublished={The code can be found under \url{https://github.com/temken/Darphene}. Version 0.1.0 is archived as \href{https://doi.org/10.5281/zenodo.xxxxxxx}{DOI:10.5281/zenodo.xxxxxxx}}
+  doi          = {DOI:10.5281/zenodo.7774374},
+  url          = {https://doi.org/10.5281/zenodo.7774374},
+  howpublished={The code can be found under \url{https://github.com/temken/Darphene}. Version 0.1.0 is archived as \href{https://doi.org/10.5281/zenodo.7774375}{DOI:10.5281/zenodo.7774375}}
 }
 ```
 </p>
