@@ -3,10 +3,10 @@
 
 #include "obscura/Configuration.hpp"
 
-#include "graphene/DM_Particle_NREFT.hpp"
-#include "graphene/Graphene.hpp"
+#include "Darphene/DM_Particle_NREFT.hpp"
+#include "Darphene/Graphene.hpp"
 
-namespace graphene
+namespace Darphene
 {
 // 1. Configuration class for input file, which extends the obscura::Configuration class.
 
@@ -31,12 +31,15 @@ class Configuration : public obscura::Configuration
 	double graphene_work_function, time;
 	std::string run_modus, carbon_wavefunctions;
 	unsigned int MC_points, grid_points;
+	// For constraints
+	double exposure, constraints_certainty, constraints_mass_min, constraints_mass_max;
+	unsigned int constraints_masses;
 
 	explicit Configuration(std::string cfg_filename, int MPI_rank = 0);
 
 	void Print_Summary(int mpi_rank = 0) override;
 };
 
-}	// namespace graphene
+}	// namespace Darphene
 
 #endif

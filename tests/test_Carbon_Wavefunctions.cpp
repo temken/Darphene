@@ -7,10 +7,10 @@
 #include "libphysica/Linear_Algebra.hpp"
 #include "libphysica/Natural_Units.hpp"
 
-#include "graphene/Carbon_Wavefunctions.hpp"
+#include "Darphene/Carbon_Wavefunctions.hpp"
 
 using namespace libphysica::natural_units;
-using namespace graphene;
+using namespace Darphene;
 
 // 2. Hydrogenic wavefunctions
 TEST(TestHydrogenicWavefunctions, TestPositionWavefunctionValues)

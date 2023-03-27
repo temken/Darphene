@@ -77,10 +77,10 @@ jobs:
 
     # # TESTS
     # - name: Test installed executable
-    #   working-directory: ${{runner.workspace}}/graphene/bin
+    #   working-directory: ${{runner.workspace}}/Darphene/bin
     #   shell: bash
     #   # Execute the executable from the /bin/ directory.
-    #   run: ./graphene config.cfg
+    #   run: ./Darphene config.cfg
 
     - name: Unit tests
       working-directory: ${{runner.workspace}}/build

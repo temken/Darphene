@@ -1,16 +1,17 @@
-#include "graphene/Configuration.hpp"
+#include "Darphene/Configuration.hpp"
 
 #include <libconfig.h++>
 
 #include "libphysica/Natural_Units.hpp"
+#include "libphysica/Utilities.hpp"
 
 #include "obscura/DM_Halo_Models.hpp"
 
-#include "graphene/DM_Particle_NREFT.hpp"
-#include "graphene/Direct_Detection_Standard.hpp"
+#include "Darphene/DM_Particle_NREFT.hpp"
+#include "Darphene/Direct_Detection_Standard.hpp"
 #include "version.hpp"
 
-namespace graphene
+namespace Darphene
 {
 using namespace libconfig;
 using namespace libphysica::natural_units;
@@ -73,7 +74,7 @@ void Configuration::Construct_DM_Particle()
 		Configuration::Construct_DM_Particle_Anapole(DM_mass);
 	else
 	{
-		std::cerr << "Error in graphene::Configuration::Construct_DM_Particle(): 'DM_interaction' setting " << DM_interaction << " in configuration file not recognized." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in graphene::Configuration::Construct_DM_Particle(): 'DM_interaction' setting " << DM_interaction << " in configuration file not recognized." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT->Set_Spin(DM_spin);
@@ -92,7 +93,7 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in DaMaSCUS_SUN::Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_form_factor' setting in configuration file." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in DaMaSCUS_SUN::Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_form_factor' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	if(DM_form_factor == "General")
@@ -104,7 +105,7 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 		}
 		catch(const SettingNotFoundException& nfex)
 		{
-			std::cerr << "Error in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_mediator_mass' setting in configuration file." << std::endl;
+			std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_mediator_mass' setting in configuration file." << std::endl;
 			std::exit(EXIT_FAILURE);
 		}
 	}
@@ -116,7 +117,7 @@ void Configuration::Construct_DM_Particle_Dark_Photon(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_cross_section_electron' setting in configuration file." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Configuration::Construct_DM_Particle_Dark_Photon(): No 'DM_cross_section_electron' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Dark_Photon(mDM, DM_cross_section_electron, DM_form_factor, DM_mediator_mass));
@@ -147,7 +148,7 @@ void Configuration::Construct_DM_Particle_Electric_Dipole(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Electric_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Configuration::Construct_DM_Particle_Electric_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Electric_Dipole(mDM, DM_coupling));
@@ -162,7 +163,7 @@ void Configuration::Construct_DM_Particle_Magnetic_Dipole(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Magnetic_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Configuration::Construct_DM_Particle_Magnetic_Dipole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Magnetic_Dipole(mDM, DM_coupling));
@@ -177,7 +178,7 @@ void Configuration::Construct_DM_Particle_Anapole(double mDM)
 	}
 	catch(const SettingNotFoundException& nfex)
 	{
-		std::cerr << "Error in Configuration::Construct_DM_Particle_Anapole(): No 'DM_coupling' setting in configuration file." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in Configuration::Construct_DM_Particle_Anapole(): No 'DM_coupling' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	DM_NREFT = new DM_Particle_NREFT(DM_Anapole(mDM, DM_coupling));
@@ -246,6 +247,31 @@ void Configuration::Import_Graphene_Parameters()
 		std::cerr << "No 'time' setting in configuration file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+	// Exclusion limit parameters
+	try
+	{
+		exposure = config.lookup("exposure");
+		exposure *= gram * year;
+		constraints_certainty = config.lookup("constraints_certainty");
+	}
+	catch(const SettingNotFoundException& nfex)
+	{
+		std::cerr << "No 'exposure' or 'constraints_certainty' setting in configuration file." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+	try
+	{
+		constraints_mass_min = config.lookup("constraints_mass_min");
+		constraints_mass_min *= MeV;
+		constraints_mass_max = config.lookup("constraints_mass_max");
+		constraints_mass_max *= MeV;
+		constraints_masses = config.lookup("constraints_masses");
+	}
+	catch(const SettingNotFoundException& nfex)
+	{
+		std::cerr << "No 'constraints_mass_min', 'constraints_mass_max', or 'constraints_masses' setting in configuration file." << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 }
 
 Configuration::Configuration(std::string cfg_filename, int MPI_rank)
@@ -294,8 +320,15 @@ void Configuration::Print_Summary(int mpi_rank)
 				  << "\tWave functions:\t\t\t" << carbon_wavefunctions << std::endl
 				  << "\tGraphene work function [eV]:\t" << graphene_work_function / eV << std::endl
 				  << "\tTime of day [hr]:\t\t" << time / hr << std::endl;
+		if(run_modus == "Exclusion-Limit")
+			std::cout << "Exclusion limit options" << std::endl
+					  << "\tExposure [g*yr]:\t\t" << exposure / (gram * year) << std::endl
+					  << "\tConstraints certainty:\t\t" << constraints_certainty << std::endl
+					  << "\tConstraints mass min [MeV]:\t" << constraints_mass_min / MeV << std::endl
+					  << "\tConstraints mass max [MeV]:\t" << constraints_mass_max / MeV << std::endl
+					  << "\tConstraints masses:\t\t" << constraints_masses << std::endl;
 		std::cout << SEPARATOR << std::endl;
 	}
 }
 
-}	// namespace graphene
+}	// namespace Darphene

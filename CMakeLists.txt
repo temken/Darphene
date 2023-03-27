@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(graphene VERSION "0.1.0")
+project(Darphene VERSION "0.1.0")
 
 # Use C++-14
 set(CMAKE_CXX_STANDARD 14)
@@ -37,7 +37,7 @@ include(FetchContent)
 set(OBSCURA_DIR ${EXTERNAL_DIR}/obscura)
 FetchContent_Declare(obscura
   GIT_REPOSITORY https://github.com/temken/obscura.git
-  GIT_TAG origin/dev
+  GIT_TAG v1.0.3
   SOURCE_DIR "${OBSCURA_DIR}"
   CMAKE_ARGS "-DCMAKE_BUILD_TYPE=Release -DCODE_COVERAGE=OFF")
 FetchContent_GetProperties(obscura)
@@ -60,7 +60,7 @@ endif()
 set(GTEST_DIR ${EXTERNAL_DIR}/googletest)
 FetchContent_Declare(googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.10.0
+  GIT_TAG release-1.12.1
   SOURCE_DIR "${GTEST_DIR}/src"
   BINARY_DIR "${GTEST_DIR}/build"
   CONFIGURE_COMMAND ""

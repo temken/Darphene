@@ -10,7 +10,7 @@
 
 #include "Carbon_Wavefunctions.hpp"
 
-namespace graphene
+namespace Darphene
 {
 
 class Graphene
@@ -43,7 +43,7 @@ class Graphene
 	std::vector<Eigen::Vector3d> lattice_vectors, reciprocal_lattice_vectors, nearest_neighbors;
 	Eigen::Vector3d high_symmetry_point_G, high_symmetry_point_M, high_symmetry_point_K;
 
-	Graphene(const std::string& wavefunctions, double workfunction = 4.3 * libphysica::natural_units::eV);
+	Graphene(const std::string& wavefunctions = "RHF", double workfunction = 4.3 * libphysica::natural_units::eV);
 
 	double Overlap_Integral(const std::string& parameter);
 
@@ -51,6 +51,7 @@ class Graphene
 	std::vector<double> Energy_Dispersion_Pi_Analytic(const Eigen::Vector3d& kVec) const;
 	std::vector<double> Energy_Dispersion_Sigma(const Eigen::Vector3d& kVec) const;
 	double Valence_Band_Energies(const Eigen::Vector3d& kVec, unsigned int energy_band);
+	double Lowest_Binding_Energy(int band);
 
 	std::vector<std::vector<double>> Energy_Bands(unsigned int k_points);
 
@@ -58,7 +59,8 @@ class Graphene
 	Eigen::Vector3d Find_G_Vector(const Eigen::Vector3d& kVec);
 
 	double Material_Response_Function(int band, const Eigen::Vector3d& lVec);
+	double Material_Response_Function(const Eigen::Vector3d& lVec);
 };
-}	// namespace graphene
+}	// namespace Darphene
 
 #endif

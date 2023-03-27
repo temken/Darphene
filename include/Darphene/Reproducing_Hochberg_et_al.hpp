@@ -11,6 +11,10 @@
 
 #include "libphysica/Natural_Units.hpp"
 
+// This code contains the implementation of the analytical expressions for the graphene material response function
+// as presented in the paper "Directional detection of dark matter with two-dimensional targets" by Y. Hochberg et al.
+// Phys.Lett.B 772 (2017) 239-246, arXiv:1606.08849 [hep-ph].
+
 namespace Hochberg_et_al
 {
 

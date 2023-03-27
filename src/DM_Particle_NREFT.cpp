@@ -1,10 +1,10 @@
-#include "graphene/DM_Particle_NREFT.hpp"
+#include "Darphene/DM_Particle_NREFT.hpp"
 
 #include "libphysica/Natural_Units.hpp"
 #include "libphysica/Special_Functions.hpp"
 #include "libphysica/Utilities.hpp"
 
-namespace graphene
+namespace Darphene
 {
 
 using namespace libphysica::natural_units;
@@ -37,11 +37,11 @@ void DM_Form_Factor::Print_Summary(int rank) const
 	}
 }
 
-double DM_Form_Factor::operator()(double q)
+double DM_Form_Factor::operator()(double q) const
 {
-	if(form_factor_type == "Contact")
+	if(form_factor_type == "Contact" || form_factor_type == "C")
 		return 1.0;
-	else if(form_factor_type == "Long-Range")
+	else if(form_factor_type == "Long-Range" || form_factor_type == "L")
 		return qRef * qRef / q / q;
 	else if(form_factor_type == "General")
 		return (qRef * qRef + m_Mediator * m_Mediator) / (q * q + m_Mediator * m_Mediator);
@@ -49,7 +49,7 @@ double DM_Form_Factor::operator()(double q)
 		return std::pow(q / qRef, q_power);
 	else
 	{
-		std::cerr << "Error in DM_Form_Factor::operator(): Form factor " << form_factor_type << " not implemented." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in DM_Form_Factor::operator(): Form factor " << form_factor_type << " not implemented." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -78,7 +78,7 @@ void DM_Particle_NREFT::Set_Coupling(int index, double value, const std::string&
 {
 	if(index < 1 || index > 15 || index == 2)
 	{
-		std::cerr << "Error in DM_Particle_NREFT::Set_Coupling: Operator " << index << " is undefined." << std::endl;
+		std::cerr << libphysica::Formatted_String("Error", "Red", true) << " in DM_Particle_NREFT::Set_Coupling: Operator " << index << " is undefined." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 	couplings[index - 1]	   = value;
@@ -97,7 +97,20 @@ void DM_Particle_NREFT::Reset_All_Couplings()
 	DM_form_factors = std::vector<DM_Form_Factor>(15);
 }
 
-double DM_Particle_NREFT::Response_Function(const Eigen::Vector3d& qVec, const Eigen::Vector3d& velDM, const Eigen::Vector3d& kPrime)
+double DM_Particle_NREFT::Sigma_Electron() const
+{
+	double qRef = aEM * mElectron;
+	double vRef = 1.0e-3;
+	Eigen::Vector3d qVec({qRef / sqrt(3.0), qRef / sqrt(3.0), qRef / sqrt(3.0)});
+	Eigen::Vector3d vVec({vRef / sqrt(3.0), vRef / sqrt(3.0), vRef / sqrt(3.0)});
+	Eigen::Vector3d kPrime({0.0, 0.0, 0.0});
+	double Rfree = Response_Function(qVec, vVec, kPrime);
+	double mu	 = libphysica::Reduced_Mass(mass, mElectron);
+	double sigma = Rfree * mu * mu / 16.0 / M_PI / mass / mass / mElectron / mElectron;
+	return sigma;
+}
+
+double DM_Particle_NREFT::Response_Function(const Eigen::Vector3d& qVec, const Eigen::Vector3d& velDM, const Eigen::Vector3d& kPrime) const
 {
 	// Kinematic quantities
 	double q				  = qVec.norm();
@@ -195,4 +208,4 @@ DM_Particle_NREFT DM_Anapole(double mDM, double g_over_lambda_2)
 	return DM;
 }
 
-}	// namespace graphene
+}	// namespace Darphene
