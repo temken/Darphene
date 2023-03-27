@@ -2,7 +2,7 @@
 
 #include "libphysica/Natural_Units.hpp"
 
-#include "graphene/DM_Particle_NREFT.hpp"
+#include "Darphene/DM_Particle_NREFT.hpp"
 
 using namespace Darphene;
 using namespace libphysica::natural_units;

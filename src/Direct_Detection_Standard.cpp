@@ -1,4 +1,4 @@
-#include "graphene/Direct_Detection_Standard.hpp"
+#include "Darphene/Direct_Detection_Standard.hpp"
 
 #include <mpi.h>
 

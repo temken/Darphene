@@ -3,8 +3,8 @@
 
 #include "obscura/DM_Halo_Models.hpp"
 
-#include "graphene/DM_Particle_NREFT.hpp"
-#include "graphene/Graphene.hpp"
+#include "Darphene/DM_Particle_NREFT.hpp"
+#include "Darphene/Graphene.hpp"
 
 namespace Darphene
 {

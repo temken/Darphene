@@ -1,12 +1,12 @@
-#include "graphene/Graphene.hpp"
+#include "Darphene/Graphene.hpp"
 
 #include <algorithm>
 
 #include "libphysica/Integration.hpp"
 #include "libphysica/Utilities.hpp"
 
-#include "graphene/Carbon_Wavefunctions.hpp"
-#include "graphene/Direct_Detection_Standard.hpp"
+#include "Darphene/Carbon_Wavefunctions.hpp"
+#include "Darphene/Direct_Detection_Standard.hpp"
 
 namespace Darphene
 {

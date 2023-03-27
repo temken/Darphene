@@ -5,7 +5,7 @@
 #include "obscura/DM_Particle.hpp"
 #include "obscura/Direct_Detection.hpp"
 
-#include "graphene/Graphene.hpp"
+#include "Darphene/Graphene.hpp"
 
 namespace Darphene
 {

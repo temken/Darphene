@@ -2,7 +2,7 @@
 
 #include "libphysica/Natural_Units.hpp"
 
-#include "graphene/Direct_Detection_Standard.hpp"
+#include "Darphene/Direct_Detection_Standard.hpp"
 
 using namespace Darphene;
 using namespace libphysica::natural_units;

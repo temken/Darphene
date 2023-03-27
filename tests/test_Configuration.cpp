@@ -2,7 +2,7 @@
 
 #include "libphysica/Natural_Units.hpp"
 
-#include "graphene/Configuration.hpp"
+#include "Darphene/Configuration.hpp"
 
 using namespace Darphene;
 using namespace libphysica::natural_units;

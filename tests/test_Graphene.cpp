@@ -7,8 +7,8 @@
 #include "libphysica/Natural_Units.hpp"
 #include "libphysica/Statistics.hpp"
 
-#include "graphene/Direct_Detection_Standard.hpp"
-#include "graphene/Graphene.hpp"
+#include "Darphene/Direct_Detection_Standard.hpp"
+#include "Darphene/Graphene.hpp"
 
 using namespace Darphene;
 using namespace libphysica::natural_units;

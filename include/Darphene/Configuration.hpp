@@ -3,8 +3,8 @@
 
 #include "obscura/Configuration.hpp"
 
-#include "graphene/DM_Particle_NREFT.hpp"
-#include "graphene/Graphene.hpp"
+#include "Darphene/DM_Particle_NREFT.hpp"
+#include "Darphene/Graphene.hpp"
 
 namespace Darphene
 {

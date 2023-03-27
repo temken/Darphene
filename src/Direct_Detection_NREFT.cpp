@@ -1,4 +1,4 @@
-#include "graphene/Direct_Detection_NREFT.hpp"
+#include "Darphene/Direct_Detection_NREFT.hpp"
 
 #include <mpi.h>
 
@@ -10,7 +10,7 @@
 
 #include "obscura/DM_Halo_Models.hpp"
 
-#include "graphene/Direct_Detection_Standard.hpp"
+#include "Darphene/Direct_Detection_Standard.hpp"
 
 namespace Darphene
 {
@@ -120,7 +120,7 @@ double R_Total_NREFT(DM_Particle_NREFT& DM, obscura::DM_Distribution& DM_distr, 
 		return kf * kf * q * v * v / std::fabs(cos_alpha) * DM_distr.PDF_Velocity(vVec) * DM.Response_Function(qVec, vVec_eigen, k_FinalVec) * graphene.Material_Response_Function(band, lVec);
 	};
 	std::vector<double> region = {qMinGlobal, -1.0, 0.0, kfMinGlobal, cos_theta_kf_min, 0.0, -1.0, 0.0, qMaxGlobal, 1.0, 2.0 * M_PI, kfMaxGlobal, cos_theta_kf_max, 2.0 * M_PI, 1.0, 2.0 * M_PI};
-	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Monte-Carlo");
+	double result			   = prefactor * libphysica::Integrate_MC(integrand, region, MC_points, "Vegas");
 	return std::isnan(result) ? 0.0 : result;
 }
 
@@ -401,7 +401,7 @@ std::vector<std::vector<double>> Tabulate_dR_dlnE_NREFT(int points, DM_Particle_
 	{
 		for(int band = 0; band < 4; band++)
 			local_dRdE[band].push_back(dR_dlnE_NREFT(E_list[i], DM, DM_distr, graphene, band, MC_points));
-		libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1], mpi_rank, 86, MPI_Wtime() - t_start);
+		libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1], mpi_rank, 86, MPI_Wtime() - t_start, "Blue");
 	}
 
 	// MPI reductions
@@ -419,7 +419,7 @@ std::vector<std::vector<double>> Tabulate_dR_dlnE_NREFT(int points, DM_Particle_
 		for(int band = 0; band < 4; band++)
 			dRdE_total[i] += global_dRdE[band][i];
 	std::vector<std::vector<double>> dRdE = libphysica::Transpose_Lists(std::vector<std::vector<double>>({E_list, global_dRdE[0], global_dRdE[1], global_dRdE[2], global_dRdE[3], dRdE_total}));
-	libphysica::Print_Progress_Bar(1.0, mpi_rank, 86, MPI_Wtime() - t_start);
+	libphysica::Print_Progress_Bar(1.0, mpi_rank, 86, MPI_Wtime() - t_start, "Blue");
 	return dRdE;
 }
 
@@ -446,7 +446,7 @@ std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Part
 			local_output[0].push_back(cos_theta);
 			local_output[1].push_back(phi);
 			local_output[2].push_back(dR_dcos_dphi_NREFT(cos_theta, phi, DM, DM_distr, graphene, MC_points));
-			libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1] / points, mpi_rank, 86, MPI_Wtime() - t_start);
+			libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1] / points, mpi_rank, 86, MPI_Wtime() - t_start, "Blue");
 		}
 	}
 
@@ -461,7 +461,7 @@ std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_NREFT(int points, DM_Part
 	for(int i = 0; i < 3; i++)
 		MPI_Allgatherv(local_output[i].data(), local_output[i].size(), MPI_DOUBLE, global_output[i].data(), recvcounts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
 
-	libphysica::Print_Progress_Bar(1.0, mpi_rank, 86, MPI_Wtime() - t_start);
+	libphysica::Print_Progress_Bar(1.0, mpi_rank, 86, MPI_Wtime() - t_start, "Blue");
 	return libphysica::Transpose_Lists(global_output);
 }
 
@@ -490,7 +490,7 @@ std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_
 
 		double R = R_Total_NREFT(DM, DM_distr, graphene, MC_points);
 		local_rates.push_back(R);
-		libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1], mpi_rank, 86, MPI_Wtime() - t_start);
+		libphysica::Print_Progress_Bar(1.0 * counter++ / index_list[1], mpi_rank, 86, MPI_Wtime() - t_start, "Blue");
 	}
 
 	// Gather all rates from the MPI processes.
@@ -504,7 +504,7 @@ std::vector<std::vector<double>> Daily_Modulation_NREFT(int points, DM_Particle_
 
 	std::vector<std::vector<double>> daily_modulation_list = libphysica::Transpose_Lists(t_list, global_rates);
 
-	libphysica::Print_Progress_Bar(1.0, mpi_rank, 86, MPI_Wtime() - t_start);
+	libphysica::Print_Progress_Bar(1.0, mpi_rank, 86, MPI_Wtime() - t_start, "Blue");
 	return daily_modulation_list;
 }
 

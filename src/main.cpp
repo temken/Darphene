@@ -15,12 +15,12 @@
 #include "obscura/DM_Halo_Models.hpp"
 #include "obscura/DM_Particle_Standard.hpp"
 
-#include "graphene/Carbon_Wavefunctions.hpp"
-#include "graphene/Configuration.hpp"
-#include "graphene/DM_Particle_NREFT.hpp"
-#include "graphene/Direct_Detection_NREFT.hpp"
-#include "graphene/Direct_Detection_Standard.hpp"
-#include "graphene/Graphene.hpp"
+#include "Darphene/Carbon_Wavefunctions.hpp"
+#include "Darphene/Configuration.hpp"
+#include "Darphene/DM_Particle_NREFT.hpp"
+#include "Darphene/Direct_Detection_NREFT.hpp"
+#include "Darphene/Direct_Detection_Standard.hpp"
+#include "Darphene/Graphene.hpp"
 #include "version.hpp"
 
 using namespace libphysica::natural_units;
@@ -306,8 +306,11 @@ int main(int argc, char* argv[])
 		if(mpi_rank == 0)
 			std::cout << "\nCompute exclusion limit for standard SI interactions:" << std::endl;
 		DM_Detector_Graphene detector("Graphene-Detector", cfg.exposure, graphene);
-		auto DM_masses		 = libphysica::Log_Space(cfg.constraints_mass_min, cfg.constraints_mass_max, cfg.constraints_masses);
-		auto exclusion_limit = detector.Upper_Limit_Curve(*cfg.DM, *cfg.DM_distr, DM_masses, cfg.constraints_certainty);
+		auto DM_masses = libphysica::Log_Space(cfg.constraints_mass_min, cfg.constraints_mass_max, cfg.constraints_masses);
+		double mDM	   = cfg.DM->mass;
+		obscura::DM_Particle_SI DM_SI(mDM);
+		DM_SI.Set_Sigma_Electron(cfg.DM->Sigma_Electron());
+		auto exclusion_limit = detector.Upper_Limit_Curve(DM_SI, *cfg.DM_distr, DM_masses, cfg.constraints_certainty);
 		if(mpi_rank == 0)
 		{
 			std::string file_path = results_path + "Exclusion_Limit.txt";
