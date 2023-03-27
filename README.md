@@ -10,12 +10,16 @@
 
 <img width="500" src="https://user-images.githubusercontent.com/29034913/227547647-9d2825dd-9cfd-4fde-9573-04d6c885a99f.png">
 
-*Darphene* performs calculation to using the [tight-binding approximation](https://en.wikipedia.org/wiki/Tight_binding). Details on the physics can be found in [the corresponding publication](https://arxiv.org/abs/2303.XXXXX).
+*Darphene* calculates predicted signal rates for dark matter detection experiments using graphene as target material using the [tight-binding approximation](https://en.wikipedia.org/wiki/Tight_binding). Details on the physics can be found in [the corresponding publication](https://arxiv.org/abs/2303.XXXXX).
 
 <img width="250" src="https://user-images.githubusercontent.com/29034913/226607786-762d3a59-88d8-4927-bd16-eb2a577391d2.png">
 
 ## General notes
 
+- The material properties of the graphene target are modeled using the tight-binding approxmation, which uses atomic orbitals of carbon as a basis for the initial wavefunction of the electrons in graphene.
+- The final electron states are approximated as plane-waves.
+- *Darphene* is written in C++ and build using CMake.
+- Parts of the calculations, in particular tabulation of event rates, are parallelized using MPI.
 
 <details><summary>Repository content</summary>
 <p>
