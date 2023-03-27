@@ -65,7 +65,7 @@ double vMinimum_Graphene(double mDM, double q, double energy_crystal, double fin
 
 // 1. Rates and spectra for a single band
 // 1.1 Total rate per band
-double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
+double R_Total_Standard(const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -120,7 +120,7 @@ double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_d
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double R_Total_Standard_Simple(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
+double R_Total_Standard_Simple(const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -166,7 +166,7 @@ double R_Total_Standard_Simple(obscura::DM_Particle& DM, obscura::DM_Distributio
 }
 
 // 1.2 Differential rates per band
-double dR_dlnE_Standard(double Ee, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
+double dR_dlnE_Standard(double Ee, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -221,7 +221,7 @@ double dR_dlnE_Standard(double Ee, obscura::DM_Particle& DM, obscura::DM_Distrib
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double dR_dlnE_Standard_Simple(double Ee, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
+double dR_dlnE_Standard_Simple(double Ee, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -267,7 +267,7 @@ double dR_dlnE_Standard_Simple(double Ee, obscura::DM_Particle& DM, obscura::DM_
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double dR_dcos_Standard(double cos_theta, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
+double dR_dcos_Standard(double cos_theta, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -319,7 +319,7 @@ double dR_dcos_Standard(double cos_theta, obscura::DM_Particle& DM, obscura::DM_
 	return std::isnan(result) ? 0.0 : result;
 }
 
-double dR_dcos_dphi_Standard(double cos_theta, double phi, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
+double dR_dcos_dphi_Standard(double cos_theta, double phi, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, int band, unsigned int MC_points)
 {
 	// 1. Prefactor
 	double mDM		 = DM.mass;
@@ -371,7 +371,7 @@ double dR_dcos_dphi_Standard(double cos_theta, double phi, obscura::DM_Particle&
 
 // 2. Rates and spectra for all bands
 // 2.1 Total rate
-double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
+double R_Total_Standard(const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
 {
 	double rTot = 0.0;
 	for(int band = 0; band < 4; band++)
@@ -385,7 +385,7 @@ double R_Total_Standard(obscura::DM_Particle& DM, obscura::DM_Distribution& DM_d
 }
 
 // 2.2 Differential rates
-double dR_dlnE_Standard(double Ee, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
+double dR_dlnE_Standard(double Ee, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
 {
 	double dRdlnE = 0.0;
 	for(int band = 0; band < 4; band++)
@@ -398,7 +398,7 @@ double dR_dlnE_Standard(double Ee, obscura::DM_Particle& DM, obscura::DM_Distrib
 	return dRdlnE;
 }
 
-double dR_dcos_Standard(double cos_theta, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
+double dR_dcos_Standard(double cos_theta, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	double dR = 0.0;
 	for(int band = 0; band < 4; band++)
@@ -406,7 +406,7 @@ double dR_dcos_Standard(double cos_theta, obscura::DM_Particle& DM, obscura::DM_
 	return dR;
 }
 
-double dR_dcos_dphi_Standard(double cos_theta, double phi, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
+double dR_dcos_dphi_Standard(double cos_theta, double phi, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	double dR = 0.0;
 	for(int band = 0; band < 4; band++)
@@ -415,7 +415,7 @@ double dR_dcos_dphi_Standard(double cos_theta, double phi, obscura::DM_Particle&
 }
 
 // 3. Tabulation functions
-std::vector<std::vector<double>> Tabulate_dR_dlnE_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
+std::vector<std::vector<double>> Tabulate_dR_dlnE_Standard(int points, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, const std::string& velocity_integral, unsigned int MC_points)
 {
 	double E_min			   = 0.1 * eV;
 	double v_max			   = DM_distr.Maximum_DM_Speed();
@@ -438,7 +438,7 @@ std::vector<std::vector<double>> Tabulate_dR_dlnE_Standard(int points, obscura::
 	return spectrum;
 }
 
-std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
+std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int points, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	auto cos_k_list = libphysica::Linear_Space(-1.0, 1.0, points);
 	auto phi_k_list = libphysica::Linear_Space(0.0, 2.0 * M_PI, points);
@@ -451,7 +451,7 @@ std::vector<std::vector<double>> Tabulate_dR_dcos_dphi_Standard(int points, obsc
 	return spectrum;
 }
 
-std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
+std::vector<std::vector<double>> Daily_Modulation_Standard(int points, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr, Graphene& graphene, unsigned int MC_points)
 {
 	// Total rate over the course of a day
 	std::vector<double> t_list = libphysica::Linear_Space(0.0, 24.0, points);
@@ -464,6 +464,46 @@ std::vector<std::vector<double>> Daily_Modulation_Standard(int points, obscura::
 		daily_modulation_list.push_back({t, R});
 	}
 	return daily_modulation_list;
+}
+
+// 4. DM detector class
+
+DM_Detector_Graphene::DM_Detector_Graphene(std::string& label, double exposure)
+: obscura::DM_Detector(label, exposure, "Electrons")
+{
+}
+
+double DM_Detector_Graphene::Maximum_Energy_Deposit(obscura::DM_Particle& DM, const obscura::DM_Distribution& DM_distr) const
+{
+	double vMax = DM_distr.Maximum_DM_Speed();
+	return DM.mass * vMax * vMax / 2.0;
+}
+
+double DM_Detector_Graphene::Minimum_DM_Speed(obscura::DM_Particle& DM) const
+{
+	double threshold = graphene.work_function;
+	double vMin		 = sqrt(2.0 * threshold / DM.mass);
+	return vMin;
+}
+
+double DM_Detector_Graphene::Minimum_DM_Mass(obscura::DM_Particle& DM, const obscura::DM_Distribution& DM_distr) const
+{
+	double threshold = graphene.work_function;
+	double vMax		 = DM_distr.Maximum_DM_Speed();
+	double mMin		 = 2.0 * threshold / vMax / vMax;
+	return mMin;
+}
+
+double DM_Detector_Graphene::dRdE(double E, const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr)
+{
+	int MC_points = 10000;
+	return 1.0 / E * dR_dlnE_Standard(E, DM, DM_distr, graphene, "Full", MC_points);
+}
+
+double DM_Detector_Graphene::DM_Signals_Total(const obscura::DM_Particle& DM, obscura::DM_Distribution& DM_distr)
+{
+	int MC_points = 10000;
+	return R_Total_Standard(DM, DM_distr, graphene, "Full", MC_points);
 }
 
 }	// namespace Darphene
