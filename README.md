@@ -5,12 +5,12 @@
 # Darphene - Modelling general dark matter - electron interactions in graphene targets
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7774374.svg)](https://doi.org/10.5281/zenodo.7774374)
-[![arXiv](https://img.shields.io/badge/arXiv-2303.xxxxx-B31B1B.svg)](https://arxiv.org/abs/2303.xxxxx)
+[![arXiv](https://img.shields.io/badge/arXiv-2303.15497-B31B1B.svg)](https://arxiv.org/abs/2303.15497)
 
 
 <img width="500" src="https://user-images.githubusercontent.com/29034913/227547647-9d2825dd-9cfd-4fde-9573-04d6c885a99f.png">
 
-*Darphene* calculates predicted signal rates for dark matter detection experiments using graphene as target material using the [tight-binding approximation](https://en.wikipedia.org/wiki/Tight_binding). Details on the physics can be found in [the corresponding publication](https://arxiv.org/abs/2303.XXXXX).
+*Darphene* calculates predicted signal rates for dark matter detection experiments using graphene as target material using the [tight-binding approximation](https://en.wikipedia.org/wiki/Tight_binding). Details on the physics can be found in the corresponding [publication](https://arxiv.org/abs/2303.15497).
 
 <img width="250" src="https://user-images.githubusercontent.com/29034913/226607786-762d3a59-88d8-4927-bd16-eb2a577391d2.png">
 
@@ -163,7 +163,7 @@ If you decide to use this code, please cite the latest archived version,
 
 As well as the original publication,
 
-> R. Catena, T. Emken, M. Matas, N.A. Spaldin, E. Urdshals , 2023,  **Direct searches for general dark matter-electron interactions with graphene detectors: Part I. Electronic structure calculations**, [[arXiv:2303.xxxxx]](https://arxiv.org/abs/2303.xxxxx).
+> R. Catena, T. Emken, M. Matas, N.A. Spaldin, E. Urdshals , 2023,  **Direct searches for general dark matter-electron interactions with graphene detectors: Part I. Electronic structure calculations**, [[arXiv:2303.15497]](https://arxiv.org/abs/2303.15497).
 
 </p>
 </details>
